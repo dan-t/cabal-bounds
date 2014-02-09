@@ -13,8 +13,8 @@ import Paths_cabal_bounds (version)
 #endif
 
 data Args = Drop { upper           :: Bool
+                 , library         :: Bool
                  , executable      :: [String]
-                 , library         :: [String]
                  , testSuite       :: [String]
                  , benchmark       :: [String]
                  , outputCabalFile :: String
@@ -22,8 +22,8 @@ data Args = Drop { upper           :: Bool
                  }
           | Update { lower           :: Bool
                    , upper           :: Bool
+                   , library         :: Bool
                    , executable      :: [String]
-                   , library         :: [String]
                    , testSuite       :: [String]
                    , benchmark       :: [String]
                    , outputCabalFile :: String
@@ -56,8 +56,8 @@ versionInfo =
 dropArgs :: Args
 dropArgs = Drop
    { upper           = def &= help "Only the upper bound is dropped, otherwise both - the lower and upper - bounds are dropped."
-   , executable      = def &= help "Only the dependencies of the executable are dropped."
    , library         = def &= help "Only the dependencies of the library are dropped."
+   , executable      = def &= help "Only the dependencies of the executable are dropped."
    , testSuite       = def &= help "Only the dependencies of the test suite are dropped."
    , benchmark       = def &= help "Only the dependencies of the benchmark are dropped."
    , outputCabalFile = def &= help "Save modified cabal file to file, if empty, the cabal file is modified inplace."
@@ -69,8 +69,8 @@ updateArgs :: Args
 updateArgs = Update
    { lower           = def &= help "Only the lower bound is updated."
    , upper           = def &= help "Only the upper bound is updated." 
-   , executable      = def &= help "Only the dependencies of the executable are updated."
    , library         = def &= help "Only the dependencies of the library are updated."
+   , executable      = def &= help "Only the dependencies of the executable are updated."
    , testSuite       = def &= help "Only the dependencies of the test suite are updated."
    , benchmark       = def &= help "Only the dependencies of the benchmark are updated."
    , outputCabalFile = def &= help "Save modified cabal file to file, if empty, the cabal file is modified inplace."
