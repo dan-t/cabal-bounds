@@ -17,6 +17,16 @@ dropTests :: TestTree
 dropTests = testGroup "Drop Tests"
    [ dropTest "DropBothOfAll" False False [] [] []
    , dropTest "DropUpperOfAll" True False [] [] []
+   , dropTest "DropBothOfLib" False True [] [] []
+   , dropTest "DropUpperOfLib" True True [] [] []
+   , dropTest "DropBothOfExe" False False ["cabal-bounds"] [] []
+   , dropTest "DropUpperOfExe" True False ["cabal-bounds"] [] []
+   , dropTest "DropBothOfOtherExe" False False ["other-exe"] [] []
+   , dropTest "DropUpperOfOtherExe" True False ["other-exe"] [] []
+   , dropTest "DropBothOfAllExes" False False ["cabal-bounds", "other-exe"] [] []
+   , dropTest "DropUpperOfAllExes" True False ["cabal-bounds", "other-exe"] [] []
+   , dropTest "DropBothOfTest" False False [] ["some-test"] []
+   , dropTest "DropUpperOfTest" True False [] ["some-test"] []
    ]
 
 updateTests :: TestTree

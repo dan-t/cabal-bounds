@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+for input in `ls inputFiles` ; do
+   gvimdiff -f inputFiles/$input goldenFiles/$input
+done
