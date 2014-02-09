@@ -55,11 +55,11 @@ versionInfo =
 
 dropArgs :: Args
 dropArgs = Drop
-   { upper           = def &= help "Only the upper bound is dropped, otherwise both - the lower and upper - bounds are dropped."
-   , library         = def &= help "Only the dependencies of the library are dropped."
-   , executable      = def &= help "Only the dependencies of the executable are dropped."
-   , testSuite       = def &= help "Only the dependencies of the test suite are dropped."
-   , benchmark       = def &= help "Only the dependencies of the benchmark are dropped."
+   { upper           = def &= explicit &= name "upper" &= name "U" &= help "Only the upper bound is dropped, otherwise both - the lower and upper - bounds are dropped."
+   , library         = def &= explicit &= name "library" &= name "l" &= help "Only the bounds of the library are dropped."
+   , executable      = def &= help "Only the bounds of the executable are dropped."
+   , testSuite       = def &= help "Only the bounds of the test suite are dropped."
+   , benchmark       = def &= help "Only the bounds of the benchmark are dropped."
    , outputCabalFile = def &= help "Save modified cabal file to file, if empty, the cabal file is modified inplace."
    , cabalFile       = def &= argPos 0 &= typ "CABAL-FILE"
    }
@@ -67,12 +67,12 @@ dropArgs = Drop
 
 updateArgs :: Args
 updateArgs = Update
-   { lower           = def &= help "Only the lower bound is updated."
-   , upper           = def &= help "Only the upper bound is updated." 
-   , library         = def &= help "Only the dependencies of the library are updated."
-   , executable      = def &= help "Only the dependencies of the executable are updated."
-   , testSuite       = def &= help "Only the dependencies of the test suite are updated."
-   , benchmark       = def &= help "Only the dependencies of the benchmark are updated."
+   { lower           = def &= explicit &= name "lower" &= name "L" &= help "Only the lower bound is updated."
+   , upper           = def &= explicit &= name "upper" &= name "U" &= help "Only the upper bound is updated."
+   , library         = def &= explicit &= name "library" &= name "l" &= help "Only the bounds of the library are updated."
+   , executable      = def &= help "Only the bounds of the executable are updated."
+   , testSuite       = def &= help "Only the bounds of the test suite are updated."
+   , benchmark       = def &= help "Only the bounds of the benchmark are updated."
    , outputCabalFile = def &= help "Save modified cabal file to file, if empty, the cabal file is modified inplace."
    , cabalFile       = def &= argPos 0 &= typ "CABAL-FILE"
    , setupConfigFile = def &= argPos 1 &= typ "SETUP-CONFIG-FILE"
