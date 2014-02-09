@@ -29,6 +29,35 @@ Executable cabal-bounds
   Build-Depends: base >= 3 && < 5,
                  cmdargs >= 0.10.5 && < 0.11,
                  lens,
-                 pretty-show,
                  strict,
                  Cabal
+
+library
+  hs-source-dirs: src
+  ghc-options:   -W
+  cpp-options:   -DCABAL
+  exposed-modules: CabalBounds.Args
+                   CabalBounds.Main
+  other-modules:  Paths_cabal_bounds
+                  CabalBounds.Command
+                  CabalBounds.Execute
+                  CabalBounds.Lenses
+  Build-Depends: base >= 3 && < 5,
+                 cmdargs >= 0.10.5 && < 0.11,
+                 lens,
+                 strict,
+                 Cabal
+
+test-suite cabal-bounds-tests
+  Main-is:        tests/Main.hs
+  ghc-options:    -W
+  type:           exitcode-stdio-1.0
+  Build-Depends:  base >= 3 && < 5,
+                  cmdargs >= 0.10.5 && < 0.11,
+                  lens,
+                  strict,
+                  Cabal,
+                  tasty,
+                  tasty-golden,
+                  filepath,
+                  cabal-bounds
