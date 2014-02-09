@@ -17,11 +17,12 @@ source-repository head
 Executable cabal-bounds
   hs-source-dirs: src
   Main-is:        Main.hs
-  other-modules:  Paths_cabal_bounds,
+  other-modules:  Paths_cabal_bounds
                   CabalBounds.Args
                   CabalBounds.Command
                   CabalBounds.Execute
                   CabalBounds.Lenses
+                  CabalBounds.Main
 
   ghc-options:   -W
   cpp-options:   -DCABAL
