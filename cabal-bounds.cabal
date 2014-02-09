@@ -1,0 +1,32 @@
+Name:          cabal-bounds
+Version:       0.1
+License:       BSD3
+License-file:  LICENSE
+Author:        Daniel Trstenjak
+Maintainer:    daniel.trstenjak@gmail.com
+Build-Type:    Simple
+Category:      Utils
+Cabal-Version: >=1.9.2
+Synopsis:      A command line program for managing the bounds/versions of the dependencies in a cabal file.
+Description:   A command line program for managing the bounds/versions of the dependencies in a cabal file.
+
+source-repository head
+  type:     git
+  location: https://github.com/dan-t/cabal-bounds
+
+Executable cabal-bounds
+  hs-source-dirs: src
+  Main-is:        Main.hs
+  other-modules:  Paths_cabal_bounds,
+                  CabalBounds.Args
+                  CabalBounds.Command
+                  CabalBounds.Execute
+                  CabalBounds.Lenses
+
+  ghc-options:   -W
+  cpp-options:   -DCABAL
+  Build-Depends: base >= 3 && < 5,
+                 cmdargs >= 0.10.5 && < 0.11,
+                 lens,
+                 pretty-show,
+                 Cabal
