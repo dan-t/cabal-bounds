@@ -1,10 +1,9 @@
-{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TemplateHaskell, Rank2Types #-}
 
 module CabalBounds.Lenses where
 
 import Distribution.PackageDescription
 import Distribution.Package
-import Distribution.Version
 import Control.Lens
 
 makeLensesFor [ ("condLibrary"    , "condLibraryL")
@@ -28,11 +27,20 @@ makeLensesFor [ ("benchmarkName", "benchmarkNameL")
 libDependencies :: Traversal' GenericPackageDescription [Dependency]
 libDependencies = condLibraryL . _Just . condTreeConstraintsL
 
-exeDependencies :: Traversal' GenericPackageDescription [Dependency]
-exeDependencies = condExecutablesL . traversed . _2 . condTreeConstraintsL
+dependenciesOfAllExes :: Traversal' GenericPackageDescription [Dependency]
+dependenciesOfAllExes = condExecutablesL . traversed . _2 . condTreeConstraintsL
 
-testDependencies :: Traversal' GenericPackageDescription [Dependency]
-testDependencies = condTestSuitesL . traversed . _2 . condTreeConstraintsL
+dependenciesOfExe :: String -> Traversal' GenericPackageDescription [Dependency]
+dependenciesOfExe exe = condExecutablesL . traversed . filtered ((== exe) . fst) . _2 . condTreeConstraintsL
 
-benchmDependencies :: Traversal' GenericPackageDescription [Dependency]
-benchmDependencies = condBenchmarksL . traversed . _2 . condTreeConstraintsL
+dependenciesOfAllTests :: Traversal' GenericPackageDescription [Dependency]
+dependenciesOfAllTests = condTestSuitesL . traversed . _2 . condTreeConstraintsL
+
+dependenciesOfTest :: String -> Traversal' GenericPackageDescription [Dependency]
+dependenciesOfTest test = condTestSuitesL . traversed . filtered ((== test) . fst) . _2 . condTreeConstraintsL
+
+dependenciesOfAllBenchms :: Traversal' GenericPackageDescription [Dependency]
+dependenciesOfAllBenchms = condBenchmarksL . traversed . _2 . condTreeConstraintsL
+
+dependenciesOfBenchm :: String -> Traversal' GenericPackageDescription [Dependency]
+dependenciesOfBenchm benchm = condBenchmarksL . traversed . filtered ((== benchm) . fst) . _2 . condTreeConstraintsL
