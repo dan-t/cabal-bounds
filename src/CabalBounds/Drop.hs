@@ -10,27 +10,27 @@ import qualified Distribution.Package as C
 import qualified Distribution.Version as C
 import Control.Lens
 import CabalBounds.Bound (Bound(..))
-import CabalBounds.Targets (Targets(..), Target(..), dependenciesOf)
+import CabalBounds.Targets (Targets(..), dependenciesOf)
 import CabalBounds.Lenses
 import Data.List (foldl')
 
 
 drop :: Bound -> Targets -> C.GenericPackageDescription -> C.GenericPackageDescription
 drop bound AllTargets pkgDescrp =
-   pkgDescrp & dependenciesOfLib        %~ map (dropBound bound)
-             & dependenciesOfAllExes    %~ map (dropBound bound)
-             & dependenciesOfAllTests   %~ map (dropBound bound)
-             & dependenciesOfAllBenchms %~ map (dropBound bound)
+   pkgDescrp & dependenciesOfLib        %~ map (dropFromDependency bound)
+             & dependenciesOfAllExes    %~ map (dropFromDependency bound)
+             & dependenciesOfAllTests   %~ map (dropFromDependency bound)
+             & dependenciesOfAllBenchms %~ map (dropFromDependency bound)
 
 drop bound (Targets targets) pkgDescrp =
    foldl' dropFromTarget pkgDescrp targets
    where
       dropFromTarget pkgDescrp target =
-         pkgDescrp & (dependenciesOf target) %~ map (dropBound bound)
+         pkgDescrp & (dependenciesOf target) %~ map (dropFromDependency bound)
 
 
-dropBound :: Bound -> C.Dependency -> C.Dependency
-dropBound UpperBound (C.Dependency pkgName versionRange) = C.Dependency pkgName versionRange'
+dropFromDependency :: Bound -> C.Dependency -> C.Dependency
+dropFromDependency UpperBound (C.Dependency pkgName versionRange) = C.Dependency pkgName versionRange'
    where
       versionRange'
          | Just vi <- C.mkVersionIntervals intervals' 
@@ -41,4 +41,4 @@ dropBound UpperBound (C.Dependency pkgName versionRange) = C.Dependency pkgName 
 
       intervals' = map (& _2 .~ C.NoUpperBound) (C.asVersionIntervals versionRange)
 
-dropBound _ (C.Dependency pkgName _) = C.Dependency pkgName C.anyVersion
+dropFromDependency _ (C.Dependency pkgName _) = C.Dependency pkgName C.anyVersion
