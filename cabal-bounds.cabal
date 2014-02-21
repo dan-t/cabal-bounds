@@ -19,8 +19,10 @@ Executable cabal-bounds
   Main-is:        Main.hs
   other-modules:  Paths_cabal_bounds
                   CabalBounds.Args
-                  CabalBounds.Command
-                  CabalBounds.Execute
+                  CabalBounds.Bound
+                  CabalBounds.Targets
+                  CabalBounds.Drop
+                  CabalBounds.Update
                   CabalBounds.Lenses
                   CabalBounds.Main
 
@@ -39,8 +41,10 @@ library
   exposed-modules: CabalBounds.Args
                    CabalBounds.Main
   other-modules:  Paths_cabal_bounds
-                  CabalBounds.Command
-                  CabalBounds.Execute
+                  CabalBounds.Bound
+                  CabalBounds.Targets
+                  CabalBounds.Drop
+                  CabalBounds.Update
                   CabalBounds.Lenses
   Build-Depends: base >= 3 && < 5,
                  cmdargs >= 0.10.5 && < 0.11,

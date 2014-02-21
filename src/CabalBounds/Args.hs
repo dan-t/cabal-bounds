@@ -3,6 +3,7 @@
 module CabalBounds.Args
    ( Args(..)
    , get
+   , outputFile
    ) where
 
 import System.Console.CmdArgs
@@ -44,13 +45,10 @@ get = cmdArgsRun . cmdArgsMode $ modes [dropArgs, updateArgs]
       summaryInfo = ""
 
 
-versionInfo :: String
-versionInfo =
-#ifdef CABAL
-   "cabal-bounds version " ++ showVersion version
-#else
-   "cabal-bounds version unknown (not built with cabal)"
-#endif
+outputFile :: Args -> FilePath
+outputFile args
+   | null $ outputCabalFile args = cabalFile args
+   | otherwise                   = outputCabalFile args
 
 
 dropArgs :: Args
@@ -77,3 +75,14 @@ updateArgs = Update
    , cabalFile       = def &= argPos 0 &= typ "CABAL-FILE"
    , setupConfigFile = def &= argPos 1 &= typ "SETUP-CONFIG-FILE"
    }
+
+
+versionInfo :: String
+versionInfo =
+#ifdef CABAL
+   "cabal-bounds version " ++ showVersion version
+#else
+   "cabal-bounds version unknown (not built with cabal)"
+#endif
+
+
