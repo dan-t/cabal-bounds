@@ -1,4 +1,4 @@
-{-# LANGUAGE PatternGuards #-}
+{-# LANGUAGE PatternGuards, Rank2Types #-}
 
 module CabalBounds.Execute
    ( execute
@@ -15,7 +15,7 @@ import Data.List (foldl')
 
 execute :: Cmd.Command -> GenericPackageDescription -> GenericPackageDescription
 execute (Cmd.Drop bound Cmd.AllTargets) pkgDescrp =
-   pkgDescrp & libDependencies          %~ map (dropBound bound)
+   pkgDescrp & dependenciesOfLib        %~ map (dropBound bound)
              & dependenciesOfAllExes    %~ map (dropBound bound)
              & dependenciesOfAllTests   %~ map (dropBound bound)
              & dependenciesOfAllBenchms %~ map (dropBound bound)
@@ -23,17 +23,8 @@ execute (Cmd.Drop bound Cmd.AllTargets) pkgDescrp =
 execute (Cmd.Drop bound (Cmd.Targets targets)) pkgDescrp =
    foldl' dropFromTarget pkgDescrp targets
    where
-      dropFromTarget pkgDescrp Cmd.Library =
-         pkgDescrp & libDependencies %~ map (dropBound bound)
-
-      dropFromTarget pkgDescrp (Cmd.Executable exe) =
-         pkgDescrp & dependenciesOfExe exe %~ map (dropBound bound)
-
-      dropFromTarget pkgDescrp (Cmd.TestSuite test) =
-         pkgDescrp & dependenciesOfTest test %~ map (dropBound bound)
-
-      dropFromTarget pkgDescrp (Cmd.Benchmark benchm) =
-         pkgDescrp & dependenciesOfBenchm benchm %~ map (dropBound bound)
+      dropFromTarget pkgDescrp target =
+         pkgDescrp & (dependenciesOf target) %~ map (dropBound bound)
 
 
 dropBound :: Cmd.Bound -> Dependency -> Dependency
@@ -46,6 +37,13 @@ dropBound Cmd.UpperBound (Dependency pkgName versionRange) = Dependency pkgName 
          | otherwise
          = versionRange
 
-      intervals' = map (\(lower, _) -> (lower, NoUpperBound)) (asVersionIntervals versionRange)
+      intervals' = map (& _2 .~ NoUpperBound) (asVersionIntervals versionRange)
 
 dropBound _ (Dependency pkgName _) = Dependency pkgName anyVersion
+
+
+dependenciesOf :: Cmd.Target -> Traversal' GenericPackageDescription [Dependency]
+dependenciesOf Cmd.Library            = dependenciesOfLib
+dependenciesOf (Cmd.Executable exe)   = dependenciesOfExe exe
+dependenciesOf (Cmd.TestSuite test)   = dependenciesOfTest test
+dependenciesOf (Cmd.Benchmark benchm) = dependenciesOfBenchm benchm

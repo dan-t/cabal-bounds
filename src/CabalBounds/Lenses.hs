@@ -24,8 +24,8 @@ makeLensesFor [ ("testName", "testNameL")
 makeLensesFor [ ("benchmarkName", "benchmarkNameL")
               ] ''Benchmark
  
-libDependencies :: Traversal' GenericPackageDescription [Dependency]
-libDependencies = condLibraryL . _Just . condTreeConstraintsL
+dependenciesOfLib :: Traversal' GenericPackageDescription [Dependency]
+dependenciesOfLib = condLibraryL . _Just . condTreeConstraintsL
 
 dependenciesOfAllExes :: Traversal' GenericPackageDescription [Dependency]
 dependenciesOfAllExes = condExecutablesL . traversed . _2 . condTreeConstraintsL
