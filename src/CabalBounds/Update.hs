@@ -47,7 +47,8 @@ updateDependency LowerBound instPkgs dep@(C.Dependency pkgName _)
    = dep
 
 updateDependency UpperBound instPkgs dep@(C.Dependency pkgName versionRange)
-   | Just (_, upperVersion)             <- find ((== pkgName) . fst) instPkgs
+   | not . C.isAnyVersion $ versionRange
+   , Just (_, upperVersion)             <- find ((== pkgName) . fst) instPkgs
    , (C.LowerBound lowerVersion _, _):_ <- C.asVersionIntervals versionRange
    , Just intervals                     <- versionIntervals lowerVersion (Just $ nextMajorVersion upperVersion)
    = C.Dependency pkgName (C.fromVersionIntervals intervals)
