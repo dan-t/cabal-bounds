@@ -1,3 +1,4 @@
+{-# Language StandaloneDeriving #-}
 
 module CabalBounds.Main
    ( cabalBounds
@@ -6,7 +7,7 @@ module CabalBounds.Main
 import Distribution.PackageDescription (GenericPackageDescription)
 import Distribution.PackageDescription.Parse (parsePackageDescription, ParseResult(..))
 import Distribution.PackageDescription.PrettyPrint (showGenericPackageDescription)
-import Distribution.Simple.Configure (tryGetPersistBuildConfig)
+import Distribution.Simple.Configure (ConfigStateFileErrorType(..), tryGetConfigStateFile)
 import Distribution.Simple.LocalBuildInfo (LocalBuildInfo)
 import qualified CabalBounds.Args as A
 import qualified CabalBounds.Bound as B
@@ -15,7 +16,6 @@ import qualified CabalBounds.Drop as D
 import qualified CabalBounds.Update as U
 import qualified System.IO.Strict as SIO
 import Control.Applicative ((<$>))
-import Control.Lens
 
 type Error = String
 
@@ -51,4 +51,6 @@ packageDescription file = do
 
 localBuildInfo :: FilePath -> IO (Either Error LocalBuildInfo)
 localBuildInfo file =
-   either (Left . (^. _1)) Right <$> tryGetPersistBuildConfig file
+   either (Left . show) Right <$> tryGetConfigStateFile file
+
+deriving instance Show ConfigStateFileErrorType
