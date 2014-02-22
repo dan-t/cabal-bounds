@@ -6,13 +6,16 @@ module CabalBounds.Main
 import Distribution.PackageDescription (GenericPackageDescription)
 import Distribution.PackageDescription.Parse (parsePackageDescription, ParseResult(..))
 import Distribution.PackageDescription.PrettyPrint (showGenericPackageDescription)
-import Distribution.Simple.Configure (tryGetConfigStateFile)
+import Distribution.Simple.Configure (tryGetPersistBuildConfig)
+import Distribution.Simple.LocalBuildInfo (LocalBuildInfo)
 import qualified CabalBounds.Args as A
 import qualified CabalBounds.Bound as B
 import qualified CabalBounds.Targets as T
 import qualified CabalBounds.Drop as D
 import qualified CabalBounds.Update as U
 import qualified System.IO.Strict as SIO
+import Control.Applicative ((<$>))
+import Control.Lens
 
 type Error = String
 
@@ -28,7 +31,7 @@ cabalBounds args@A.Drop {} = do
 
 cabalBounds args@A.Update {} = do
    pkgDescrp <- packageDescription $ A.cabalFile args
-   buildInfo <- tryGetConfigStateFile $ A.setupConfigFile args
+   buildInfo <- localBuildInfo $ A.setupConfigFile args
    case (pkgDescrp, buildInfo) of
         (Left error, _) -> return . Just $ error
         (_, Left error) -> return . Just $ error
@@ -44,3 +47,8 @@ packageDescription file = do
    case parsePackageDescription contents of
         ParseFailed error   -> return . Left  $ show error
         ParseOk _ pkgDescrp -> return . Right $ pkgDescrp
+
+
+localBuildInfo :: FilePath -> IO (Either Error LocalBuildInfo)
+localBuildInfo file =
+   either (Left . (^. _1)) Right <$> tryGetPersistBuildConfig file
