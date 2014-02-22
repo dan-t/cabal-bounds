@@ -30,7 +30,7 @@ dependencies args
 
 filterDependencies :: Dependencies -> Traversal' [C.Dependency] C.Dependency
 filterDependencies AllDependencies =
-   traversed . filtered (const True)
+   traversed
 
 filterDependencies (OnlyDependencies deps) =
    traversed . filtered (\(C.Dependency (C.PackageName pkgName) _) -> any (== pkgName) deps) 

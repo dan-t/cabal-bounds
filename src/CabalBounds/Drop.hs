@@ -31,7 +31,7 @@ drop bound (Targets targets) deps pkgDescrp =
    foldl' dropFromTarget pkgDescrp targets
    where
       dropFromTarget pkgDescrp target =
-         pkgDescrp & (dependenciesOf target). filterDeps %~ dropFromDep
+         pkgDescrp & (dependenciesOf target) . filterDeps %~ dropFromDep
 
       filterDeps  = filterDependencies deps
       dropFromDep = dropFromDependency bound
