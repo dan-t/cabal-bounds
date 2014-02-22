@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-for input in `ls inputFiles` ; do
-   gvimdiff -f inputFiles/$input goldenFiles/$input
+for golden in `ls goldenFiles` ; do
+   gvimdiff -f inputFiles/original.cabal goldenFiles/$golden
 done
