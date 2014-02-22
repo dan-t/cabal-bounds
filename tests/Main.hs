@@ -5,7 +5,7 @@ import Test.Tasty
 import Test.Tasty.Golden
 import System.FilePath
 import System.IO (hPutStrLn, stderr)
-import qualified CabalBounds.Args as Args
+import CabalBounds.Args
 import CabalBounds.Main (cabalBounds)
 
 main = defaultMain tests
@@ -15,97 +15,67 @@ tests = testGroup "Tests" [dropTests, updateTests]
 
 dropTests :: TestTree
 dropTests = testGroup "Drop Tests"
-   [ dropTest "DropBothOfAll" False False [] [] []
-   , dropTest "DropUpperOfAll" True False [] [] []
-   , dropTest "DropBothOfLib" False True [] [] []
-   , dropTest "DropUpperOfLib" True True [] [] []
-   , dropTest "DropBothOfExe" False False ["cabal-bounds"] [] []
-   , dropTest "DropUpperOfExe" True False ["cabal-bounds"] [] []
-   , dropTest "DropBothOfOtherExe" False False ["other-exe"] [] []
-   , dropTest "DropUpperOfOtherExe" True False ["other-exe"] [] []
-   , dropTest "DropBothOfAllExes" False False ["cabal-bounds", "other-exe"] [] []
-   , dropTest "DropUpperOfAllExes" True False ["cabal-bounds", "other-exe"] [] []
-   , dropTest "DropBothOfTest" False False [] ["some-test"] []
-   , dropTest "DropUpperOfTest" True False [] ["some-test"] []
+   [ test "DropBothOfAll" defaultDrop
+   , test "DropUpperOfAll" $ defaultDrop { upper = True }
+   , test "DropBothOfLib" $ defaultDrop { library = True }
+   , test "DropUpperOfLib" $ defaultDrop { upper = True, library = True }
+   , test "DropBothOfExe" $ defaultDrop { executable = ["cabal-bounds"] }
+   , test "DropUpperOfExe" $ defaultDrop { upper = True, executable = ["cabal-bounds"] }
+   , test "DropBothOfOtherExe" $ defaultDrop { executable = ["other-exe"] }
+   , test "DropUpperOfOtherExe" $ defaultDrop { upper = True, executable = ["other-exe"] }
+   , test "DropBothOfAllExes" $ defaultDrop { executable = ["cabal-bounds", "other-exe"] }
+   , test "DropUpperOfAllExes" $ defaultDrop { upper = True, executable = ["cabal-bounds", "other-exe"] }
+   , test "DropBothOfTest" $ defaultDrop { testSuite = ["some-test"] }
+   , test "DropUpperOfTest" $ defaultDrop { upper = True, testSuite = ["some-test"] }
    ]
 
 
 updateTests :: TestTree
 updateTests = testGroup "Update Tests"
-   [ updateTest "UpdateBothOfAll" False False False [] [] []
-   , updateTest "UpdateBothOfAll" True True False [] [] []
-   , updateTest "UpdateBothOfAllExes" True True False ["cabal-bounds", "other-exe"] [] []
-   , updateTest "UpdateBothOfExe" True True False ["cabal-bounds"] [] []
-   , updateTest "UpdateBothOfLibrary" True True True [] [] []
-   , updateTest "UpdateBothOfOtherExe" True True False ["other-exe"] [] []
-   , updateTest "UpdateBothOfTest" True True False [] ["some-test"] []
-   , updateTest "UpdateLowerOfAll" True False False [] [] []
-   , updateTest "UpdateLowerOfAllExes" True False False ["cabal-bounds", "other-exe"] [] []
-   , updateTest "UpdateLowerOfExe" True False False ["cabal-bounds"] [] []
-   , updateTest "UpdateLowerOfLibrary" True False True [] [] []
-   , updateTest "UpdateLowerOfOtherExe" True False False ["other-exe"] [] []
-   , updateTest "UpdateLowerOfTest" True False False [] ["some-test"] []
-   , updateTest "UpdateUpperOfAll" False True False [] [] []
-   , updateTest "UpdateUpperOfAllExes" False True False ["cabal-bounds", "other-exe"] [] []
-   , updateTest "UpdateUpperOfExe" False True False ["cabal-bounds"] [] []
-   , updateTest "UpdateUpperOfLibrary" False True True [] [] []
-   , updateTest "UpdateUpperOfOtherExe" False True False ["other-exe"] [] []
-   , updateTest "UpdateUpperOfTest" False True False [] ["some-test"] []
+   [ test "UpdateBothOfAll" $ defaultUpdate
+   , test "UpdateBothOfAll" $ defaultUpdate { lower = True, upper = True }
+   , test "UpdateBothOfAllExes" $ defaultUpdate { executable = ["cabal-bounds", "other-exe"] }
+   , test "UpdateBothOfExe" $ defaultUpdate { executable = ["cabal-bounds"] }
+   , test "UpdateBothOfLibrary" $ defaultUpdate { library = True }
+   , test "UpdateBothOfOtherExe" $ defaultUpdate { executable = ["other-exe"] }
+   , test "UpdateBothOfTest" $ defaultUpdate { testSuite = ["some-test"] }
+   , test "UpdateLowerOfAll" $ defaultUpdate { lower = True }
+   , test "UpdateLowerOfAllExes" $ defaultUpdate { lower = True, executable = ["cabal-bounds", "other-exe"] }
+   , test "UpdateLowerOfExe" $ defaultUpdate { lower = True, executable = ["cabal-bounds"] }
+   , test "UpdateLowerOfLibrary" $ defaultUpdate { lower = True, library = True }
+   , test "UpdateLowerOfOtherExe" $ defaultUpdate { lower = True, executable = ["other-exe"] }
+   , test "UpdateLowerOfTest" $ defaultUpdate { lower = True, testSuite = ["some-test"] }
+   , test "UpdateUpperOfAll" $ defaultUpdate { upper = True }
+   , test "UpdateUpperOfAllExes" $ defaultUpdate { upper = True, executable = ["cabal-bounds", "other-exe"] }
+   , test "UpdateUpperOfExe" $ defaultUpdate { upper = True, executable = ["cabal-bounds"] }
+   , test "UpdateUpperOfLibrary" $ defaultUpdate { upper = True, library = True }
+   , test "UpdateUpperOfOtherExe" $ defaultUpdate { upper = True, executable = ["other-exe"] }
+   , test "UpdateUpperOfTest" $ defaultUpdate { upper = True, testSuite = ["some-test"] }
    ] 
 
 
-updateTest :: String -> Bool -> Bool -> Bool -> [String] -> [String] -> [String] -> TestTree 
-updateTest testName lower upper lib exes tests benchms =
+test :: String -> Args -> TestTree
+test testName args =
    goldenVsFileDiff testName diff goldenFile outputFile command
    where
       command = do
-         let args = Args.Update { Args.lower           = lower
-                                , Args.upper           = upper
-                                , Args.library         = lib
-                                , Args.executable      = exes
-                                , Args.testSuite       = tests
-                                , Args.benchmark       = benchms
-                                , Args.cabalFile       = inputFile
-                                , Args.outputCabalFile = outputFile
-                                , Args.setupConfigFile = setupConfigFile
-                                }
-
-         error <- cabalBounds args
+         error <- cabalBounds argsWithFiles
          case error of
               Just err -> hPutStrLn stderr ("cabal-bounds: " ++ err)
               _        -> return ()
 
+      argsWithFiles = 
+         case args of
+              Drop {}   -> args { cabalFile       = inputFile
+                                , outputCabalFile = outputFile
+                                }
+              Update {} -> args { cabalFile       = inputFile
+                                , outputCabalFile = outputFile
+                                , setupConfigFile = setupConfigFile
+                                }
 
-      diff ref new = ["diff", "-u", ref, new]
-
+      diff ref new    = ["diff", "-u", ref, new]
       goldenFile      = "tests" </> "goldenFiles" </> testName <.> "cabal"
       outputFile      = "tests" </> "outputFiles" </> testName <.> "cabal"
       inputFile       = "tests" </> "inputFiles"  </> "original.cabal"
       setupConfigFile = "tests" </> "inputFiles"  </> "setup-config"
-
-
-dropTest :: String -> Bool -> Bool -> [String] -> [String] -> [String] -> TestTree
-dropTest testName upper lib exes tests benchms =
-   goldenVsFileDiff testName diff goldenFile outputFile command
-   where
-      command = do
-         let args = Args.Drop { Args.upper           = upper
-                              , Args.library         = lib
-                              , Args.executable      = exes
-                              , Args.testSuite       = tests
-                              , Args.benchmark       = benchms
-                              , Args.cabalFile       = inputFile
-                              , Args.outputCabalFile = outputFile
-                              }
-
-         error <- cabalBounds args
-         case error of
-              Just err -> hPutStrLn stderr ("cabal-bounds: " ++ err)
-              _        -> return ()
-
-
-      diff ref new = ["diff", "-u", ref, new]
-
-      goldenFile = "tests" </> "goldenFiles" </> testName <.> "cabal"
-      outputFile = "tests" </> "outputFiles" </> testName <.> "cabal"
-      inputFile  = "tests" </> "inputFiles"  </> "original.cabal"

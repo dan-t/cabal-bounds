@@ -4,6 +4,8 @@ module CabalBounds.Args
    ( Args(..)
    , get
    , outputFile
+   , defaultDrop
+   , defaultUpdate
    ) where
 
 import System.Console.CmdArgs
@@ -49,6 +51,32 @@ outputFile :: Args -> FilePath
 outputFile args
    | null $ outputCabalFile args = cabalFile args
    | otherwise                   = outputCabalFile args
+
+
+defaultDrop :: Args
+defaultDrop = Drop
+   { upper           = False
+   , library         = False
+   , executable      = []
+   , testSuite       = []
+   , benchmark       = []
+   , outputCabalFile = ""
+   , cabalFile       = ""
+   }
+
+
+defaultUpdate :: Args
+defaultUpdate = Update
+   { lower           = False
+   , upper           = False
+   , library         = False
+   , executable      = []
+   , testSuite       = []
+   , benchmark       = []
+   , outputCabalFile = ""
+   , cabalFile       = ""
+   , setupConfigFile = ""
+   }
 
 
 dropArgs :: Args
