@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+for output in `ls outputFiles` ; do
+   gvimdiff -f outputFiles/$output goldenFiles/$output
+done
