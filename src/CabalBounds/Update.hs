@@ -13,28 +13,31 @@ import qualified Distribution.InstalledPackageInfo as C
 import Control.Lens
 import CabalBounds.Bound (Bound(..))
 import CabalBounds.Targets (Targets(..), dependenciesOf)
+import CabalBounds.Dependencies (Dependencies, filterDependencies)
 import CabalBounds.Lenses
 import Data.List (sort, foldl', find)
 
 type InstalledPackages = [(C.PackageName, C.Version)]
 
-update :: Bound -> Targets -> C.GenericPackageDescription -> C.LocalBuildInfo -> C.GenericPackageDescription
-update bound AllTargets pkgDescrp buildInfo =
-   pkgDescrp & dependenciesOfLib        %~ map updateDep
-             & dependenciesOfAllExes    %~ map updateDep
-             & dependenciesOfAllTests   %~ map updateDep
-             & dependenciesOfAllBenchms %~ map updateDep
+update :: Bound -> Targets -> Dependencies -> C.GenericPackageDescription -> C.LocalBuildInfo -> C.GenericPackageDescription
+update bound AllTargets deps pkgDescrp buildInfo =
+   pkgDescrp & dependenciesOfLib        . filterDeps %~ updateDep
+             & dependenciesOfAllExes    . filterDeps %~ updateDep
+             & dependenciesOfAllTests   . filterDeps %~ updateDep
+             & dependenciesOfAllBenchms . filterDeps %~ updateDep
    where
-      updateDep = updateDependency bound (installedPackages buildInfo)
+      filterDeps = filterDependencies deps
+      updateDep  = updateDependency bound (installedPackages buildInfo)
 
 
-update bound (Targets targets) pkgDescrp buildInfo =
+update bound (Targets targets) deps pkgDescrp buildInfo =
    foldl' updateTarget pkgDescrp targets
    where
       updateTarget pkgDescrp target =
-         pkgDescrp & (dependenciesOf target) %~ map updateDep
+         pkgDescrp & (dependenciesOf target) . filterDeps %~ updateDep
 
-      updateDep = updateDependency bound (installedPackages buildInfo)
+      filterDeps = filterDependencies deps
+      updateDep  = updateDependency bound (installedPackages buildInfo)
 
 
 updateDependency :: Bound -> InstalledPackages -> C.Dependency -> C.Dependency

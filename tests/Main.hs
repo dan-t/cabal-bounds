@@ -27,6 +27,10 @@ dropTests = testGroup "Drop Tests"
    , test "DropUpperOfAllExes" $ defaultDrop { upper = True, executable = ["cabal-bounds", "other-exe"] }
    , test "DropBothOfTest" $ defaultDrop { testSuite = ["some-test"] }
    , test "DropUpperOfTest" $ defaultDrop { upper = True, testSuite = ["some-test"] }
+   , test "DropBothOnlyBase" $ defaultDrop { only = ["base"] }
+   , test "DropUpperOnlyBase" $ defaultDrop { upper = True, only = ["base"] }
+   , test "DropBothIgnoreBase" $ defaultDrop { ignore = ["base"] }
+   , test "DropUpperIgnoreBase" $ defaultDrop { upper = True, ignore = ["base"] }
    ]
 
 
@@ -51,6 +55,10 @@ updateTests = testGroup "Update Tests"
    , test "UpdateUpperOfLibrary" $ defaultUpdate { upper = True, library = True }
    , test "UpdateUpperOfOtherExe" $ defaultUpdate { upper = True, executable = ["other-exe"] }
    , test "UpdateUpperOfTest" $ defaultUpdate { upper = True, testSuite = ["some-test"] }
+   , test "UpdateBothOnlyBase" $ defaultUpdate { only = ["base"] }
+   , test "UpdateUpperOnlyBase" $ defaultUpdate { upper = True, only = ["base"] }
+   , test "UpdateBothIgnoreBase" $ defaultUpdate { ignore = ["base"] }
+   , test "UpdateLowerIgnoreBase" $ defaultUpdate { lower = True, ignore = ["base"] }
    ] 
 
 

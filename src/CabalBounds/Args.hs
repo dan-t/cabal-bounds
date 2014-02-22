@@ -8,7 +8,7 @@ module CabalBounds.Args
    , defaultUpdate
    ) where
 
-import System.Console.CmdArgs
+import System.Console.CmdArgs hiding (ignore)
 
 #ifdef CABAL
 import Data.Version (showVersion)
@@ -20,6 +20,8 @@ data Args = Drop { upper           :: Bool
                  , executable      :: [String]
                  , testSuite       :: [String]
                  , benchmark       :: [String]
+                 , only            :: [String]
+                 , ignore          :: [String]
                  , outputCabalFile :: String
                  , cabalFile       :: String
                  }
@@ -29,6 +31,8 @@ data Args = Drop { upper           :: Bool
                    , executable      :: [String]
                    , testSuite       :: [String]
                    , benchmark       :: [String]
+                   , only            :: [String]
+                   , ignore          :: [String]
                    , outputCabalFile :: String
                    , cabalFile       :: String
                    , setupConfigFile :: String
@@ -60,6 +64,8 @@ defaultDrop = Drop
    , executable      = []
    , testSuite       = []
    , benchmark       = []
+   , only            = []
+   , ignore          = []
    , outputCabalFile = ""
    , cabalFile       = ""
    }
@@ -73,6 +79,8 @@ defaultUpdate = Update
    , executable      = []
    , testSuite       = []
    , benchmark       = []
+   , only            = []
+   , ignore          = []
    , outputCabalFile = ""
    , cabalFile       = ""
    , setupConfigFile = ""
@@ -86,7 +94,9 @@ dropArgs = Drop
    , executable      = def &= help "Only the bounds of the executable are dropped."
    , testSuite       = def &= help "Only the bounds of the test suite are dropped."
    , benchmark       = def &= help "Only the bounds of the benchmark are dropped."
-   , outputCabalFile = def &= help "Save modified cabal file to file, if empty, the cabal file is modified inplace."
+   , only            = def &= explicit &= name "only" &= name "O" &= help "Only the bounds of the dependency are modified."
+   , ignore          = def &= explicit &= name "ignore" &= name "I" &= help "This dependency is ignored, not modified in any way."
+   , outputCabalFile = def &= explicit &= name "outputCabalFile" &= name "o" &= help "Save modified cabal file to file, if empty, the cabal file is modified inplace."
    , cabalFile       = def &= argPos 0 &= typ "CABAL-FILE"
    }
 
@@ -99,7 +109,9 @@ updateArgs = Update
    , executable      = def &= help "Only the bounds of the executable are updated."
    , testSuite       = def &= help "Only the bounds of the test suite are updated."
    , benchmark       = def &= help "Only the bounds of the benchmark are updated."
-   , outputCabalFile = def &= help "Save modified cabal file to file, if empty, the cabal file is modified inplace."
+   , only            = def &= explicit &= name "only" &= name "O" &= help "Only the bounds of the dependency are modified."
+   , ignore          = def &= explicit &= name "ignore" &= name "I" &= help "This dependency is ignored, not modified in any way."
+   , outputCabalFile = def &= explicit &= name "outputCabalFile" &= name "o" &= help "Save modified cabal file to file, if empty, the cabal file is modified inplace."
    , cabalFile       = def &= argPos 0 &= typ "CABAL-FILE"
    , setupConfigFile = def &= argPos 1 &= typ "SETUP-CONFIG-FILE"
    }

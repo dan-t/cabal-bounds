@@ -21,6 +21,7 @@ Executable cabal-bounds
                   CabalBounds.Args
                   CabalBounds.Bound
                   CabalBounds.Targets
+                  CabalBounds.Dependencies
                   CabalBounds.Drop
                   CabalBounds.Update
                   CabalBounds.Lenses
@@ -43,6 +44,7 @@ library
   other-modules:  Paths_cabal_bounds
                   CabalBounds.Bound
                   CabalBounds.Targets
+                  CabalBounds.Dependencies
                   CabalBounds.Drop
                   CabalBounds.Update
                   CabalBounds.Lenses
