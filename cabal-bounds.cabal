@@ -31,9 +31,9 @@ Executable cabal-bounds
   cpp-options:   -DCABAL
   Build-Depends: base >= 3 && < 5,
                  cmdargs >= 0.10.5 && < 0.11,
-                 lens,
-                 strict,
-                 Cabal
+                 lens >= 4.0.1 && < 4.1,
+                 strict >= 0.3.2 && < 0.4,
+                 Cabal >= 1.18.1
 
 library
   hs-source-dirs: src
@@ -50,9 +50,9 @@ library
                   CabalBounds.Lenses
   Build-Depends: base >= 3 && < 5,
                  cmdargs >= 0.10.5 && < 0.11,
-                 lens,
-                 strict,
-                 Cabal
+                 lens >= 4.0.1 && < 4.1,
+                 strict >= 0.3.2 && < 0.4,
+                 Cabal >= 1.18.1
 
 test-suite cabal-bounds-tests
   Main-is:        tests/Main.hs
@@ -60,10 +60,10 @@ test-suite cabal-bounds-tests
   type:           exitcode-stdio-1.0
   Build-Depends:  base >= 3 && < 5,
                   cmdargs >= 0.10.5 && < 0.11,
-                  lens,
-                  strict,
-                  Cabal,
-                  tasty,
-                  tasty-golden,
-                  filepath,
+                  lens >= 4.0.1 && < 4.1,
+                  strict >= 0.3.2 && < 0.4,
+                  Cabal >= 1.18.1,
+                  tasty >= 0.7 && < 0.8,
+                  tasty-golden >= 2.2.0.2 && < 2.3,
+                  filepath >= 1.3.0.1 && < 1.4,
                   cabal-bounds
