@@ -38,6 +38,41 @@ You have to ensure, that the `Cabal` library of `cabal-bounds` matches the one u
 
 If you update the `cabal` binary and the used `Cabal` library changes, then you have to rebuild `cabal-bounds`.
 
+Command Line Usage
+==================
+
+    $> cabal-bounds --help
+    cabal-bounds [COMMAND] ... [OPTIONS]
+      A command line program for managing the bounds/versions of the dependencies
+      in a cabal file.
+    
+    Common flags:
+      -O --only=ITEM             Only the bounds of the dependency are modified.
+      -I --ignore=ITEM           This dependency is ignored, not modified in any
+                                 way.
+      -o --outputCabalFile=ITEM  Save modified cabal file to file, if empty, the
+                                 cabal file is modified inplace.
+      -h --help                  Display help message
+      -v --version               Print version information
+    
+    cabal-bounds drop [OPTIONS] CABAL-FILE
+    
+      -U --upper                 Only the upper bound is dropped, otherwise both
+                                 - the lower and upper - bounds are dropped.
+      -l --library               Only the bounds of the library are dropped.
+      -e --executable=ITEM       Only the bounds of the executable are dropped.
+      -t --testsuite=ITEM        Only the bounds of the test suite are dropped.
+      -b --benchmark=ITEM        Only the bounds of the benchmark are dropped.
+    
+    cabal-bounds update [OPTIONS] CABAL-FILE SETUP-CONFIG-FILE
+    
+      -L --lower                 Only the lower bound is updated.
+      -U --upper                 Only the upper bound is updated.
+      -l --library               Only the bounds of the library are updated.
+      -e --executable=ITEM       Only the bounds of the executable are updated.
+      -t --testsuite=ITEM        Only the bounds of the test suite are updated.
+      -b --benchmark=ITEM        Only the bounds of the benchmark are updated.
+
 Issues
 ======
 
