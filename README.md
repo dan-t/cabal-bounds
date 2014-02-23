@@ -38,6 +38,10 @@ You have to ensure, that the `Cabal` library of `cabal-bounds` matches the one u
 
 If you update the `cabal` binary and the used `Cabal` library changes, then you have to rebuild `cabal-bounds`.
 
+Currently you need at least `Cabal 1.18.1` to be able to build `cabal-bounds`. Its certainly possible to
+build `cabal-bounds` with a lower version, but it's definitively to possible to build it with `Cabal 1.16`.
+So if someone tells me, that it's buildable with a lower version (and the tests still pass), then I will decrease it. 
+
 Issues
 ======
 
