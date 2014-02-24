@@ -20,19 +20,21 @@ description: 'cabal-bounds' is able to do two things:
              .
              'cabal-bounds' tries to automate this update process to some degree. So a typical update process might look like:
              .
-             > $> # update the version infos of all libraries
+             > # update the version infos of all libraries
              > $> cabal update
              > 
-             > $> # drops the upper bound of all dependencies in 'myproject.cabal', most likely you want to ignore 'base'
+             > # drops the upper bound of all dependencies in 'myproject.cabal',
+             > # most likely you want to ignore 'base'
              > $> cabal-bounds drop --upper --ignore=base myproject.cabal
              > 
-             > $> # create a cabal sandbox for building of 'myproject'
+             > # create a cabal sandbox for building of 'myproject'
              > $> cabal sandbox init
              >   
-             > $> # build 'myproject'
+             > # build 'myproject'
              > $> cabal install
              > 
-             > $> # update the upper bound of all dependencies in 'myproject.cabal' by the cabal build information
+             > # update the upper bound of all dependencies in 'myproject.cabal'
+             > # by the cabal build information
              > $> cabal-bounds update --upper --ignore=base myproject.cabal dist/dist-sandbox-*/setup-config 
              .
              /Example: Bound Changes/
