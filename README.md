@@ -25,6 +25,34 @@ versions of the dependencies.
     $> # update the upper bound of all dependencies in 'myproject.cabal' by the cabal build information
     $> cabal-bounds update --upper --ignore=base myproject.cabal dist/dist-sandbox-*/setup-config 
 
+Examples
+========
+
+The `=>` shows what the result is of the operation for every dependency. Left is the dependency before
+calling the command, right the one after calling.
+
+    $> cabal drop myproject.cabal
+    lens >=4.0.1 && <4.1   =>   lens
+
+    $> cabal drop --upper myproject.cabal
+    lens >=4.0.1 && <4.1   =>   lens >=4.0.1
+
+If the cabal build (the setup-config) uses `lens 4.1.2`, then the results of the `update` command would be:
+
+    $> cabal update myproject.cabal setup-config
+    lens >=4.0.1 && <4.1   =>   lens >=4.1.2 && <4.2
+    lens                   =>   lens >=4.1.2 && <4.2
+
+    $> cabal update --lower myproject.cabal setup-config
+    lens >=4.0.1 && <4.1   =>   lens >=4.1.2
+    lens <4.1              =>   lens >=4.1.2
+    lens                   =>   lens >=4.1.2
+
+    $> cabal update --upper myproject.cabal setup-config
+    lens >=4.0.1 && <4.1   =>   lens >=4.0.1 && <4.2
+    lens >=4.0.1           =>   lens >=4.0.1 && <4.2
+    lens                   =>   lens >=4.1.2 && <4.2
+
 Installation
 ============
 
