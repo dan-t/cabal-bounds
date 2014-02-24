@@ -3,6 +3,14 @@ cabal-bounds
 
 A command line program for managing the bounds/versions of the dependencies in a cabal file.
 
+`cabal-bounds` is able to do two things:
+
+    - drop the bounds of the dependencies in the cabal file
+    - update the bounds of the dependencies in the cabal file using the cabal build information
+
+Example: Raise the upper Bounds
+===============================
+
 If you have several cabalized projects, then it can be quite time consuming to keep the
 bounds of your dependencies up to date. Especially if you're following the [package versioning policy](<http://www.haskell.org/haskellwiki/Package_versioning_policy>),
 then you want to raise your upper bounds from time to time, to allow the building with newer
@@ -25,8 +33,8 @@ versions of the dependencies.
     $> # update the upper bound of all dependencies in 'myproject.cabal' by the cabal build information
     $> cabal-bounds update --upper --ignore=base myproject.cabal dist/dist-sandbox-*/setup-config 
 
-Examples
-========
+Example: Bound Changes
+======================
 
 The `=>` shows what the result is of the operation for every dependency. Left is the dependency before
 calling the command, right the one after calling.
