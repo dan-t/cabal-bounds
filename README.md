@@ -4,9 +4,8 @@ cabal-bounds
 A command line program for managing the bounds/versions of the dependencies in a cabal file.
 
 `cabal-bounds` is able to do two things:
-
-    - drop the bounds of the dependencies in the cabal file
-    - update the bounds of the dependencies in the cabal file using the cabal build information
+* drop the bounds of the dependencies in the cabal file
+* update the bounds of the dependencies in the cabal file using the cabal build information
 
 Example: Raise the upper Bounds
 ===============================
