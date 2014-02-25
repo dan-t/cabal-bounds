@@ -38,24 +38,24 @@ Example: Bound Changes
 The `=>` shows what the result is of the operation for every dependency. Left is the dependency before
 calling the command, right the one after calling.
 
-    $> cabal drop myproject.cabal
+    $> cabal-bounds drop myproject.cabal
     lens >=4.0.1 && <4.1   =>   lens
 
-    $> cabal drop --upper myproject.cabal
+    $> cabal-bounds drop --upper myproject.cabal
     lens >=4.0.1 && <4.1   =>   lens >=4.0.1
 
 If the cabal build (the setup-config) uses `lens 4.1.2`, then the results of the `update` command would be:
 
-    $> cabal update myproject.cabal setup-config
+    $> cabal-bounds update myproject.cabal setup-config
     lens >=4.0.1 && <4.1   =>   lens >=4.1.2 && <4.2
     lens                   =>   lens >=4.1.2 && <4.2
 
-    $> cabal update --lower myproject.cabal setup-config
+    $> cabal-bounds update --lower myproject.cabal setup-config
     lens >=4.0.1 && <4.1   =>   lens >=4.1.2
     lens <4.1              =>   lens >=4.1.2
     lens                   =>   lens >=4.1.2
 
-    $> cabal update --upper myproject.cabal setup-config
+    $> cabal-bounds update --upper myproject.cabal setup-config
     lens >=4.0.1 && <4.1   =>   lens >=4.0.1 && <4.2
     lens >=4.0.1           =>   lens >=4.0.1 && <4.2
     lens                   =>   lens >=4.1.2 && <4.2
@@ -76,12 +76,15 @@ If you update the `cabal` binary and the used `Cabal` library changes, then you 
 Command Line Usage
 ==================
 
-    $> cabal-bounds --help
-    cabal-bounds [COMMAND] ... [OPTIONS]
+    $> cabal-bounds [COMMAND] ... [OPTIONS]
       A command line program for managing the bounds/versions of the dependencies
       in a cabal file.
     
     Common flags:
+      -l --library               Only the bounds of the library are modified.
+      -e --executable=ITEM       Only the bounds of the executable are modified.
+      -t --testsuite=ITEM        Only the bounds of the test suite are modified.
+      -b --benchmark=ITEM        Only the bounds of the benchmark are modified.
       -O --only=ITEM             Only the bounds of the dependency are modified.
       -I --ignore=ITEM           This dependency is ignored, not modified in any
                                  way.
@@ -94,19 +97,11 @@ Command Line Usage
     
       -U --upper                 Only the upper bound is dropped, otherwise both
                                  - the lower and upper - bounds are dropped.
-      -l --library               Only the bounds of the library are dropped.
-      -e --executable=ITEM       Only the bounds of the executable are dropped.
-      -t --testsuite=ITEM        Only the bounds of the test suite are dropped.
-      -b --benchmark=ITEM        Only the bounds of the benchmark are dropped.
     
     cabal-bounds update [OPTIONS] CABAL-FILE SETUP-CONFIG-FILE
     
       -L --lower                 Only the lower bound is updated.
       -U --upper                 Only the upper bound is updated.
-      -l --library               Only the bounds of the library are updated.
-      -e --executable=ITEM       Only the bounds of the executable are updated.
-      -t --testsuite=ITEM        Only the bounds of the test suite are updated.
-      -b --benchmark=ITEM        Only the bounds of the benchmark are updated.
 
 Issues
 ======
