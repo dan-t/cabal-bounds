@@ -60,6 +60,25 @@ If the cabal build (the setup-config) uses `lens 4.1.2`, then the results of the
     lens >=4.0.1           =>   lens >=4.0.1 && <4.2
     lens                   =>   lens >=4.1.2 && <4.2
 
+Options
+=======
+
+You can restrict the modification to certain sections in the cabal file by specifing the type and the name of the section:
+* `--library`
+* `--executable=name`
+* `--testsuite=name`
+* `--benchmark=name`
+
+If you omit these options, then all sections are considered and modified.
+
+You can also restrict the modification of dependencies by specifing which dependencies should only or shouldn't be modified:
+* `--only=name`
+* `--ignore=name`
+
+If you omit these options, then all dependencies are considered and modified.
+
+Please consult `cabal-bounds --help` for a complete list of options.
+
 Installation
 ============
 
@@ -72,36 +91,6 @@ You have to ensure, that the `Cabal` library of `cabal-bounds` matches the one u
     $> cabal install --constraint="Cabal == 1.18.1" cabal-bounds
 
 If you update the `cabal` binary and the used `Cabal` library changes, then you have to rebuild `cabal-bounds`.
-
-Command Line Usage
-==================
-
-    $> cabal-bounds [COMMAND] ... [OPTIONS]
-      A command line program for managing the bounds/versions of the dependencies
-      in a cabal file.
-    
-    Common flags:
-      -l --library               Only the bounds of the library are modified.
-      -e --executable=ITEM       Only the bounds of the executable are modified.
-      -t --testsuite=ITEM        Only the bounds of the test suite are modified.
-      -b --benchmark=ITEM        Only the bounds of the benchmark are modified.
-      -O --only=ITEM             Only the bounds of the dependency are modified.
-      -I --ignore=ITEM           This dependency is ignored, not modified in any
-                                 way.
-      -o --outputCabalFile=ITEM  Save modified cabal file to file, if empty, the
-                                 cabal file is modified inplace.
-      -h --help                  Display help message
-      -v --version               Print version information
-    
-    cabal-bounds drop [OPTIONS] CABAL-FILE
-    
-      -U --upper                 Only the upper bound is dropped, otherwise both
-                                 - the lower and upper - bounds are dropped.
-    
-    cabal-bounds update [OPTIONS] CABAL-FILE SETUP-CONFIG-FILE
-    
-      -L --lower                 Only the lower bound is updated.
-      -U --upper                 Only the upper bound is updated.
 
 Issues
 ======
