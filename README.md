@@ -77,6 +77,9 @@ You can also restrict the modification of dependencies by specifing which depend
 
 If you omit these options, then all dependencies are considered and modified.
 
+All options taking a name can be specified multiple times:
+e.g. `--executable=exe1 --executable=exe2` or `--ignore=base --ignore=whatever`
+
 Please consult `cabal-bounds --help` for a complete list of options.
 
 Installation

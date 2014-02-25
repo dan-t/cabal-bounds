@@ -1,5 +1,5 @@
 name: cabal-bounds
-version: 0.1.11
+version: 0.1.12
 cabal-version: >=1.9.2
 build-type: Simple
 license: BSD3
@@ -98,6 +98,10 @@ description: 'cabal-bounds' is able to do two things:
              * --ignore=name
              .
              If you omit these options, then all dependencies are considered and modified.
+             .
+             All options taking a name can be specified multiple times:
+             .
+             e.g. '--executable=exe1 --executable=exe2' or '--ignore=base --ignore=whatever'
              .
              Please consult 'cabal-bounds --help' for a complete list of options.
              .
