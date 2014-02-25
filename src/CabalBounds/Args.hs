@@ -1,4 +1,5 @@
 {-# LANGUAGE DeriveDataTypeable, CPP #-}
+{-# OPTIONS_GHC -w #-}
 
 module CabalBounds.Args
    ( Args(..)
@@ -91,12 +92,12 @@ dropArgs :: Args
 dropArgs = Drop
    { upper           = def &= explicit &= name "upper" &= name "U" &= help "Only the upper bound is dropped, otherwise both - the lower and upper - bounds are dropped."
    , library         = def &= explicit &= name "library" &= name "l" &= help "Only the bounds of the library are modified."
-   , executable      = def &= help "Only the bounds of the executable are modified."
-   , testSuite       = def &= help "Only the bounds of the test suite are modified."
-   , benchmark       = def &= help "Only the bounds of the benchmark are modified."
-   , only            = def &= explicit &= name "only" &= name "O" &= help "Only the bounds of the dependency are modified."
-   , ignore          = def &= explicit &= name "ignore" &= name "I" &= help "This dependency is ignored, not modified in any way."
-   , outputCabalFile = def &= explicit &= name "outputCabalFile" &= name "o" &= help "Save modified cabal file to file, if empty, the cabal file is modified inplace."
+   , executable      = def &= typ "EXECUTABLE" &= help "Only the bounds of the executable are modified."
+   , testSuite       = def &= typ "TESTSUITE" &= help "Only the bounds of the test suite are modified."
+   , benchmark       = def &= typ "BENCHMARK" &= help "Only the bounds of the benchmark are modified."
+   , only            = def &= explicit &= typ "DEPENDENCY" &= name "only" &= name "O" &= help "Only the bounds of the dependency are modified."
+   , ignore          = def &= explicit &= typ "DEPENDENCY" &= name "ignore" &= name "I" &= help "This dependency is ignored, not modified in any way."
+   , outputCabalFile = def &= explicit &= typ "FILE" &= name "outputCabalFile" &= name "o" &= help "Save modified cabal file to file, if empty, the cabal file is modified inplace."
    , cabalFile       = def &= argPos 0 &= typ "CABAL-FILE"
    }
 
@@ -105,14 +106,6 @@ updateArgs :: Args
 updateArgs = Update
    { lower           = def &= explicit &= name "lower" &= name "L" &= help "Only the lower bound is updated."
    , upper           = def &= explicit &= name "upper" &= name "U" &= help "Only the upper bound is updated."
-   , library         = def &= explicit &= name "library" &= name "l" &= help "Only the bounds of the library are modified."
-   , executable      = def &= help "Only the bounds of the executable are modified."
-   , testSuite       = def &= help "Only the bounds of the test suite are modified."
-   , benchmark       = def &= help "Only the bounds of the benchmark are modified."
-   , only            = def &= explicit &= name "only" &= name "O" &= help "Only the bounds of the dependency are modified."
-   , ignore          = def &= explicit &= name "ignore" &= name "I" &= help "This dependency is ignored, not modified in any way."
-   , outputCabalFile = def &= explicit &= name "outputCabalFile" &= name "o" &= help "Save modified cabal file to file, if empty, the cabal file is modified inplace."
-   , cabalFile       = def &= argPos 0 &= typ "CABAL-FILE"
    , setupConfigFile = def &= argPos 1 &= typ "SETUP-CONFIG-FILE"
    }
 
