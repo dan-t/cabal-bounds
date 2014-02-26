@@ -1,5 +1,5 @@
 name: cabal-bounds
-version: 0.1.12
+version: 0.1.13
 cabal-version: >=1.9.2
 build-type: Simple
 license: BSD3
@@ -12,7 +12,10 @@ description: 'cabal-bounds' is able to do two things:
              .
              * update the bounds of the dependencies in the cabal file using the cabal build information
              .
+             .
+             .
              /Example: Raise the upper Bounds/
+             .
              .
              If you have several cabalized projects, then it can be quite time consuming to keep the
              bounds of your dependencies up to date. Especially if you're following the package versioning
@@ -38,7 +41,10 @@ description: 'cabal-bounds' is able to do two things:
              > # by the cabal build information
              > $> cabal-bounds update --upper --ignore=base myproject.cabal dist/dist-sandbox-*/setup-config 
              .
+             .
+             .
              /Example: Bound Changes/
+             .
              .
              The '=>' shows what the result is of the operation for every dependency. Left is the dependency before
              calling the command, right the one after calling.
@@ -65,7 +71,10 @@ description: 'cabal-bounds' is able to do two things:
              > lens >=4.0.1           =>   lens >=4.0.1 && <4.2
              > lens                   =>   lens >=4.1.2 && <4.2
              .
+             .
+             .
              /Installation/
+             .
              .
              You have to ensure, that the 'Cabal' library of 'cabal-bounds' matches the one used by the 'cabal' binary:
              .
@@ -77,7 +86,10 @@ description: 'cabal-bounds' is able to do two things:
              .
              If you update the 'cabal' binary and the used 'Cabal' library changes, then you have to rebuild 'cabal-bounds'.
              .
+             .
+             .
              /Options/
+             .
              .
              You can restrict the modification to certain sections in the cabal file by specifing the type and the name of the section:
              .
@@ -91,6 +103,7 @@ description: 'cabal-bounds' is able to do two things:
              .
              If you omit these options, then all sections are considered and modified.
              .
+             .
              You can also restrict the modification of dependencies by specifing which dependencies should only or shouldn't be modified:
              .
              * --only=name
@@ -99,13 +112,17 @@ description: 'cabal-bounds' is able to do two things:
              .
              If you omit these options, then all dependencies are considered and modified.
              .
+             .
              All options taking a name can be specified multiple times:
              .
              e.g. '--executable=exe1 --executable=exe2' or '--ignore=base --ignore=whatever'
              .
              Please consult 'cabal-bounds --help' for a complete list of options.
              .
+             .
+             .
              /Issues/
+             .
              .
              Perhaps the currently most annoying thing is, that you have to live with the reformating of your
              'cabal' file done by the pretty printer of the 'Cabal' library.
