@@ -1,5 +1,5 @@
 name: cabal-bounds
-version: 0.1.15
+version: 0.1.16
 cabal-version: >=1.9.2
 build-type: Simple
 license: BSD3
@@ -14,7 +14,7 @@ description: 'cabal-bounds' is able to do two things:
              .
              .
              .
-             = Example: Raise the upper Bounds
+             /Example: Raise the upper Bounds/
              .
              .
              If you have several cabalized projects, then it can be quite time consuming to keep the
@@ -43,7 +43,7 @@ description: 'cabal-bounds' is able to do two things:
              .
              .
              .
-             = Example: Bound Changes
+             /Example: Bound Changes/
              .
              .
              The '=>' shows what the result is of the operation for every dependency. Left is the dependency before
@@ -73,7 +73,7 @@ description: 'cabal-bounds' is able to do two things:
              .
              .
              .
-             = Installation
+             /Installation/
              .
              .
              You have to ensure, that the 'Cabal' library of 'cabal-bounds' matches the one used by the 'cabal' binary:
@@ -88,7 +88,7 @@ description: 'cabal-bounds' is able to do two things:
              .
              .
              .
-             = Options
+             /Options/
              .
              .
              You can restrict the modification to certain sections in the cabal file by specifing the type and the name of the section:
@@ -121,7 +121,7 @@ description: 'cabal-bounds' is able to do two things:
              .
              .
              .
-             = Issues
+             /Issues/
              .
              .
              Perhaps the currently most annoying thing is, that you have to live with the reformating of your
