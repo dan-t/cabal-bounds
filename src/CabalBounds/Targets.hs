@@ -8,10 +8,11 @@ module CabalBounds.Targets
    ) where
 
 import Control.Lens
-import qualified Distribution.PackageDescription as C
-import qualified Distribution.Package as C
-import CabalBounds.Args
-import CabalBounds.Lenses
+import Distribution.PackageDescription (GenericPackageDescription(..))
+import Distribution.Package (Dependency(..))
+import CabalBounds.Args (Args)
+import qualified CabalBounds.Args as A
+import qualified CabalBounds.Lenses as L
 
 data Targets = Targets [Target]
              | AllTargets
@@ -25,10 +26,10 @@ data Target = Library
 
 targets :: Args -> Targets
 targets args 
-   | ts@(_:_) <- concat [ if (library args) then [Library] else []
-                        , map Executable (executable args)
-                        , map TestSuite (testSuite args)
-                        , map Benchmark (benchmark args)
+   | ts@(_:_) <- concat [ if (A.library args) then [Library] else []
+                        , map Executable (A.executable args)
+                        , map TestSuite (A.testSuite args)
+                        , map Benchmark (A.benchmark args)
                         ]
    = Targets ts
 
@@ -36,8 +37,8 @@ targets args
    = AllTargets
 
 
-dependenciesOf :: Target -> Traversal' C.GenericPackageDescription [C.Dependency]
-dependenciesOf Library            = dependenciesOfLib
-dependenciesOf (Executable exe)   = dependenciesOfExe exe
-dependenciesOf (TestSuite test)   = dependenciesOfTest test
-dependenciesOf (Benchmark benchm) = dependenciesOfBenchm benchm
+dependenciesOf :: Target -> Traversal' GenericPackageDescription [Dependency]
+dependenciesOf Library            = L.dependenciesOfLib
+dependenciesOf (Executable exe)   = L.dependenciesOfExe exe
+dependenciesOf (TestSuite test)   = L.dependenciesOfTest test
+dependenciesOf (Benchmark benchm) = L.dependenciesOfBenchm benchm

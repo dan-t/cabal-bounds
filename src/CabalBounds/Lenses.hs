@@ -1,6 +1,16 @@
 {-# LANGUAGE TemplateHaskell, Rank2Types #-}
 
-module CabalBounds.Lenses where
+module CabalBounds.Lenses
+   ( vbranch
+   , vtags
+   , dependenciesOfLib
+   , dependenciesOfAllExes
+   , dependenciesOfExe
+   , dependenciesOfAllTests
+   , dependenciesOfTest
+   , dependenciesOfAllBenchms
+   , dependenciesOfBenchm
+   ) where
 
 import Distribution.PackageDescription
 import Distribution.Package
@@ -13,18 +23,6 @@ makeLensesFor [ ("condLibrary"    , "condLibraryL")
               , ("condTestSuites" , "condTestSuitesL")
               , ("condBenchmarks" , "condBenchmarksL")
               ] ''GenericPackageDescription
-
-makeLensesFor [ ("condTreeConstraints", "condTreeConstraintsL")
-              ] ''CondTree
-
-makeLensesFor [ ("exeName", "exeNameL")
-              ] ''Executable
-
-makeLensesFor [ ("testName", "testNameL")
-              ] ''TestSuite
-
-makeLensesFor [ ("benchmarkName", "benchmarkNameL")
-              ] ''Benchmark
 
 makeLensesFor [ ("versionBranch", "vbranch")
               , ("versionTags"  , "vtags")

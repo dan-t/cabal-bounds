@@ -5,23 +5,23 @@ module CabalBounds.Drop
    ) where
 
 import Prelude hiding (drop)
-import qualified Distribution.PackageDescription as C
-import qualified Distribution.Package as C
-import qualified Distribution.Version as C
 import Control.Lens
 import CabalBounds.Bound (DropBound(..))
 import CabalBounds.Targets (Targets(..), dependenciesOf)
 import CabalBounds.Dependencies (Dependencies, filterDependencies)
-import CabalBounds.Lenses
+import qualified CabalBounds.Lenses as L
 import Data.List (foldl')
+import Distribution.PackageDescription (GenericPackageDescription)
+import Distribution.Package (Dependency(..))
+import Distribution.Version (mkVersionIntervals, fromVersionIntervals, asVersionIntervals, UpperBound(..), anyVersion)
 
 
-drop :: DropBound -> Targets -> Dependencies -> C.GenericPackageDescription -> C.GenericPackageDescription
+drop :: DropBound -> Targets -> Dependencies -> GenericPackageDescription -> GenericPackageDescription
 drop bound AllTargets deps pkgDescrp =
-   pkgDescrp & dependenciesOfLib        . filterDeps %~ dropFromDep
-             & dependenciesOfAllExes    . filterDeps %~ dropFromDep
-             & dependenciesOfAllTests   . filterDeps %~ dropFromDep
-             & dependenciesOfAllBenchms . filterDeps %~ dropFromDep
+   pkgDescrp & L.dependenciesOfLib        . filterDeps %~ dropFromDep
+             & L.dependenciesOfAllExes    . filterDeps %~ dropFromDep
+             & L.dependenciesOfAllTests   . filterDeps %~ dropFromDep
+             & L.dependenciesOfAllBenchms . filterDeps %~ dropFromDep
    where
       filterDeps  = filterDependencies deps
       dropFromDep = dropFromDependency bound
@@ -37,16 +37,16 @@ drop bound (Targets targets) deps pkgDescrp =
       dropFromDep = dropFromDependency bound
 
 
-dropFromDependency :: DropBound -> C.Dependency -> C.Dependency
-dropFromDependency DropUpper (C.Dependency pkgName versionRange) = C.Dependency pkgName versionRange'
+dropFromDependency :: DropBound -> Dependency -> Dependency
+dropFromDependency DropUpper (Dependency pkgName versionRange) = Dependency pkgName versionRange'
    where
       versionRange'
-         | Just vi <- C.mkVersionIntervals intervals' 
-         = C.fromVersionIntervals vi
+         | Just vi <- mkVersionIntervals intervals'
+         = fromVersionIntervals vi
 
          | otherwise
          = versionRange
 
-      intervals' = map (& _2 .~ C.NoUpperBound) (C.asVersionIntervals versionRange)
+      intervals' = map (& _2 .~ NoUpperBound) (asVersionIntervals versionRange)
 
-dropFromDependency DropBoth (C.Dependency pkgName _) = C.Dependency pkgName C.anyVersion
+dropFromDependency DropBoth (Dependency pkgName _) = Dependency pkgName anyVersion

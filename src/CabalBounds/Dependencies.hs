@@ -8,7 +8,7 @@ module CabalBounds.Dependencies
 
 import Control.Lens 
 import qualified CabalBounds.Args as A
-import qualified Distribution.Package as C
+import Distribution.Package (Dependency(..), PackageName(..))
 
 data Dependencies = AllDependencies
                   | OnlyDependencies [String]
@@ -28,12 +28,12 @@ dependencies args
    = AllDependencies
 
 
-filterDependencies :: Dependencies -> Traversal' [C.Dependency] C.Dependency
+filterDependencies :: Dependencies -> Traversal' [Dependency] Dependency
 filterDependencies AllDependencies =
    traversed
 
 filterDependencies (OnlyDependencies deps) =
-   traversed . filtered (\(C.Dependency (C.PackageName pkgName) _) -> any (== pkgName) deps) 
+   traversed . filtered (\(Dependency (PackageName pkgName) _) -> any (== pkgName) deps)
 
 filterDependencies (IgnoreDependencies deps) =
-   traversed . filtered (\(C.Dependency (C.PackageName pkgName) _) -> all (/= pkgName) deps)
+   traversed . filtered (\(Dependency (PackageName pkgName) _) -> all (/= pkgName) deps)

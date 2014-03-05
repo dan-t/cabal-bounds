@@ -1,21 +1,21 @@
 
 module Main where
 
-import Test.Tasty
-import Test.Tasty.Golden
-import System.FilePath
+import qualified Test.Tasty as T
+import qualified Test.Tasty.Golden as G
 import System.IO (hPutStrLn, stderr)
+import System.FilePath ((</>), (<.>))
 import CabalBounds.Args
 import CabalBounds.Main (cabalBounds)
 import CabalBounds.VersionComp (VersionComp(..))
 
-main = defaultMain tests
+main = T.defaultMain tests
 
-tests :: TestTree
-tests = testGroup "Tests" [dropTests, updateTests]
+tests :: T.TestTree
+tests = T.testGroup "Tests" [dropTests, updateTests]
 
-dropTests :: TestTree
-dropTests = testGroup "Drop Tests"
+dropTests :: T.TestTree
+dropTests = T.testGroup "Drop Tests"
    [ test "DropBothOfAll" defaultDrop
    , test "DropUpperOfAll" $ defaultDrop { upper = True }
    , test "DropBothOfLib" $ defaultDrop { library = True }
@@ -35,8 +35,8 @@ dropTests = testGroup "Drop Tests"
    ]
 
 
-updateTests :: TestTree
-updateTests = testGroup "Update Tests"
+updateTests :: T.TestTree
+updateTests = T.testGroup "Update Tests"
    [ test "UpdateBothOfAll" $ defaultUpdate
    , test "UpdateBothOfAll" $ defaultUpdate { lower = True, upper = True }
    , test "UpdateBothOfAllExes" $ defaultUpdate { executable = ["cabal-bounds", "other-exe"] }
@@ -71,9 +71,9 @@ updateTests = testGroup "Update Tests"
    ] 
 
 
-test :: String -> Args -> TestTree
+test :: String -> Args -> T.TestTree
 test testName args =
-   goldenVsFileDiff testName diff goldenFile outputFile command
+   G.goldenVsFileDiff testName diff goldenFile outputFile command
    where
       command = do
          error <- cabalBounds argsWithFiles
