@@ -26,7 +26,7 @@ cabalBounds args@A.Drop {} = do
    case pkgDescrp of
         Left  error      -> return . Just $ error
         Right pkgDescrp_ -> do
-           let pkgDescrp' = D.drop (B.bound args) (T.targets args) (DP.dependencies args) pkgDescrp_
+           let pkgDescrp' = D.drop (B.boundOfDrop args) (T.targets args) (DP.dependencies args) pkgDescrp_
            writeFile (A.outputFile args) (showGenericPackageDescription pkgDescrp')
            return Nothing
 
@@ -37,7 +37,7 @@ cabalBounds args@A.Update {} = do
         (Left error, _) -> return . Just $ error
         (_, Left error) -> return . Just $ error
         (Right pkgDescrp_, Right buildInfo_) -> do
-           let pkgDescrp' = U.update (B.bound args) (T.targets args) (DP.dependencies args) pkgDescrp_ buildInfo_
+           let pkgDescrp' = U.update (B.boundOfUpdate args) (T.targets args) (DP.dependencies args) pkgDescrp_ buildInfo_
            writeFile (A.outputFile args) (showGenericPackageDescription pkgDescrp')
            return Nothing
 

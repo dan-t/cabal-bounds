@@ -10,6 +10,7 @@ module CabalBounds.Args
    ) where
 
 import System.Console.CmdArgs hiding (ignore)
+import CabalBounds.VersionComp (VersionComp(..))
 
 #ifdef CABAL
 import Data.Version (showVersion)
@@ -28,6 +29,8 @@ data Args = Drop { upper           :: Bool
                  }
           | Update { lower           :: Bool
                    , upper           :: Bool
+                   , lowerComp       :: Maybe VersionComp
+                   , upperComp       :: Maybe VersionComp
                    , library         :: Bool
                    , executable      :: [String]
                    , testSuite       :: [String]
@@ -76,6 +79,8 @@ defaultUpdate :: Args
 defaultUpdate = Update
    { lower           = False
    , upper           = False
+   , lowerComp       = Nothing
+   , upperComp       = Nothing
    , library         = False
    , executable      = []
    , testSuite       = []
@@ -104,8 +109,10 @@ dropArgs = Drop
 
 updateArgs :: Args
 updateArgs = Update
-   { lower           = def &= explicit &= name "lower" &= name "L" &= help "Only the lower bound is updated."
-   , upper           = def &= explicit &= name "upper" &= name "U" &= help "Only the upper bound is updated."
+   { lower           = def &= explicit &= name "lower" &= name "L" &= help "Only the lower bound is updated. The same as using '--lowercomp=minor'."
+   , upper           = def &= explicit &= name "upper" &= name "U" &= help "Only the upper bound is updated. The same as using '--uppercomp=major2'."
+   , lowerComp       = def &= explicit &= name "lowercomp" &= help "Only the lower bound is updated with the specified version component. (major1, major2 or minor)" 
+   , upperComp       = def &= explicit &= name "uppercomp" &= help "Only the upper bound is updated with the specified version component. (major1, major2 or minor)"
    , setupConfigFile = def &= argPos 1 &= typ "SETUP-CONFIG-FILE"
    }
 

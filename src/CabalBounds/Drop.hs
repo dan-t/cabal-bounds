@@ -9,14 +9,14 @@ import qualified Distribution.PackageDescription as C
 import qualified Distribution.Package as C
 import qualified Distribution.Version as C
 import Control.Lens
-import CabalBounds.Bound (Bound(..))
+import CabalBounds.Bound (DropBound(..))
 import CabalBounds.Targets (Targets(..), dependenciesOf)
 import CabalBounds.Dependencies (Dependencies, filterDependencies)
 import CabalBounds.Lenses
 import Data.List (foldl')
 
 
-drop :: Bound -> Targets -> Dependencies -> C.GenericPackageDescription -> C.GenericPackageDescription
+drop :: DropBound -> Targets -> Dependencies -> C.GenericPackageDescription -> C.GenericPackageDescription
 drop bound AllTargets deps pkgDescrp =
    pkgDescrp & dependenciesOfLib        . filterDeps %~ dropFromDep
              & dependenciesOfAllExes    . filterDeps %~ dropFromDep
@@ -37,8 +37,8 @@ drop bound (Targets targets) deps pkgDescrp =
       dropFromDep = dropFromDependency bound
 
 
-dropFromDependency :: Bound -> C.Dependency -> C.Dependency
-dropFromDependency UpperBound (C.Dependency pkgName versionRange) = C.Dependency pkgName versionRange'
+dropFromDependency :: DropBound -> C.Dependency -> C.Dependency
+dropFromDependency DropUpper (C.Dependency pkgName versionRange) = C.Dependency pkgName versionRange'
    where
       versionRange'
          | Just vi <- C.mkVersionIntervals intervals' 
@@ -49,4 +49,4 @@ dropFromDependency UpperBound (C.Dependency pkgName versionRange) = C.Dependency
 
       intervals' = map (& _2 .~ C.NoUpperBound) (C.asVersionIntervals versionRange)
 
-dropFromDependency _ (C.Dependency pkgName _) = C.Dependency pkgName C.anyVersion
+dropFromDependency DropBoth (C.Dependency pkgName _) = C.Dependency pkgName C.anyVersion

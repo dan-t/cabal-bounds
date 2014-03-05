@@ -11,15 +11,16 @@ import qualified Distribution.Simple.LocalBuildInfo as C
 import qualified Distribution.Simple.PackageIndex as C
 import qualified Distribution.InstalledPackageInfo as C
 import Control.Lens
-import CabalBounds.Bound (Bound(..))
+import CabalBounds.Bound (UpdateBound(..))
 import CabalBounds.Targets (Targets(..), dependenciesOf)
 import CabalBounds.Dependencies (Dependencies, filterDependencies)
+import CabalBounds.VersionComp (VersionComp(..), defaultLowerComp)
 import CabalBounds.Lenses
 import Data.List (sort, foldl', find)
 
 type InstalledPackages = [(C.PackageName, C.Version)]
 
-update :: Bound -> Targets -> Dependencies -> C.GenericPackageDescription -> C.LocalBuildInfo -> C.GenericPackageDescription
+update :: UpdateBound -> Targets -> Dependencies -> C.GenericPackageDescription -> C.LocalBuildInfo -> C.GenericPackageDescription
 update bound AllTargets deps pkgDescrp buildInfo =
    pkgDescrp & dependenciesOfLib        . filterDeps %~ updateDep
              & dependenciesOfAllExes    . filterDeps %~ updateDep
@@ -40,28 +41,28 @@ update bound (Targets targets) deps pkgDescrp buildInfo =
       updateDep  = updateDependency bound (installedPackages buildInfo)
 
 
-updateDependency :: Bound -> InstalledPackages -> C.Dependency -> C.Dependency
-updateDependency LowerBound instPkgs dep@(C.Dependency pkgName _)
+updateDependency :: UpdateBound -> InstalledPackages -> C.Dependency -> C.Dependency
+updateDependency (UpdateLower comp) instPkgs dep@(C.Dependency pkgName _)
    | Just (_, version) <- find ((== pkgName) . fst) instPkgs
-   , Just intervals    <- versionIntervals version Nothing
+   , Just intervals    <- versionIntervals (versionComp comp version) Nothing
    = C.Dependency pkgName (C.fromVersionIntervals intervals)
 
    | otherwise
    = dep
 
-updateDependency UpperBound instPkgs dep@(C.Dependency pkgName versionRange)
+updateDependency (UpdateUpper comp) instPkgs dep@(C.Dependency pkgName versionRange)
    | not . C.isAnyVersion $ versionRange
    , Just (_, upperVersion)             <- find ((== pkgName) . fst) instPkgs
    , (C.LowerBound lowerVersion _, _):_ <- C.asVersionIntervals versionRange
-   , Just intervals                     <- versionIntervals lowerVersion (Just $ nextMajorVersion upperVersion)
+   , Just intervals                     <- versionIntervals lowerVersion (Just $ nextVersion $ versionComp comp upperVersion)
    = C.Dependency pkgName (C.fromVersionIntervals intervals)
 
    | otherwise
-   = updateDependency BothBounds instPkgs dep
+   = updateDependency (UpdateBoth defaultLowerComp comp) instPkgs dep
 
-updateDependency BothBounds instPkgs dep@(C.Dependency pkgName _)
+updateDependency (UpdateBoth lowerComp upperComp) instPkgs dep@(C.Dependency pkgName _)
    | Just (_, version) <- find ((== pkgName) . fst) instPkgs
-   , Just intervals    <- versionIntervals version (Just $ nextMajorVersion version)
+   , Just intervals    <- versionIntervals (versionComp lowerComp version) (Just $ nextVersion $ versionComp upperComp version)
    = C.Dependency pkgName (C.fromVersionIntervals intervals)
 
    | otherwise
@@ -76,16 +77,24 @@ versionIntervals lowerVersion (Just upperVersion) =
    C.mkVersionIntervals [(C.LowerBound lowerVersion C.InclusiveBound, C.UpperBound upperVersion C.ExclusiveBound)]
 
 
-nextMajorVersion :: C.Version -> C.Version
-nextMajorVersion version
-   | (v1:v2:_) <- C.versionBranch version
-   = C.Version {C.versionBranch = [v1, (v2 + 1)], C.versionTags = []}
+versionComp :: VersionComp -> C.Version -> C.Version
+versionComp Major1 version =
+   version & vbranch %~ take 1
+           & vtags   .~ []
 
-   | (v1:_)    <- C.versionBranch version
-   = C.Version {C.versionBranch = [v1, 1], C.versionTags = []}
+versionComp Major2 version =
+   version & vbranch %~ take 2
+           & vtags   .~ []
 
-   | otherwise
-   = version
+versionComp Minor version =
+   version & vtags .~ []
+
+
+nextVersion :: C.Version -> C.Version
+nextVersion version =
+   version & vbranch %~ increaseLast
+   where
+      increaseLast = reverse . (& ix 0 %~ (+ 1)) . reverse
 
 
 installedPackages :: C.LocalBuildInfo -> InstalledPackages

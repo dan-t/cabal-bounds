@@ -4,6 +4,7 @@ module CabalBounds.Lenses where
 
 import Distribution.PackageDescription
 import Distribution.Package
+import Distribution.Version
 import Control.Lens
 import Data.Data.Lens
 
@@ -24,6 +25,10 @@ makeLensesFor [ ("testName", "testNameL")
 
 makeLensesFor [ ("benchmarkName", "benchmarkNameL")
               ] ''Benchmark
+
+makeLensesFor [ ("versionBranch", "vbranch")
+              , ("versionTags"  , "vtags")
+              ] ''Version
 
 dependenciesOfLib :: Traversal' GenericPackageDescription [Dependency]
 dependenciesOfLib = condLibraryL . _Just . biplate
