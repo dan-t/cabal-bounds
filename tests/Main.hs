@@ -7,6 +7,7 @@ import System.FilePath
 import System.IO (hPutStrLn, stderr)
 import CabalBounds.Args
 import CabalBounds.Main (cabalBounds)
+import CabalBounds.VersionComp (VersionComp(..))
 
 main = defaultMain tests
 
@@ -59,6 +60,14 @@ updateTests = testGroup "Update Tests"
    , test "UpdateUpperOnlyBase" $ defaultUpdate { upper = True, only = ["base"] }
    , test "UpdateBothIgnoreBase" $ defaultUpdate { ignore = ["base"] }
    , test "UpdateLowerIgnoreBase" $ defaultUpdate { lower = True, ignore = ["base"] }
+   , test "UpdateMinorLower" $ defaultUpdate { lowerComp = Just Minor }
+   , test "UpdateMajor2Lower" $ defaultUpdate {lowerComp = Just Major2 }
+   , test "UpdateMajor1Lower" $ defaultUpdate {lowerComp = Just Major1 }
+   , test "UpdateMinorUpper" $ defaultUpdate { upperComp = Just Minor }
+   , test "UpdateMajor2Upper" $ defaultUpdate {upperComp = Just Major2 }
+   , test "UpdateMajor1Upper" $ defaultUpdate {upperComp = Just Major1 }
+   , test "UpdateMinorLowerAndUpper" $ defaultUpdate { lowerComp = Just Minor, upperComp = Just Minor }
+   , test "UpdateMajor1LowerAndUpper" $ defaultUpdate { lowerComp = Just Major1, upperComp = Just Major1 }
    ] 
 
 
