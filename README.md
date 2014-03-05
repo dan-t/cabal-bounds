@@ -38,27 +38,47 @@ Example: Bound Changes
 The `=>` shows what the result is of the operation for every dependency. Left is the dependency before
 calling the command, right the one after calling.
 
-    $> cabal-bounds drop myproject.cabal
+    $> cabal-bounds drop ...
     lens >=4.0.1 && <4.1   =>   lens
 
-    $> cabal-bounds drop --upper myproject.cabal
+    $> cabal-bounds drop --upper ...
     lens >=4.0.1 && <4.1   =>   lens >=4.0.1
 
 If the cabal build (the setup-config) uses `lens 4.1.2`, then the results of the `update` command would be:
 
-    $> cabal-bounds update myproject.cabal setup-config
+    $> cabal-bounds update ...
     lens >=4.0.1 && <4.1   =>   lens >=4.1.2 && <4.2
     lens                   =>   lens >=4.1.2 && <4.2
 
-    $> cabal-bounds update --lower myproject.cabal setup-config
+    $> cabal-bounds update --lower ...
     lens >=4.0.1 && <4.1   =>   lens >=4.1.2
     lens <4.1              =>   lens >=4.1.2
     lens                   =>   lens >=4.1.2
 
-    $> cabal-bounds update --upper myproject.cabal setup-config
+    $> cabal-bounds update --upper ...
     lens >=4.0.1 && <4.1   =>   lens >=4.0.1 && <4.2
     lens >=4.0.1           =>   lens >=4.0.1 && <4.2
     lens                   =>   lens >=4.1.2 && <4.2
+
+You can also specify which component of the version number should be updated:
+
+    $> cabal-bounds update --lowercomp=minor ...
+    lens >=4.0.1 && <4.1   =>   lens >=4.1.2
+
+    $> cabal-bounds update --lowercomp=major2 ...
+    lens >=4.0.1 && <4.1   =>   lens >=4.1
+
+    $> cabal-bounds update --lowercomp=major1 ...
+    lens >=4.0.1 && <4.1   =>   lens >=4
+
+    $> cabal-bounds update --uppercomp=minor ...
+    lens >=4.0.1 && <4.1   =>   lens >=4.0.1 && <4.1.3
+
+    $> cabal-bounds update --uppercomp=major2 ...
+    lens >=4.0.1 && <4.1   =>   lens >=4.0.1 && <4.2
+
+    $> cabal-bounds update --uppercomp=major1 ...
+    lens >=4.0.1 && <4.1   =>   lens >=4.0.1 && <5
 
 Options
 =======
