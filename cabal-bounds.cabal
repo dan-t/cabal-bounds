@@ -178,27 +178,19 @@ library
     ghc-options: -W
  
 executable cabal-bounds
-    build-depends: base >=3 && <5, cmdargs >=0.10.5 && <0.11,
-                   lens >=4.0.1 && <4.1, strict >=0.3.2 && <0.4,
-                   unordered-containers >=0.2.3.3 && <0.3, Cabal >=1.18.0 && <1.19
+    build-depends: base >=3 && <5, cabal-bounds
     main-is: Main.hs
     buildable: True
-    cpp-options: -DCABAL
-    hs-source-dirs: src
-    other-modules: Paths_cabal_bounds CabalBounds.Args
-                   CabalBounds.Bound CabalBounds.Targets CabalBounds.Dependencies
-                   CabalBounds.Drop CabalBounds.Update CabalBounds.Lenses
-                   CabalBounds.VersionComp CabalBounds.Main
+    hs-source-dirs: exe
     ghc-options: -W
  
 test-suite cabal-bounds-tests
-    build-depends: base >=3 && <5, cmdargs >=0.10.5 && <0.11,
-                   lens >=4.0.1 && <4.1, strict >=0.3.2 && <0.4,
-                   unordered-containers >=0.2.3.3 && <0.3, Cabal >=1.18.0 && <1.19,
-                   tasty ==0.7.*, tasty-golden >=2.2.0.2 && <2.3,
-                   filepath >=1.3.0.1 && <1.4, cabal-bounds -any
+    build-depends: base >=3 && <5, tasty ==0.7.*,
+                   tasty-golden >=2.2.0.2 && <2.3, filepath >=1.3.0.1 && <1.4,
+                   cabal-bounds
     type: exitcode-stdio-1.0
-    main-is: tests/Main.hs
+    main-is: Main.hs
     buildable: True
+    hs-source-dirs: tests
     ghc-options: -W
  
