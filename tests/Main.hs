@@ -83,11 +83,11 @@ test testName args =
 
       argsWithFiles = 
          case args of
-              Drop {}   -> args { cabalFile       = inputFile
-                                , outputCabalFile = outputFile
+              Drop {}   -> args { cabalFile = inputFile
+                                , output    = outputFile
                                 }
               Update {} -> args { cabalFile       = inputFile
-                                , outputCabalFile = outputFile
+                                , output          = outputFile
                                 , setupConfigFile = setupConfigFile
                                 }
 

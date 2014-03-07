@@ -17,15 +17,15 @@ import Data.Version (showVersion)
 import Paths_cabal_bounds (version)
 #endif
 
-data Args = Drop { upper           :: Bool
-                 , library         :: Bool
-                 , executable      :: [String]
-                 , testSuite       :: [String]
-                 , benchmark       :: [String]
-                 , only            :: [String]
-                 , ignore          :: [String]
-                 , outputCabalFile :: String
-                 , cabalFile       :: String
+data Args = Drop { upper      :: Bool
+                 , library    :: Bool
+                 , executable :: [String]
+                 , testSuite  :: [String]
+                 , benchmark  :: [String]
+                 , only       :: [String]
+                 , ignore     :: [String]
+                 , output     :: String
+                 , cabalFile  :: String
                  }
           | Update { lower           :: Bool
                    , upper           :: Bool
@@ -37,7 +37,7 @@ data Args = Drop { upper           :: Bool
                    , benchmark       :: [String]
                    , only            :: [String]
                    , ignore          :: [String]
-                   , outputCabalFile :: String
+                   , output          :: String
                    , cabalFile       :: String
                    , setupConfigFile :: String
                    } 
@@ -57,8 +57,8 @@ get = cmdArgsRun . cmdArgsMode $ modes [dropArgs, updateArgs]
 
 outputFile :: Args -> FilePath
 outputFile args
-   | null $ outputCabalFile args = cabalFile args
-   | otherwise                   = outputCabalFile args
+   | null $ output args = cabalFile args
+   | otherwise          = output args
 
 
 defaultDrop :: Args
@@ -70,7 +70,7 @@ defaultDrop = Drop
    , benchmark       = []
    , only            = []
    , ignore          = []
-   , outputCabalFile = ""
+   , output          = ""
    , cabalFile       = ""
    }
 
@@ -87,7 +87,7 @@ defaultUpdate = Update
    , benchmark       = []
    , only            = []
    , ignore          = []
-   , outputCabalFile = ""
+   , output          = ""
    , cabalFile       = ""
    , setupConfigFile = ""
    }
@@ -102,7 +102,7 @@ dropArgs = Drop
    , benchmark       = def &= typ "BENCHMARK" &= help "Only the bounds of the benchmark are modified."
    , only            = def &= explicit &= typ "DEPENDENCY" &= name "only" &= name "O" &= help "Only the bounds of the dependency are modified."
    , ignore          = def &= explicit &= typ "DEPENDENCY" &= name "ignore" &= name "I" &= help "This dependency is ignored, not modified in any way."
-   , outputCabalFile = def &= explicit &= typ "FILE" &= name "outputCabalFile" &= name "o" &= help "Save modified cabal file to file, if empty, the cabal file is modified inplace."
+   , output = def &= explicit &= typ "FILE" &= name "output" &= name "o" &= help "Save modified cabal file to file, if empty, the cabal file is modified inplace."
    , cabalFile       = def &= argPos 0 &= typ "CABAL-FILE"
    }
 
