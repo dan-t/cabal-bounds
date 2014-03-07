@@ -18,10 +18,7 @@ import Distribution.Version (mkVersionIntervals, fromVersionIntervals, asVersion
 
 drop :: DropBound -> Targets -> Dependencies -> GenericPackageDescription -> GenericPackageDescription
 drop bound AllTargets deps pkgDescrp =
-   pkgDescrp & L.dependenciesOfLib        . filterDeps %~ dropFromDep
-             & L.dependenciesOfAllExes    . filterDeps %~ dropFromDep
-             & L.dependenciesOfAllTests   . filterDeps %~ dropFromDep
-             & L.dependenciesOfAllBenchms . filterDeps %~ dropFromDep
+   pkgDescrp & L.allDependencies . filterDeps %~ dropFromDep
    where
       filterDeps  = filterDependencies deps
       dropFromDep = dropFromDependency bound

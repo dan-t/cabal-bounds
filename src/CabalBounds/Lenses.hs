@@ -3,6 +3,7 @@
 module CabalBounds.Lenses
    ( vbranch
    , vtags
+   , allDependencies
    , dependenciesOfLib
    , dependenciesOfAllExes
    , dependenciesOfExe
@@ -27,6 +28,10 @@ makeLensesFor [ ("condLibrary"    , "condLibraryL")
 makeLensesFor [ ("versionBranch", "vbranch")
               , ("versionTags"  , "vtags")
               ] ''Version
+
+
+allDependencies :: Traversal' GenericPackageDescription [Dependency]
+allDependencies = biplate
 
 dependenciesOfLib :: Traversal' GenericPackageDescription [Dependency]
 dependenciesOfLib = condLibraryL . _Just . biplate

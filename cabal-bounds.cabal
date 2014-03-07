@@ -1,5 +1,5 @@
 name: cabal-bounds
-version: 0.2
+version: 0.2.1
 cabal-version: >=1.9.2
 build-type: Simple
 license: BSD3
@@ -26,20 +26,20 @@ description: 'cabal-bounds' is able to do two things:
              .
              > # update the version infos of all libraries
              > $> cabal update
-             > 
+             >
              > # drops the upper bound of all dependencies in 'myproject.cabal',
              > # most likely you want to ignore 'base'
              > $> cabal-bounds drop --upper --ignore=base myproject.cabal
-             > 
+             >
              > # create a cabal sandbox for building of 'myproject'
              > $> cabal sandbox init
-             >   
+             >
              > # build 'myproject'
              > $> cabal install
-             > 
+             >
              > # update the upper bound of all dependencies in 'myproject.cabal'
              > # by the cabal build information
-             > $> cabal-bounds update --upper --ignore=base myproject.cabal dist/dist-sandbox-*/setup-config 
+             > $> cabal-bounds update --upper --ignore=base myproject.cabal dist/dist-sandbox-*/setup-config
              .
              .
              .
@@ -51,7 +51,7 @@ description: 'cabal-bounds' is able to do two things:
              .
              > $> cabal-bounds drop ...
              > lens >=4.0.1 && <4.1   =>   lens
-             > 
+             >
              > $> cabal-bounds drop --upper ...
              > lens >=4.0.1 && <4.1   =>   lens >=4.0.1
              .
@@ -100,8 +100,8 @@ description: 'cabal-bounds' is able to do two things:
              .
              > $> cabal --version
              > cabal-install version 1.18.0.2
-             > using version 1.18.1 of the Cabal library 
-             > 
+             > using version 1.18.1 of the Cabal library
+             >
              > $> cabal install --constraint="Cabal == 1.18.1" cabal-bounds
              .
              If you update the 'cabal' binary and the used 'Cabal' library changes, then you have to rebuild 'cabal-bounds'.
@@ -164,8 +164,10 @@ source-repository head
  
 library
     build-depends: base >=3 && <5, cmdargs >=0.10.5 && <0.11,
-                   lens >=4.0.1 && <4.1, strict >=0.3.2 && <0.4, Cabal >=1.18.0 && <1.19
-    exposed-modules: CabalBounds.Args CabalBounds.Main CabalBounds.VersionComp
+                   lens >=4.0.1 && <4.1, strict >=0.3.2 && <0.4,
+                   unordered-containers >=0.2.3.3 && <0.3, Cabal >=1.18.0 && <1.19
+    exposed-modules: CabalBounds.Args CabalBounds.Main
+                     CabalBounds.VersionComp
     exposed: True
     buildable: True
     cpp-options: -DCABAL
@@ -177,7 +179,8 @@ library
  
 executable cabal-bounds
     build-depends: base >=3 && <5, cmdargs >=0.10.5 && <0.11,
-                   lens >=4.0.1 && <4.1, strict >=0.3.2 && <0.4, Cabal >=1.18.0 && <1.19
+                   lens >=4.0.1 && <4.1, strict >=0.3.2 && <0.4,
+                   unordered-containers >=0.2.3.3 && <0.3, Cabal >=1.18.0 && <1.19
     main-is: Main.hs
     buildable: True
     cpp-options: -DCABAL
@@ -190,7 +193,8 @@ executable cabal-bounds
  
 test-suite cabal-bounds-tests
     build-depends: base >=3 && <5, cmdargs >=0.10.5 && <0.11,
-                   lens >=4.0.1 && <4.1, strict >=0.3.2 && <0.4, Cabal >=1.18.0 && <1.19,
+                   lens >=4.0.1 && <4.1, strict >=0.3.2 && <0.4,
+                   unordered-containers >=0.2.3.3 && <0.3, Cabal >=1.18.0 && <1.19,
                    tasty ==0.7.*, tasty-golden >=2.2.0.2 && <2.3,
                    filepath >=1.3.0.1 && <1.4, cabal-bounds -any
     type: exitcode-stdio-1.0
