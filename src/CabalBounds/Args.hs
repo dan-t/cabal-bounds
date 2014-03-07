@@ -63,33 +63,33 @@ outputFile args
 
 defaultDrop :: Args
 defaultDrop = Drop
-   { upper           = False
-   , library         = False
-   , executable      = []
-   , testSuite       = []
-   , benchmark       = []
-   , only            = []
-   , ignore          = []
-   , output          = ""
-   , cabalFile       = ""
+   { upper           = def
+   , library         = def
+   , executable      = def
+   , testSuite       = def
+   , benchmark       = def
+   , only            = def
+   , ignore          = def
+   , output          = def
+   , cabalFile       = def
    }
 
 
 defaultUpdate :: Args
 defaultUpdate = Update
-   { lower           = False
-   , upper           = False
-   , lowerComp       = Nothing
-   , upperComp       = Nothing
-   , library         = False
-   , executable      = []
-   , testSuite       = []
-   , benchmark       = []
-   , only            = []
-   , ignore          = []
-   , output          = ""
-   , cabalFile       = ""
-   , setupConfigFile = ""
+   { lower           = def
+   , upper           = def
+   , lowerComp       = def
+   , upperComp       = def
+   , library         = def
+   , executable      = def
+   , testSuite       = def
+   , benchmark       = def
+   , only            = def
+   , ignore          = def
+   , output          = def
+   , cabalFile       = def
+   , setupConfigFile = def
    }
 
 
