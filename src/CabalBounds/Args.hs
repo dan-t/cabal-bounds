@@ -97,9 +97,9 @@ dropArgs :: Args
 dropArgs = Drop
    { upper           = def &= explicit &= name "upper" &= name "U" &= help "Only the upper bound is dropped, otherwise both - the lower and upper - bounds are dropped."
    , library         = def &= explicit &= name "library" &= name "l" &= help "Only the bounds of the library are modified."
-   , executable      = def &= typ "EXECUTABLE" &= help "Only the bounds of the executable are modified."
-   , testSuite       = def &= typ "TESTSUITE" &= help "Only the bounds of the test suite are modified."
-   , benchmark       = def &= typ "BENCHMARK" &= help "Only the bounds of the benchmark are modified."
+   , executable      = def &= typ "NAME" &= help "Only the bounds of the executable are modified."
+   , testSuite       = def &= typ "NAME" &= help "Only the bounds of the test suite are modified."
+   , benchmark       = def &= typ "NAME" &= help "Only the bounds of the benchmark are modified."
    , only            = def &= explicit &= typ "DEPENDENCY" &= name "only" &= name "O" &= help "Only the bounds of the dependency are modified."
    , ignore          = def &= explicit &= typ "DEPENDENCY" &= name "ignore" &= name "I" &= help "This dependency is ignored, not modified in any way."
    , output = def &= explicit &= typ "FILE" &= name "output" &= name "o" &= help "Save modified cabal file to file, if empty, the cabal file is modified inplace."
