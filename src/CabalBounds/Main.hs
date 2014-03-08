@@ -27,16 +27,14 @@ cabalBounds args@A.Drop {} = do
    leftToJust <$> (runEitherT $ do
       pkgDescrp <- packageDescription $ A.cabalFile args
       let pkgDescrp' = D.drop (B.boundOfDrop args) (S.sections args) (DP.dependencies args) pkgDescrp
-      liftIO $ writeFile (A.outputFile args) (showGenericPackageDescription pkgDescrp')
-      right ())
+      liftIO $ writeFile (A.outputFile args) (showGenericPackageDescription pkgDescrp'))
 
 cabalBounds args@A.Update {} = do
    leftToJust <$> (runEitherT $ do
       pkgDescrp <- packageDescription $ A.cabalFile args
       buildInfo <- localBuildInfo $ A.setupConfigFile args
       let pkgDescrp' = U.update (B.boundOfUpdate args) (S.sections args) (DP.dependencies args) pkgDescrp buildInfo
-      liftIO $ writeFile (A.outputFile args) (showGenericPackageDescription pkgDescrp')
-      right ())
+      liftIO $ writeFile (A.outputFile args) (showGenericPackageDescription pkgDescrp'))
 
 
 packageDescription :: FilePath -> EitherT Error IO GenericPackageDescription
