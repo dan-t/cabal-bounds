@@ -1,9 +1,9 @@
 {-# LANGUAGE PatternGuards, Rank2Types #-}
 
-module CabalBounds.Targets
-   ( Targets(..)
-   , Target(..)
-   , targets
+module CabalBounds.Sections
+   ( Sections(..)
+   , Section(..)
+   , sections
    , dependenciesOf
    ) where
 
@@ -14,30 +14,31 @@ import CabalBounds.Args (Args)
 import qualified CabalBounds.Args as A
 import qualified CabalBounds.Lenses as L
 
-data Targets = Targets [Target]
-             | AllTargets
+data Sections = Sections [Section]
+              | AllSections
+              deriving (Show, Eq)
+
+-- | A section of the cabal file.
+data Section = Library
+             | Executable String
+             | TestSuite String
+             | Benchmark String
              deriving (Show, Eq)
 
-data Target = Library
-            | Executable String
-            | TestSuite String
-            | Benchmark String
-            deriving (Show, Eq)
-
-targets :: Args -> Targets
-targets args 
+sections :: Args -> Sections
+sections args 
    | ts@(_:_) <- concat [ if (A.library args) then [Library] else []
                         , map Executable (A.executable args)
                         , map TestSuite (A.testSuite args)
                         , map Benchmark (A.benchmark args)
                         ]
-   = Targets ts
+   = Sections ts
 
    | otherwise
-   = AllTargets
+   = AllSections
 
 
-dependenciesOf :: Target -> Traversal' GenericPackageDescription [Dependency]
+dependenciesOf :: Section -> Traversal' GenericPackageDescription [Dependency]
 dependenciesOf Library            = L.dependenciesOfLib
 dependenciesOf (Executable exe)   = L.dependenciesOfExe exe
 dependenciesOf (TestSuite test)   = L.dependenciesOfTest test

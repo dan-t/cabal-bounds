@@ -13,7 +13,7 @@ import qualified Distribution.InstalledPackageInfo as PI
 import Control.Lens
 import Control.Applicative ((<$>))
 import CabalBounds.Bound (UpdateBound(..))
-import CabalBounds.Targets (Targets(..), dependenciesOf)
+import CabalBounds.Sections (Sections(..), dependenciesOf)
 import CabalBounds.Dependencies (Dependencies, filterDependencies)
 import CabalBounds.VersionComp (VersionComp(..), defaultLowerComp)
 import qualified CabalBounds.Lenses as L
@@ -25,18 +25,18 @@ type PkgName           = String
 type InstalledPackages = HM.HashMap PkgName V.Version
 
 
-update :: UpdateBound -> Targets -> Dependencies -> D.GenericPackageDescription -> BI.LocalBuildInfo -> D.GenericPackageDescription
-update bound AllTargets deps pkgDescrp buildInfo =
+update :: UpdateBound -> Sections -> Dependencies -> D.GenericPackageDescription -> BI.LocalBuildInfo -> D.GenericPackageDescription
+update bound AllSections deps pkgDescrp buildInfo =
    pkgDescrp & L.allDependencies . filterDeps %~ updateDep
    where
       filterDeps = filterDependencies deps
       updateDep  = updateDependency bound (installedPackages buildInfo)
 
-update bound (Targets targets) deps pkgDescrp buildInfo =
-   foldl' updateTarget pkgDescrp targets
+update bound (Sections sections) deps pkgDescrp buildInfo =
+   foldl' updateSection pkgDescrp sections
    where
-      updateTarget pkgDescrp target =
-         pkgDescrp & (dependenciesOf target) . filterDeps %~ updateDep
+      updateSection pkgDescrp section =
+         pkgDescrp & (dependenciesOf section) . filterDeps %~ updateDep
 
       filterDeps = filterDependencies deps
       updateDep  = updateDependency bound (installedPackages buildInfo)

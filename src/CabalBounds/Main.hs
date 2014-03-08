@@ -11,7 +11,7 @@ import Distribution.Simple.Configure (ConfigStateFileErrorType(..), tryGetConfig
 import Distribution.Simple.LocalBuildInfo (LocalBuildInfo)
 import qualified CabalBounds.Args as A
 import qualified CabalBounds.Bound as B
-import qualified CabalBounds.Targets as T
+import qualified CabalBounds.Sections as S
 import qualified CabalBounds.Dependencies as DP
 import qualified CabalBounds.Drop as D
 import qualified CabalBounds.Update as U
@@ -26,7 +26,7 @@ cabalBounds args@A.Drop {} = do
    case pkgDescrp of
         Left  error      -> return . Just $ error
         Right pkgDescrp_ -> do
-           let pkgDescrp' = D.drop (B.boundOfDrop args) (T.targets args) (DP.dependencies args) pkgDescrp_
+           let pkgDescrp' = D.drop (B.boundOfDrop args) (S.sections args) (DP.dependencies args) pkgDescrp_
            writeFile (A.outputFile args) (showGenericPackageDescription pkgDescrp')
            return Nothing
 
@@ -37,7 +37,7 @@ cabalBounds args@A.Update {} = do
         (Left error, _) -> return . Just $ error
         (_, Left error) -> return . Just $ error
         (Right pkgDescrp_, Right buildInfo_) -> do
-           let pkgDescrp' = U.update (B.boundOfUpdate args) (T.targets args) (DP.dependencies args) pkgDescrp_ buildInfo_
+           let pkgDescrp' = U.update (B.boundOfUpdate args) (S.sections args) (DP.dependencies args) pkgDescrp_ buildInfo_
            writeFile (A.outputFile args) (showGenericPackageDescription pkgDescrp')
            return Nothing
 

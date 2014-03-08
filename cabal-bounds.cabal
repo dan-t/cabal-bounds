@@ -173,7 +173,7 @@ library
     cpp-options: -DCABAL
     hs-source-dirs: src
     other-modules: Paths_cabal_bounds CabalBounds.Bound
-                   CabalBounds.Targets CabalBounds.Dependencies CabalBounds.Drop
+                   CabalBounds.Sections CabalBounds.Dependencies CabalBounds.Drop
                    CabalBounds.Update CabalBounds.Lenses
     ghc-options: -W
  
