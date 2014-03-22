@@ -164,7 +164,7 @@ source-repository head
  
 library
     build-depends: base >=3 && <5, cmdargs >=0.10.5 && <0.11,
-                   lens >=4.0.1 && <4.1, strict >=0.3.2 && <0.4,
+                   lens >=4.0.1 && <4.2, strict >=0.3.2 && <0.4,
                    unordered-containers >=0.2.3.3 && <0.3,
                    transformers >=0.3.0.0 && <0.4, either >=4.1.1 && <4.2,
                    Cabal >=1.18.0 && <1.19
@@ -187,7 +187,7 @@ executable cabal-bounds
     ghc-options: -W
  
 test-suite cabal-bounds-tests
-    build-depends: base >=3 && <5, tasty ==0.7.*,
+    build-depends: base >=3 && <5, tasty >=0.7 && <0.9,
                    tasty-golden >=2.2.0.2 && <2.3, filepath >=1.3.0.1 && <1.4,
                    cabal-bounds -any
     type: exitcode-stdio-1.0
