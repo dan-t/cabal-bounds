@@ -3,13 +3,14 @@ module Main where
 
 import qualified Test.Tasty as T
 import qualified Test.Tasty.Golden as G
+import qualified Test.Tasty.Golden.Manage as GM
 import System.IO (hPutStrLn, stderr)
 import System.FilePath ((</>), (<.>))
 import CabalBounds.Args
 import CabalBounds.Main (cabalBounds)
 import CabalBounds.VersionComp (VersionComp(..))
 
-main = T.defaultMain tests
+main = GM.defaultMain tests
 
 tests :: T.TestTree
 tests = T.testGroup "Tests" [dropTests, updateTests]
