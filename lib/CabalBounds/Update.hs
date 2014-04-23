@@ -1,5 +1,3 @@
-{-# LANGUAGE PatternGuards #-}
-
 module CabalBounds.Update
    ( update
    ) where
@@ -17,7 +15,7 @@ import CabalBounds.Sections (Sections(..), dependenciesOf)
 import CabalBounds.Dependencies (Dependencies, filterDependencies)
 import CabalBounds.VersionComp (VersionComp(..), defaultLowerComp)
 import qualified CabalBounds.Lenses as L
-import Data.List (sort, foldl')
+import Data.List (foldl')
 import qualified Data.HashMap.Strict as HM
 import Data.Maybe (fromMaybe, listToMaybe)
 
@@ -36,7 +34,7 @@ update bound (Sections sections) deps pkgDescrp buildInfo =
    foldl' updateSection pkgDescrp sections
    where
       updateSection pkgDescrp section =
-         pkgDescrp & (dependenciesOf section) . filterDeps %~ updateDep
+         pkgDescrp & dependenciesOf section . filterDeps %~ updateDep
 
       filterDeps = filterDependencies deps
       updateDep  = updateDependency bound (installedPackages buildInfo)
@@ -57,7 +55,7 @@ updateDependency (UpdateUpper comp) instPkgs dep
    | otherwise
    = fromMaybe dep $ do
         upperVersion                <- HM.lookup pkgName_ instPkgs
-        V.LowerBound lowerVersion _ <- fst <$> (listToMaybe $ V.asVersionIntervals versionRange_)
+        V.LowerBound lowerVersion _ <- fst <$> listToMaybe (V.asVersionIntervals versionRange_)
         vrange                      <- mkVersionRange lowerVersion (Just $ nextVersion $ comp `compOf` upperVersion)
         return $ mkDependency pkgName_ vrange
    where
@@ -108,7 +106,7 @@ installedPackages = HM.fromList
                     . PX.allPackagesByName . BI.installedPkgs
    where
       newestVersion :: [PI.InstalledPackageInfo] -> V.Version
-      newestVersion = last . sort . map (P.pkgVersion . PI.sourcePackageId)
+      newestVersion = maximum . map (P.pkgVersion . PI.sourcePackageId)
 
 
 pkgName :: P.Dependency -> PkgName
@@ -120,4 +118,4 @@ versionRange (P.Dependency _ vrange) = vrange
 
 
 mkDependency :: PkgName -> V.VersionRange -> P.Dependency
-mkDependency name vrange = P.Dependency (P.PackageName name) vrange
+mkDependency name = P.Dependency (P.PackageName name)

@@ -26,8 +26,8 @@ data Section = Library
              deriving (Show, Eq)
 
 sections :: Args -> Sections
-sections args 
-   | ts@(_:_) <- concat [ if (A.library args) then [Library] else []
+sections args
+   | ts@(_:_) <- concat [ [ Library | A.library args ]
                         , map Executable (A.executable args)
                         , map TestSuite (A.testSuite args)
                         , map Benchmark (A.benchmark args)

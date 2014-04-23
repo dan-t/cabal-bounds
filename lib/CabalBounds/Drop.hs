@@ -28,7 +28,7 @@ drop bound (Sections sections) deps pkgDescrp =
    foldl' dropFromSection pkgDescrp sections
    where
       dropFromSection pkgDescrp section =
-         pkgDescrp & (dependenciesOf section) . filterDeps %~ dropFromDep
+         pkgDescrp & dependenciesOf section . filterDeps %~ dropFromDep
 
       filterDeps  = filterDependencies deps
       dropFromDep = dropFromDependency bound

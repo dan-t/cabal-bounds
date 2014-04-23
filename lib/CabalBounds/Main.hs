@@ -23,14 +23,14 @@ import Control.Monad.IO.Class
 type Error = String
 
 cabalBounds :: A.Args -> IO (Maybe Error)
-cabalBounds args@A.Drop {} = do
-   leftToJust <$> (runEitherT $ do
+cabalBounds args@A.Drop {} =
+   leftToJust <$> runEitherT (do
       pkgDescrp <- packageDescription $ A.cabalFile args
       let pkgDescrp' = D.drop (B.boundOfDrop args) (S.sections args) (DP.dependencies args) pkgDescrp
       liftIO $ writeFile (A.outputFile args) (showGenericPackageDescription pkgDescrp'))
 
-cabalBounds args@A.Update {} = do
-   leftToJust <$> (runEitherT $ do
+cabalBounds args@A.Update {} =
+   leftToJust <$> runEitherT (do
       pkgDescrp <- packageDescription $ A.cabalFile args
       buildInfo <- localBuildInfo $ A.setupConfigFile args
       let pkgDescrp' = U.update (B.boundOfUpdate args) (S.sections args) (DP.dependencies args) pkgDescrp buildInfo
