@@ -16,7 +16,7 @@ source-repository head
     location: https://github.com/dan-t/cabal-bounds
  
 library
-    build-depends: base ==4.*, cmdargs ==0.*, lens ==4.*,
+    build-depends: base >=3 && <5, cmdargs ==0.*, lens ==4.*,
                    pretty-show -any, strict ==0.*, Cabal ==1.*
     exposed-modules: CabalBounds.Args CabalBounds.Command
                      CabalBounds.Execute CabalBounds.Lenses
@@ -27,7 +27,7 @@ library
                    CabalBounds.Command CabalBounds.Execute CabalBounds.Lenses
  
 executable cabal-bounds
-    build-depends: base ==4.*, cmdargs ==0.*, lens ==4.*,
+    build-depends: base >=3 && <5, cmdargs ==0.*, lens ==4.*,
                    pretty-show -any, strict ==0.*, Cabal ==1.*
     main-is: Main.hs
     buildable: True
@@ -38,7 +38,7 @@ executable cabal-bounds
     ghc-options: -W
  
 executable other-exe
-    build-depends: base ==4.*, cmdargs ==0.*, lens ==4.*,
+    build-depends: base >=3 && <5, cmdargs ==0.*, lens ==4.*,
                    pretty-show -any, strict ==0.*, Cabal ==1.*
     main-is: Main.hs
     buildable: True
@@ -49,14 +49,14 @@ executable other-exe
     ghc-options: -W
  
 test-suite some-test
-    build-depends: base ==4.*, cmdargs ==0.*, lens ==4.*,
+    build-depends: base >=3 && <5, cmdargs ==0.*, lens ==4.*,
                    pretty-show -any, strict ==0.*, Cabal ==1.*
     type: exitcode-stdio-1.0
     main-is: Main.hs
     buildable: True
     ghc-options: -W
 test-suite other-test
-    build-depends: base ==4.*, cmdargs ==0.*, lens ==4.*,
+    build-depends: base >=3 && <5, cmdargs ==0.*, lens ==4.*,
                    pretty-show -any, strict ==0.*, Cabal ==1.*
     type: exitcode-stdio-1.0
     main-is: Main.hs

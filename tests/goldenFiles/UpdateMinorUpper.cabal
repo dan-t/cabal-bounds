@@ -16,9 +16,8 @@ source-repository head
     location: https://github.com/dan-t/cabal-bounds
  
 library
-    build-depends: base >=3 && <4.6.0.2, cmdargs >=0.10.5 && <0.10.8,
-                   lens ==4.0.1.*, pretty-show -any, strict ==0.3.2.*,
-                   Cabal ==1.18.1.*
+    build-depends: base >=3 && <5, cmdargs >=0.10.5 && <0.11,
+                   lens <4.0.2, pretty-show -any, strict <0.3.3, Cabal <1.18.2
     exposed-modules: CabalBounds.Args CabalBounds.Command
                      CabalBounds.Execute CabalBounds.Lenses
     exposed: True
@@ -28,9 +27,8 @@ library
                    CabalBounds.Command CabalBounds.Execute CabalBounds.Lenses
  
 executable cabal-bounds
-    build-depends: base >=3 && <4.6.0.2, cmdargs >=0.10.5 && <0.10.8,
-                   lens ==4.0.1.*, pretty-show -any, strict ==0.3.2.*,
-                   Cabal ==1.18.1.*
+    build-depends: base >=3 && <5, cmdargs >=0.10.5 && <0.11,
+                   lens <4.0.2, pretty-show -any, strict <0.3.3, Cabal <1.18.2
     main-is: Main.hs
     buildable: True
     cpp-options: -DCABAL
@@ -40,9 +38,8 @@ executable cabal-bounds
     ghc-options: -W
  
 executable other-exe
-    build-depends: base >=3 && <4.6.0.2, cmdargs >=0.10.5 && <0.10.8,
-                   lens ==4.0.1.*, pretty-show -any, strict ==0.3.2.*,
-                   Cabal ==1.18.1.*
+    build-depends: base >=3 && <5, cmdargs >=0.10.5 && <0.11,
+                   lens <4.0.2, pretty-show -any, strict <0.3.3, Cabal <1.18.2
     main-is: Main.hs
     buildable: True
     cpp-options: -DCABAL
@@ -52,17 +49,15 @@ executable other-exe
     ghc-options: -W
  
 test-suite some-test
-    build-depends: base >=3 && <4.6.0.2, cmdargs >=0.10.5 && <0.10.8,
-                   lens ==4.0.1.*, pretty-show -any, strict ==0.3.2.*,
-                   Cabal ==1.18.1.*
+    build-depends: base >=3 && <5, cmdargs >=0.10.5 && <0.11,
+                   lens <4.0.2, pretty-show -any, strict <0.3.3, Cabal <1.18.2
     type: exitcode-stdio-1.0
     main-is: Main.hs
     buildable: True
     ghc-options: -W
 test-suite other-test
-    build-depends: base >=3 && <4.6.0.2, cmdargs >=0.10.5 && <0.10.8,
-                   lens ==4.0.1.*, pretty-show -any, strict ==0.3.2.*,
-                   Cabal ==1.18.1.*
+    build-depends: base >=3 && <5, cmdargs >=0.10.5 && <0.11,
+                   lens <4.0.2, pretty-show -any, strict <0.3.3, Cabal <1.18.2
     type: exitcode-stdio-1.0
     main-is: Main.hs
     buildable: True

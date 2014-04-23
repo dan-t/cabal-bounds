@@ -16,8 +16,8 @@ source-repository head
     location: https://github.com/dan-t/cabal-bounds
  
 library
-    build-depends: base >=4.6.0.1, cmdargs >=0.10.7, lens >=4.0.1,
-                   pretty-show -any, strict >=0.3.2, Cabal >=1.18.1
+    build-depends: base >=3 && <5, cmdargs >=0.10.5 && <0.11,
+                   lens >=4.0.1, pretty-show -any, strict >=0.3.2, Cabal >=1.18.1
     exposed-modules: CabalBounds.Args CabalBounds.Command
                      CabalBounds.Execute CabalBounds.Lenses
     exposed: True
