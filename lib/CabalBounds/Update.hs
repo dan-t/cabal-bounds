@@ -43,15 +43,10 @@ updateDependency :: UpdateBound -> InstalledPackages -> P.Dependency -> P.Depend
 updateDependency (UpdateLower comp) instPkgs dep =
    fromMaybe dep $ do
       version <- HM.lookup pkgName_ instPkgs
-      let newLowerBound = V.LowerBound (comp `compOf` version) V.InclusiveBound
-      vrange <- modifyVersionIntervals (updateLower newLowerBound) versionRange_
-
-      let vrange_
-            | version `V.withinRange` vrange = vrange
-              -- This may happen when the lower bound is greater than the new upper bound.
-              -- In this case, we just drop all existing bounds and only set the upper bound.
-            | otherwise = V.laterVersion $ comp `compOf` version
-      return $ mkDependency pkgName_ vrange_
+      let newLowerVersion = comp `compOf` version
+          newLowerBound = V.LowerBound newLowerVersion V.InclusiveBound
+          vrange = fromMaybe (V.orLaterVersion newLowerVersion) $ modifyVersionIntervals (updateLower newLowerBound) versionRange_
+      return $ mkDependency pkgName_ vrange
    where
       updateLower newLowerBound [] = [(newLowerBound, V.NoUpperBound)]
       updateLower newLowerBound intervals = intervals & _head . lowerBound .~ newLowerBound
