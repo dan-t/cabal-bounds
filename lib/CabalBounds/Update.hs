@@ -48,9 +48,7 @@ updateDependency (UpdateLower comp) instPkgs dep =
       return $ mkDependency pkgName_ vrange
    where
       updateLower newLowerBound [] = [(newLowerBound, V.NoUpperBound)]
-      updateLower newLowerBound intervals = intervals & _head . lowerBound %~ merge newLowerBound
-        where merge x (V.LowerBound (V.Version [0] _) _) = x
-              merge x y                                  = min x y
+      updateLower newLowerBound intervals = intervals & _head . lowerBound .~ newLowerBound
 
       pkgName_ = pkgName dep
       versionRange_ = versionRange dep
@@ -66,9 +64,7 @@ updateDependency (UpdateUpper comp) instPkgs dep =
       pkgName_      = pkgName dep
 
       updateUpper version newUpperBound [] = [(V.LowerBound (defaultLowerComp `compOf` version) V.InclusiveBound, newUpperBound)]
-      updateUpper _       newUpperBound intervals = intervals & _last . upperBound %~ merge newUpperBound
-        where merge x V.NoUpperBound = x
-              merge x y              = max x y
+      updateUpper _       newUpperBound intervals = intervals & _last . upperBound .~ newUpperBound
 
 updateDependency (UpdateBoth lowerComp upperComp) instPkgs dep =
     updateDependency (UpdateLower lowerComp) instPkgs $
