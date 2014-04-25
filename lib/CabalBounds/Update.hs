@@ -12,7 +12,7 @@ import Control.Lens
 import CabalBounds.Bound (UpdateBound(..))
 import CabalBounds.Sections (Sections(..), dependenciesOf)
 import CabalBounds.Dependencies (Dependencies, filterDependencies)
-import CabalBounds.VersionComp (VersionComp(..), defaultLowerComp)
+import CabalBounds.VersionComp (VersionComp(..))
 import qualified CabalBounds.Lenses as L
 import Data.List (foldl')
 import qualified Data.HashMap.Strict as HM
@@ -56,15 +56,17 @@ updateDependency (UpdateLower comp) instPkgs dep =
 updateDependency (UpdateUpper comp) instPkgs dep =
    fromMaybe dep $ do
         upperVersion <- HM.lookup pkgName_ instPkgs
-        let newUpperBound = V.UpperBound (nextVersion $ comp `compOf` upperVersion) V.ExclusiveBound
-        vrange <- modifyVersionIntervals (updateUpper upperVersion newUpperBound) versionRange_
+        let newUpperVersion = comp `compOf` upperVersion
+            newUpperBound = V.UpperBound (nextVersion newUpperVersion)  V.ExclusiveBound
+        vrange <- modifyVersionIntervals (updateUpper newUpperBound) versionRange_
         return $ mkDependency pkgName_ vrange
    where
       versionRange_ = versionRange dep
       pkgName_      = pkgName dep
 
-      updateUpper version newUpperBound [] = [(V.LowerBound (defaultLowerComp `compOf` version) V.InclusiveBound, newUpperBound)]
-      updateUpper _       newUpperBound intervals = intervals & _last . upperBound .~ newUpperBound
+      updateUpper newUpperBound [] = [(noLowerBound, newUpperBound)]
+      updateUpper newUpperBound intervals = intervals & _last . upperBound .~ newUpperBound
+      noLowerBound = V.LowerBound (V.Version [0] []) V.InclusiveBound
 
 updateDependency (UpdateBoth lowerComp upperComp) instPkgs dep =
     updateDependency (UpdateLower lowerComp) instPkgs $
