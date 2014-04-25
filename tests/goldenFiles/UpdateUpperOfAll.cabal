@@ -17,8 +17,7 @@ source-repository head
  
 library
     build-depends: base >=3 && <4.7, cmdargs >=0.10.5 && <0.11,
-                   lens >=4.0.1 && <4.1, pretty-show -any, strict >=0.3.2 && <0.4,
-                   Cabal >=1.18.1 && <1.19
+                   lens <4.1, pretty-show -any, strict <0.4, Cabal <1.19
     exposed-modules: CabalBounds.Args CabalBounds.Command
                      CabalBounds.Execute CabalBounds.Lenses
     exposed: True
@@ -29,8 +28,7 @@ library
  
 executable cabal-bounds
     build-depends: base >=3 && <4.7, cmdargs >=0.10.5 && <0.11,
-                   lens >=4.0.1 && <4.1, pretty-show -any, strict >=0.3.2 && <0.4,
-                   Cabal >=1.18.1 && <1.19
+                   lens <4.1, pretty-show -any, strict <0.4, Cabal <1.19
     main-is: Main.hs
     buildable: True
     cpp-options: -DCABAL
@@ -41,8 +39,7 @@ executable cabal-bounds
  
 executable other-exe
     build-depends: base >=3 && <4.7, cmdargs >=0.10.5 && <0.11,
-                   lens >=4.0.1 && <4.1, pretty-show -any, strict >=0.3.2 && <0.4,
-                   Cabal >=1.18.1 && <1.19
+                   lens <4.1, pretty-show -any, strict <0.4, Cabal <1.19
     main-is: Main.hs
     buildable: True
     cpp-options: -DCABAL
@@ -53,16 +50,14 @@ executable other-exe
  
 test-suite some-test
     build-depends: base >=3 && <4.7, cmdargs >=0.10.5 && <0.11,
-                   lens >=4.0.1 && <4.1, pretty-show -any, strict >=0.3.2 && <0.4,
-                   Cabal >=1.18.1 && <1.19
+                   lens <4.1, pretty-show -any, strict <0.4, Cabal <1.19
     type: exitcode-stdio-1.0
     main-is: Main.hs
     buildable: True
     ghc-options: -W
 test-suite other-test
     build-depends: base >=3 && <4.7, cmdargs >=0.10.5 && <0.11,
-                   lens >=4.0.1 && <4.1, pretty-show -any, strict >=0.3.2 && <0.4,
-                   Cabal >=1.18.1 && <1.19
+                   lens <4.1, pretty-show -any, strict <0.4, Cabal <1.19
     type: exitcode-stdio-1.0
     main-is: Main.hs
     buildable: True

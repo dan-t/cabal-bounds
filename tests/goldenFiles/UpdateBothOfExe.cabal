@@ -17,7 +17,7 @@ source-repository head
  
 library
     build-depends: base >=3 && <5, cmdargs >=0.10.5 && <0.11,
-                   lens -any, pretty-show -any, strict -any, Cabal -any
+                   lens -any, pretty-show -any, strict <0.2, Cabal -any
     exposed-modules: CabalBounds.Args CabalBounds.Command
                      CabalBounds.Execute CabalBounds.Lenses
     exposed: True
