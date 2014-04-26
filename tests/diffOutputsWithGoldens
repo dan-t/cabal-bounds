@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
 for output in `ls outputFiles` ; do
-   gvimdiff -f outputFiles/$output goldenFiles/$output
+   # only call gvimdiff on files having a difference
+   outputFile=outputFiles/$output
+   goldenFile=goldenFiles/$output
+   diff $outputFile $goldenFile > /dev/null || gvimdiff -f $outputFile $goldenFile
 done
