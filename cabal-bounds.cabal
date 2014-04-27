@@ -158,6 +158,9 @@ extra-source-files:
     README.md
     tests/inputFiles/original.cabal
     tests/inputFiles/setup-config
+    tests/inputFiles/setup-config-build-env/setup-config.cabal
+    tests/inputFiles/setup-config-build-env/src/*.hs
+    tests/inputFiles/setup-config-build-env/src/CabalBounds/*.hs
     tests/goldenFiles/*.cabal
     tests/outputFiles/.gitignore
  
