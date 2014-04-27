@@ -6,7 +6,7 @@ module CabalBounds.Dependencies
    , filterDependencies
    ) where
 
-import Control.Lens 
+import Control.Lens
 import qualified CabalBounds.Args as A
 import Distribution.Package (Dependency(..), PackageName(..))
 
@@ -33,7 +33,7 @@ filterDependencies AllDependencies =
    traversed
 
 filterDependencies (OnlyDependencies deps) =
-   traversed . filtered (\(Dependency (PackageName pkgName) _) -> any (== pkgName) deps)
+   traversed . filtered (\(Dependency (PackageName pkgName) _) -> pkgName `elem` deps)
 
 filterDependencies (IgnoreDependencies deps) =
-   traversed . filtered (\(Dependency (PackageName pkgName) _) -> all (/= pkgName) deps)
+   traversed . filtered (\(Dependency (PackageName pkgName) _) -> pkgName `notElem` deps)

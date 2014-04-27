@@ -37,7 +37,7 @@ dropTests = T.testGroup "Drop Tests"
 
 updateTests :: T.TestTree
 updateTests = T.testGroup "Update Tests"
-   [ test "UpdateBothOfAll" $ defaultUpdate
+   [ test "UpdateBothOfAll" defaultUpdate
    , test "UpdateBothOfAll" $ defaultUpdate { lower = True, upper = True }
    , test "UpdateBothOfAllExes" $ defaultUpdate { executable = ["cabal-bounds", "other-exe"] }
    , test "UpdateBothOfExe" $ defaultUpdate { executable = ["cabal-bounds"] }
@@ -68,7 +68,7 @@ updateTests = T.testGroup "Update Tests"
    , test "UpdateMajor1Upper" $ defaultUpdate {upperComp = Just Major1 }
    , test "UpdateMinorLowerAndUpper" $ defaultUpdate { lowerComp = Just Minor, upperComp = Just Minor }
    , test "UpdateMajor1LowerAndUpper" $ defaultUpdate { lowerComp = Just Major1, upperComp = Just Major1 }
-   ] 
+   ]
 
 
 test :: String -> Args -> T.TestTree
@@ -81,7 +81,7 @@ test testName args =
               Just err -> hPutStrLn stderr ("cabal-bounds: " ++ err)
               _        -> return ()
 
-      argsWithFiles = 
+      argsWithFiles =
          case args of
               Drop {}   -> args { cabalFile = inputFile
                                 , output    = outputFile
