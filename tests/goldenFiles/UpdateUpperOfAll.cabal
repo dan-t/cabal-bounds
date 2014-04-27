@@ -18,10 +18,10 @@ library
     build-depends:
         base >=3 && <4.7,
         cmdargs >=0.10.5 && <0.11,
-        lens >=4.0.1 && <4.1,
-        pretty-show >=1.6.7 && <1.7,
-        strict >=0.3.2 && <0.4,
-        Cabal >=1.18.1 && <1.19
+        lens <4.1,
+        pretty-show <1.7,
+        strict <0.4,
+        Cabal <1.19
     exposed-modules:
         CabalBounds.Args
         CabalBounds.Command
@@ -37,10 +37,10 @@ executable cabal-bounds
     build-depends:
         base >=3 && <4.7,
         cmdargs >=0.10.5 && <0.11,
-        lens >=4.0.1 && <4.1,
-        pretty-show >=1.6.7 && <1.7,
-        strict >=0.3.2 && <0.4,
-        Cabal >=1.18.1 && <1.19
+        lens <4.1,
+        pretty-show <1.7,
+        strict <0.4,
+        Cabal <1.19
     main-is: ExeMain1.hs
     buildable: True
     cpp-options: -DCABAL
@@ -57,10 +57,10 @@ executable other-exe
     build-depends:
         base >=3 && <4.7,
         cmdargs >=0.10.5 && <0.11,
-        lens >=4.0.1 && <4.1,
-        pretty-show >=1.6.7 && <1.7,
-        strict >=0.3.2 && <0.4,
-        Cabal >=1.18.1 && <1.19
+        lens <4.1,
+        pretty-show <1.7,
+        strict <0.4,
+        Cabal <1.19
     main-is: ExeMain2.hs
     buildable: True
     cpp-options: -DCABAL
@@ -77,10 +77,10 @@ test-suite some-test
     build-depends:
         base >=3 && <4.7,
         cmdargs >=0.10.5 && <0.11,
-        lens >=4.0.1 && <4.1,
-        pretty-show >=1.6.7 && <1.7,
-        strict >=0.3.2 && <0.4,
-        Cabal >=1.18.1 && <1.19
+        lens <4.1,
+        pretty-show <1.7,
+        strict <0.4,
+        Cabal <1.19
     type: exitcode-stdio-1.0
     main-is: TestMain1.hs
     buildable: True
@@ -96,10 +96,10 @@ test-suite other-test
     build-depends:
         base >=3 && <4.7,
         cmdargs >=0.10.5 && <0.11,
-        lens >=4.0.1 && <4.1,
-        pretty-show >=1.6.7 && <1.7,
-        strict >=0.3.2 && <0.4,
-        Cabal >=1.18.1 && <1.19
+        lens <4.1,
+        pretty-show <1.7,
+        strict <0.4,
+        Cabal <1.19
     type: exitcode-stdio-1.0
     main-is: TestMain2.hs
     buildable: True

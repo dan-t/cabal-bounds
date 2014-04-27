@@ -18,10 +18,10 @@ library
     build-depends:
         base >=3 && <5,
         cmdargs >=0.10.5 && <1,
-        lens >=4.0.1 && <5,
-        pretty-show >=1.6.7 && <2,
-        strict >=0.3.2 && <1,
-        Cabal >=1.18.1 && <2
+        lens <5,
+        pretty-show <2,
+        strict ==0.*,
+        Cabal <2
     exposed-modules:
         CabalBounds.Args
         CabalBounds.Command
@@ -37,10 +37,10 @@ executable cabal-bounds
     build-depends:
         base >=3 && <5,
         cmdargs >=0.10.5 && <1,
-        lens >=4.0.1 && <5,
-        pretty-show >=1.6.7 && <2,
-        strict >=0.3.2 && <1,
-        Cabal >=1.18.1 && <2
+        lens <5,
+        pretty-show <2,
+        strict ==0.*,
+        Cabal <2
     main-is: ExeMain1.hs
     buildable: True
     cpp-options: -DCABAL
@@ -57,10 +57,10 @@ executable other-exe
     build-depends:
         base >=3 && <5,
         cmdargs >=0.10.5 && <1,
-        lens >=4.0.1 && <5,
-        pretty-show >=1.6.7 && <2,
-        strict >=0.3.2 && <1,
-        Cabal >=1.18.1 && <2
+        lens <5,
+        pretty-show <2,
+        strict ==0.*,
+        Cabal <2
     main-is: ExeMain2.hs
     buildable: True
     cpp-options: -DCABAL
@@ -77,10 +77,10 @@ test-suite some-test
     build-depends:
         base >=3 && <5,
         cmdargs >=0.10.5 && <1,
-        lens >=4.0.1 && <5,
-        pretty-show >=1.6.7 && <2,
-        strict >=0.3.2 && <1,
-        Cabal >=1.18.1 && <2
+        lens <5,
+        pretty-show <2,
+        strict ==0.*,
+        Cabal <2
     type: exitcode-stdio-1.0
     main-is: TestMain1.hs
     buildable: True
@@ -96,10 +96,10 @@ test-suite other-test
     build-depends:
         base >=3 && <5,
         cmdargs >=0.10.5 && <1,
-        lens >=4.0.1 && <5,
-        pretty-show >=1.6.7 && <2,
-        strict >=0.3.2 && <1,
-        Cabal >=1.18.1 && <2
+        lens <5,
+        pretty-show <2,
+        strict ==0.*,
+        Cabal <2
     type: exitcode-stdio-1.0
     main-is: TestMain2.hs
     buildable: True

@@ -16,8 +16,8 @@ source-repository head
  
 library
     build-depends:
-        base >=4,
-        cmdargs -any,
+        base ==4.*,
+        cmdargs <0.11,
         lens >=4,
         pretty-show >=1,
         strict -any,
@@ -35,8 +35,8 @@ library
  
 executable cabal-bounds
     build-depends:
-        base >=4,
-        cmdargs -any,
+        base ==4.*,
+        cmdargs <0.11,
         lens >=4,
         pretty-show >=1,
         strict -any,
@@ -55,8 +55,8 @@ executable cabal-bounds
  
 executable other-exe
     build-depends:
-        base >=4,
-        cmdargs -any,
+        base ==4.*,
+        cmdargs <0.11,
         lens >=4,
         pretty-show >=1,
         strict -any,
@@ -75,8 +75,8 @@ executable other-exe
  
 test-suite some-test
     build-depends:
-        base >=4,
-        cmdargs -any,
+        base ==4.*,
+        cmdargs <0.11,
         lens >=4,
         pretty-show >=1,
         strict -any,
@@ -94,8 +94,8 @@ test-suite some-test
     ghc-options: -W
 test-suite other-test
     build-depends:
-        base >=4,
-        cmdargs -any,
+        base ==4.*,
+        cmdargs <0.11,
         lens >=4,
         pretty-show >=1,
         strict -any,
