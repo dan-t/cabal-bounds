@@ -1,5 +1,5 @@
 name: cabal-bounds
-version: 0.4
+version: 0.4.1
 cabal-version: >=1.9.2
 build-type: Simple
 license: BSD3
@@ -63,6 +63,7 @@ description:
     > lens                   =>   lens >=4.1.2 && <4.2
     >
     > $> cabal-bounds update --lower ...
+    > lens >=4.0.1 && <5     =>   lens >=4.1.2 && <5
     > lens >=4.0.1 && <4.1   =>   lens >=4.1.2
     > lens <4.1              =>   lens >=4.1.2
     > lens                   =>   lens >=4.1.2
@@ -70,7 +71,7 @@ description:
     > $> cabal-bounds update --upper ...
     > lens >=4.0.1 && <4.1   =>   lens >=4.0.1 && <4.2
     > lens >=4.0.1           =>   lens >=4.0.1 && <4.2
-    > lens                   =>   lens >=4.1.2 && <4.2
+    > lens                   =>   lens <4.2
     .
     You can also specify which component of the version number should be updated:
     .
@@ -81,7 +82,7 @@ description:
     > lens >=4.0.1 && <4.1   =>   lens >=4.1
     >
     > $> cabal-bounds update --lowercomp=major1 ...
-    > lens >=4.0.1 && <4.1   =>   lens >=4
+    > lens >=4.0.1 && <4.1   =>   lens >=4 && <4.1
     >
     > $> cabal-bounds update --uppercomp=minor ...
     > lens >=4.0.1 && <4.1   =>   lens >=4.0.1 && <4.1.3
