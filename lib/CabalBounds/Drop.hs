@@ -7,31 +7,24 @@ module CabalBounds.Drop
 import Prelude hiding (drop)
 import Control.Lens
 import CabalBounds.Bound (DropBound(..))
-import CabalBounds.Sections (Sections(..), dependenciesOf)
-import CabalBounds.Dependencies (Dependencies, filterDependencies)
-import qualified CabalBounds.Lenses as L
+import CabalBounds.Dependencies (Dependencies, filterDependency)
+import qualified CabalLenses as CL
 import Data.List (foldl')
 import Distribution.PackageDescription (GenericPackageDescription)
 import Distribution.Package (Dependency(..))
 import Distribution.Version (mkVersionIntervals, fromVersionIntervals, asVersionIntervals, UpperBound(..), anyVersion)
 
 
-drop :: DropBound -> Sections -> Dependencies -> GenericPackageDescription -> GenericPackageDescription
-drop bound AllSections deps pkgDescrp =
-   pkgDescrp & L.allDependencies . filterDeps %~ dropFromDep
-   where
-      filterDeps  = filterDependencies deps
-      dropFromDep = dropFromDependency bound
-
-
-drop bound (Sections sections) deps pkgDescrp =
+drop :: DropBound -> [CL.Section] -> Dependencies -> GenericPackageDescription -> GenericPackageDescription
+drop bound sections deps pkgDescrp =
    foldl' dropFromSection pkgDescrp sections
    where
       dropFromSection pkgDescrp section =
-         pkgDescrp & dependenciesOf section . filterDeps %~ dropFromDep
+         pkgDescrp & CL.dependencyIf condVars section . filterDep %~ dropFromDep
 
-      filterDeps  = filterDependencies deps
+      filterDep   = filterDependency deps
       dropFromDep = dropFromDependency bound
+      condVars    = CL.fromDefaults pkgDescrp
 
 
 dropFromDependency :: DropBound -> Dependency -> Dependency

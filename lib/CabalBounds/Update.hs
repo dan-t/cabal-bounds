@@ -10,10 +10,9 @@ import qualified Distribution.Simple.PackageIndex as PX
 import qualified Distribution.InstalledPackageInfo as PI
 import Control.Lens
 import CabalBounds.Bound (UpdateBound(..))
-import CabalBounds.Sections (Sections(..), dependenciesOf)
-import CabalBounds.Dependencies (Dependencies, filterDependencies)
+import CabalBounds.Dependencies (Dependencies, filterDependency)
 import CabalBounds.VersionComp (VersionComp(..))
-import qualified CabalBounds.Lenses as L
+import qualified CabalLenses as CL
 import Data.List (foldl')
 import qualified Data.HashMap.Strict as HM
 import Data.Maybe (fromMaybe)
@@ -22,21 +21,16 @@ type PkgName           = String
 type InstalledPackages = HM.HashMap PkgName V.Version
 
 
-update :: UpdateBound -> Sections -> Dependencies -> D.GenericPackageDescription -> BI.LocalBuildInfo -> D.GenericPackageDescription
-update bound AllSections deps pkgDescrp buildInfo =
-   pkgDescrp & L.allDependencies . filterDeps %~ updateDep
-   where
-      filterDeps = filterDependencies deps
-      updateDep  = updateDependency bound (installedPackages buildInfo)
-
-update bound (Sections sections) deps pkgDescrp buildInfo =
+update :: UpdateBound -> [CL.Section] -> Dependencies -> D.GenericPackageDescription -> BI.LocalBuildInfo -> D.GenericPackageDescription
+update bound sections deps pkgDescrp buildInfo =
    foldl' updateSection pkgDescrp sections
    where
       updateSection pkgDescrp section =
-         pkgDescrp & dependenciesOf section . filterDeps %~ updateDep
+         pkgDescrp & CL.dependencyIf condVars section . filterDep %~ updateDep
 
-      filterDeps = filterDependencies deps
-      updateDep  = updateDependency bound (installedPackages buildInfo)
+      filterDep = filterDependency deps
+      updateDep = updateDependency bound (installedPackages buildInfo)
+      condVars  = CL.fromDefaults pkgDescrp
 
 
 updateDependency :: UpdateBound -> InstalledPackages -> P.Dependency -> P.Dependency
@@ -81,20 +75,20 @@ modifyVersionIntervals f = fmap V.fromVersionIntervals . V.mkVersionIntervals . 
 
 compOf :: VersionComp -> V.Version -> V.Version
 Major1 `compOf` version =
-   version & L.vbranch %~ take 1
-           & L.vtags   .~ []
+   version & CL.versionBranchL %~ take 1
+           & CL.versionTagsL   .~ []
 
 Major2 `compOf` version =
-   version & L.vbranch %~ take 2
-           & L.vtags   .~ []
+   version & CL.versionBranchL %~ take 2
+           & CL.versionTagsL   .~ []
 
 Minor `compOf` version =
-   version & L.vtags .~ []
+   version & CL.versionTagsL .~ []
 
 
 nextVersion :: V.Version -> V.Version
 nextVersion version =
-   version & L.vbranch %~ increaseLastComp
+   version & CL.versionBranchL %~ increaseLastComp
    where
       increaseLastComp = reverse . (& ix 0 %~ (+ 1)) . reverse
 

@@ -178,6 +178,7 @@ library
         unordered-containers >=0.2.3.3 && <0.3,
         transformers >=0.3.0.0 && <0.4,
         either >=4.1.1 && <4.2,
+        cabal-lenses >=0.1 && <0.2,
         Cabal >=1.18.0 && <1.21
     exposed-modules:
         CabalBounds.Args
@@ -194,7 +195,6 @@ library
         CabalBounds.Dependencies
         CabalBounds.Drop
         CabalBounds.Update
-        CabalBounds.Lenses
     ghc-options: -W
  
 executable cabal-bounds

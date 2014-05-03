@@ -3,7 +3,7 @@
 module CabalBounds.Dependencies
    ( Dependencies(..)
    , dependencies
-   , filterDependencies
+   , filterDependency
    ) where
 
 import Control.Lens
@@ -28,12 +28,12 @@ dependencies args
    = AllDependencies
 
 
-filterDependencies :: Dependencies -> Traversal' [Dependency] Dependency
-filterDependencies AllDependencies =
-   traversed
+filterDependency :: Dependencies -> Traversal' Dependency Dependency
+filterDependency AllDependencies =
+   filtered (const True)
 
-filterDependencies (OnlyDependencies deps) =
-   traversed . filtered (\(Dependency (PackageName pkgName) _) -> pkgName `elem` deps)
+filterDependency (OnlyDependencies deps) =
+   filtered (\(Dependency (PackageName pkgName) _) -> pkgName `elem` deps)
 
-filterDependencies (IgnoreDependencies deps) =
-   traversed . filtered (\(Dependency (PackageName pkgName) _) -> pkgName `notElem` deps)
+filterDependency (IgnoreDependencies deps) =
+   filtered (\(Dependency (PackageName pkgName) _) -> pkgName `notElem` deps)
