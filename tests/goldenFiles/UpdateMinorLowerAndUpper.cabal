@@ -21,7 +21,7 @@ library
         lens ==4.0.1.*,
         pretty-show ==1.6.7.*,
         strict ==0.3.2.*,
-        Cabal ==1.18.1.*
+        Cabal ==1.20.0.1.*
     exposed-modules:
         CabalBounds.Args
         CabalBounds.Command
@@ -40,7 +40,7 @@ executable cabal-bounds
         lens ==4.0.1.*,
         pretty-show ==1.6.7.*,
         strict ==0.3.2.*,
-        Cabal ==1.18.1.*
+        Cabal ==1.20.0.1.*
     main-is: ExeMain1.hs
     buildable: True
     cpp-options: -DCABAL
@@ -60,7 +60,7 @@ executable other-exe
         lens ==4.0.1.*,
         pretty-show ==1.6.7.*,
         strict ==0.3.2.*,
-        Cabal ==1.18.1.*
+        Cabal ==1.20.0.1.*
     main-is: ExeMain2.hs
     buildable: True
     cpp-options: -DCABAL
@@ -80,7 +80,7 @@ test-suite some-test
         lens ==4.0.1.*,
         pretty-show ==1.6.7.*,
         strict ==0.3.2.*,
-        Cabal ==1.18.1.*
+        Cabal ==1.20.0.1.*
     type: exitcode-stdio-1.0
     main-is: TestMain1.hs
     buildable: True
@@ -99,7 +99,7 @@ test-suite other-test
         lens ==4.0.1.*,
         pretty-show ==1.6.7.*,
         strict ==0.3.2.*,
-        Cabal ==1.18.1.*
+        Cabal ==1.20.0.1.*
     type: exitcode-stdio-1.0
     main-is: TestMain2.hs
     buildable: True

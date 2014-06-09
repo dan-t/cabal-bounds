@@ -80,7 +80,7 @@ test-suite some-test
         lens >=4.0.1,
         pretty-show >=1.6.7,
         strict >=0.3.2,
-        Cabal >=1.18.1
+        Cabal >=1.20.0.1
     type: exitcode-stdio-1.0
     main-is: TestMain1.hs
     buildable: True

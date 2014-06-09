@@ -21,7 +21,7 @@ library
         lens >=4.0.1,
         pretty-show >=1.6.7,
         strict >=0.3.2,
-        Cabal >=1.18.1
+        Cabal >=1.20.0.1
     exposed-modules:
         CabalBounds.Args
         CabalBounds.Command

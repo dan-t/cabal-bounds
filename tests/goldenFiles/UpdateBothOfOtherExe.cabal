@@ -60,7 +60,7 @@ executable other-exe
         lens >=4.0.1 && <4.1,
         pretty-show >=1.6.7 && <1.7,
         strict >=0.3.2 && <0.4,
-        Cabal >=1.18.1 && <1.19
+        Cabal >=1.20.0.1 && <1.21
     main-is: ExeMain2.hs
     buildable: True
     cpp-options: -DCABAL
