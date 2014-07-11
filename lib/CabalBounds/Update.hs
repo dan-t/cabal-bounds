@@ -1,72 +1,80 @@
 module CabalBounds.Update
    ( update
+   , Libraries
    ) where
 
 import qualified Distribution.PackageDescription as D
 import qualified Distribution.Package as P
 import qualified Distribution.Version as V
-import qualified Distribution.Simple.LocalBuildInfo as BI
-import qualified Distribution.Simple.PackageIndex as PX
-import qualified Distribution.InstalledPackageInfo as PI
 import Control.Lens
 import CabalBounds.Bound (UpdateBound(..))
-import CabalBounds.Dependencies (Dependencies, filterDependency)
+import CabalBounds.Dependencies (Dependencies(..), filterDependency)
 import CabalBounds.VersionComp (VersionComp(..))
 import qualified CabalLenses as CL
 import Data.List (foldl')
 import qualified Data.HashMap.Strict as HM
 import Data.Maybe (fromMaybe)
 
-type PkgName           = String
-type InstalledPackages = HM.HashMap PkgName V.Version
+type PkgName    = String
+type LibName    = String
+type LibVersion = V.Version
+type Libraries  = HM.HashMap LibName LibVersion
 
 
-update :: UpdateBound -> [CL.Section] -> Dependencies -> D.GenericPackageDescription -> BI.LocalBuildInfo -> D.GenericPackageDescription
-update bound sections deps pkgDescrp buildInfo =
+update :: UpdateBound -> [CL.Section] -> Dependencies -> Libraries -> D.GenericPackageDescription -> D.GenericPackageDescription
+update bound sections deps libs pkgDescrp =
    foldl' updateSection pkgDescrp sections
    where
       updateSection pkgDescrp section =
          pkgDescrp & CL.dependencyIf condVars section . filterDep %~ updateDep
 
       filterDep = filterDependency deps
-      updateDep = updateDependency bound (installedPackages buildInfo)
+      updateDep = updateDependency bound ifMissing libs
       condVars  = CL.fromDefaults pkgDescrp
+      ifMissing = deps == WithMissingBounds
 
 
-updateDependency :: UpdateBound -> InstalledPackages -> P.Dependency -> P.Dependency
-updateDependency (UpdateLower comp) instPkgs dep =
-   fromMaybe dep $ do
-      version <- HM.lookup pkgName_ instPkgs
-      let newLowerVersion = comp `compOf` version
-          newLowerBound   = V.LowerBound newLowerVersion V.InclusiveBound
-          vrange          = fromMaybe (V.orLaterVersion newLowerVersion) $ modifyVersionIntervals (updateLower newLowerBound) versionRange_
-      return $ mkDependency pkgName_ vrange
+updateDependency :: UpdateBound -> Bool -> Libraries -> P.Dependency -> P.Dependency
+updateDependency (UpdateLower comp) ifMissing libs dep =
+   fromMaybe dep $
+      if ifMissing && lowerBound_ /= noLowerBound
+         then return dep
+         else do
+            version <- HM.lookup pkgName_ libs
+            let newLowerVersion = comp `compOf` version
+                newLowerBound   = V.LowerBound newLowerVersion V.InclusiveBound
+                vrange          = fromMaybe (V.orLaterVersion newLowerVersion)
+                                            (modifyVersionIntervals (updateLower newLowerBound) versionRange_)
+            return $ mkDependency pkgName_ vrange
    where
       updateLower newLowerBound []        = [(newLowerBound, V.NoUpperBound)]
       updateLower newLowerBound intervals = intervals & _head . lowerBound .~ newLowerBound
 
-      pkgName_ = pkgName dep
+      pkgName_      = pkgName dep
       versionRange_ = versionRange dep
+      lowerBound_   = fromMaybe noLowerBound $ V.asVersionIntervals versionRange_ ^? _head . lowerBound
 
-updateDependency (UpdateUpper comp) instPkgs dep =
-   fromMaybe dep $ do
-        upperVersion <- HM.lookup pkgName_ instPkgs
-        let newUpperVersion = comp `compOf` upperVersion
-            newUpperBound   = V.UpperBound (nextVersion newUpperVersion) V.ExclusiveBound
-        vrange <- modifyVersionIntervals (updateUpper newUpperBound) versionRange_
-        return $ mkDependency pkgName_ vrange
+updateDependency (UpdateUpper comp) ifMissing libs dep =
+   fromMaybe dep $
+      if ifMissing && upperBound_ /= V.NoUpperBound
+         then return dep
+         else do
+            upperVersion <- HM.lookup pkgName_ libs
+            let newUpperVersion = comp `compOf` upperVersion
+                newUpperBound   = V.UpperBound (nextVersion newUpperVersion) V.ExclusiveBound
+            vrange <- modifyVersionIntervals (updateUpper newUpperBound) versionRange_
+            return $ mkDependency pkgName_ vrange
    where
       versionRange_ = versionRange dep
       pkgName_      = pkgName dep
+      upperBound_   = fromMaybe V.NoUpperBound $ V.asVersionIntervals versionRange_ ^? _head . upperBound
 
       updateUpper newUpperBound []        = [(noLowerBound, newUpperBound)]
       updateUpper newUpperBound intervals = intervals & _last . upperBound .~ newUpperBound
 
-      noLowerBound = V.LowerBound (V.Version [0] []) V.InclusiveBound
-
-updateDependency (UpdateBoth lowerComp upperComp) instPkgs dep =
-    updateDependency (UpdateLower lowerComp) instPkgs $
-    updateDependency (UpdateUpper upperComp) instPkgs dep
+updateDependency (UpdateBoth lowerComp upperComp) ifMissing libs dep =
+    updateDependency (UpdateLower lowerComp) ifMissing libs $
+    updateDependency (UpdateUpper upperComp) ifMissing libs dep
 
 
 modifyVersionIntervals :: ([V.VersionInterval] -> [V.VersionInterval]) -> V.VersionRange -> Maybe V.VersionRange
@@ -93,16 +101,6 @@ nextVersion version =
       increaseLastComp = reverse . (& ix 0 %~ (+ 1)) . reverse
 
 
-installedPackages :: BI.LocalBuildInfo -> InstalledPackages
-installedPackages = HM.fromList
-                    . map (\(P.PackageName n, v) -> (n, newestVersion v))
-                    . filter ((not . null) . snd)
-                    . PX.allPackagesByName . BI.installedPkgs
-   where
-      newestVersion :: [PI.InstalledPackageInfo] -> V.Version
-      newestVersion = maximum . map (P.pkgVersion . PI.sourcePackageId)
-
-
 pkgName :: P.Dependency -> PkgName
 pkgName (P.Dependency (P.PackageName name) _) = name
 
@@ -121,3 +119,7 @@ lowerBound = _1
 
 upperBound :: Lens' V.VersionInterval V.UpperBound
 upperBound = _2
+
+
+noLowerBound :: V.LowerBound
+noLowerBound = V.LowerBound (V.Version [0] []) V.InclusiveBound

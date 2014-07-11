@@ -88,7 +88,7 @@ test testName args =
                                 }
               Update {} -> args { cabalFile       = inputFile
                                 , output          = outputFile
-                                , setupConfigFile = setupConfigFile
+                                , setupConfigFile = [setupConfigFile]
                                 }
 
       diff ref new    = ["diff", "-u", ref, new]

@@ -195,6 +195,7 @@ library
         CabalBounds.Dependencies
         CabalBounds.Drop
         CabalBounds.Update
+        CabalBounds.HaskellPlatform
     ghc-options: -W
  
 executable cabal-bounds

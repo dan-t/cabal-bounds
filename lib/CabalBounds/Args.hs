@@ -37,10 +37,12 @@ data Args = Drop { upper      :: Bool
                    , benchmark       :: [String]
                    , only            :: [String]
                    , ignore          :: [String]
+                   , missing         :: Bool
                    , output          :: String
+                   , haskellPlatform :: String
                    , cabalFile       :: String
-                   , setupConfigFile :: String
-                   } 
+                   , setupConfigFile :: [String]
+                   }
           deriving (Data, Typeable, Show, Eq)
 
 
@@ -87,7 +89,9 @@ defaultUpdate = Update
    , benchmark       = def
    , only            = def
    , ignore          = def
+   , missing         = def
    , output          = def
+   , haskellPlatform = def
    , cabalFile       = def
    , setupConfigFile = def
    }
@@ -111,9 +115,11 @@ updateArgs :: Args
 updateArgs = Update
    { lower           = def &= explicit &= name "lower" &= name "L" &= help "Only the lower bound is updated. The same as using '--lowercomp=minor'."
    , upper           = def &= explicit &= name "upper" &= name "U" &= help "Only the upper bound is updated. The same as using '--uppercomp=major2'."
-   , lowerComp       = def &= explicit &= name "lowercomp" &= help "Only the lower bound is updated with the specified version component. (major1, major2 or minor)" 
+   , lowerComp       = def &= explicit &= name "lowercomp" &= help "Only the lower bound is updated with the specified version component. (major1, major2 or minor)"
    , upperComp       = def &= explicit &= name "uppercomp" &= help "Only the upper bound is updated with the specified version component. (major1, major2 or minor)"
-   , setupConfigFile = def &= argPos 1 &= typ "SETUP-CONFIG-FILE"
+   , missing         = def &= help "Only the dependencies having missing bounds are updated."
+   , haskellPlatform = def &= explicit &= typ "VERSION" &= name "haskell-platform" &= help "Update bounds by the library versions of the specified haskell platform version"
+   , setupConfigFile = def &= args &= typ "SETUP-CONFIG-FILE"
    }
 
 
