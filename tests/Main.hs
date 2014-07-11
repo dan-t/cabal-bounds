@@ -70,6 +70,7 @@ updateTests = T.testGroup "Update Tests"
    , test "UpdateMajor1LowerAndUpper" $ defaultUpdate { lowerComp = Just Major1, upperComp = Just Major1 }
    , test "UpdateOnlyMissing" $ defaultUpdate { missing = True }
    , testWithoutSetupConfig "UpdateByHaskellPlatform" $ defaultUpdate { haskellPlatform = "2013.2.0.0" }
+   , test "UpdateByHaskellPlatformAndSetupConfig" $ defaultUpdate { haskellPlatform = "2013.2.0.0" }
    ]
 
 
