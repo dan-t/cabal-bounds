@@ -69,11 +69,20 @@ updateTests = T.testGroup "Update Tests"
    , test "UpdateMinorLowerAndUpper" $ defaultUpdate { lowerComp = Just Minor, upperComp = Just Minor }
    , test "UpdateMajor1LowerAndUpper" $ defaultUpdate { lowerComp = Just Major1, upperComp = Just Major1 }
    , test "UpdateOnlyMissing" $ defaultUpdate { missing = True }
+   , testWithoutSetupConfig "UpdateByHaskellPlatform" $ defaultUpdate { haskellPlatform = "2013.2.0.0" }
    ]
 
 
 test :: String -> Args -> T.TestTree
-test testName args =
+test testName args = test_ testName args True
+
+
+testWithoutSetupConfig :: String -> Args -> T.TestTree
+testWithoutSetupConfig testName args = test_ testName args False
+
+
+test_ :: String -> Args -> Bool -> T.TestTree
+test_ testName args withSetupConfig =
    G.goldenVsFileDiff testName diff goldenFile outputFile command
    where
       command = do
@@ -89,7 +98,7 @@ test testName args =
                                 }
               Update {} -> args { cabalFile       = inputFile
                                 , output          = outputFile
-                                , setupConfigFile = [setupConfigFile]
+                                , setupConfigFile = [setupConfigFile | withSetupConfig]
                                 }
 
       diff ref new    = ["diff", "-u", ref, new]
