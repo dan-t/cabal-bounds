@@ -68,6 +68,7 @@ updateTests = T.testGroup "Update Tests"
    , test "UpdateMajor1Upper" $ defaultUpdate {upperComp = Just Major1 }
    , test "UpdateMinorLowerAndUpper" $ defaultUpdate { lowerComp = Just Minor, upperComp = Just Minor }
    , test "UpdateMajor1LowerAndUpper" $ defaultUpdate { lowerComp = Just Major1, upperComp = Just Major1 }
+   , test "UpdateOnlyMissing" $ defaultUpdate { missing = True }
    ]
 
 
