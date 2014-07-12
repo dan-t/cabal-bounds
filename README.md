@@ -3,11 +3,12 @@ cabal-bounds
 
 A command line program for managing the bounds/versions of the dependencies in a cabal file.
 
-`cabal-bounds` is able to do two things:
-* drop the bounds of the dependencies in the cabal file
-* update the bounds of the dependencies in the cabal file using the cabal build information
+`cabal-bounds` is able to do three things with the bounds of the dependencies in the cabal file:
+* drop them
+* update them by the library versions of the current cabal build
+* update them by the library versions of a haskell platform release
 
-Example: Raise the upper Bounds
+Example: Raise the Upper Bounds
 ===============================
 
 If you have several cabalized projects, then it can be quite time consuming to keep the
@@ -31,6 +32,42 @@ versions of the dependencies.
 
     # update the upper bound of all dependencies in 'myproject.cabal' by the cabal build information
     $> cabal-bounds update --upper --ignore=base myproject.cabal dist/dist-sandbox-*/setup-config 
+
+Example: Update Bounds by Haskell Platform
+==========================================
+
+Ensuring that your project builds with the current [haskell platform](<https://www.haskell.org/platform/>) - or
+perhaps the last two ones - can make it, especially for beginners, a lot easier to build your project.
+
+`cabal-bounds` supports the updating of the bounds by the library versions of a specific haskell platform release.
+
+To update the bounds to the haskell platform `2013.2.0.0`:
+
+    $> cabal-bounds update --haskell-platform=2013.2.0.0 myproject.cabal
+
+There're two additional symbolic names for specifying a haskell platform release: `current` and `previous`.
+
+So one use case might be to initialize the bounds to library versions used by a haskell platform release,
+test if your project builds and works with these, and then raise the upper bounds to the newest available versions:
+
+    # intialize the bounds to the previous haskell platform release
+    $> cabal-bounds update --ignore=base --haskell-platform=previous myproject.cabal
+
+    # build and test the project
+
+    # initialize the lower bounds of libraries not present in the haskell platform
+    $> cabal-bounds update --lower --missing --ignore=base myproject.cabal dist/dist-sandbox-*/setup-config
+
+    # drop the upper bounds to test your project with the newest available library versions
+    $> cabal-bounds drop --upper --ignore=base myproject.cabal
+
+    # build and test the project
+
+    # set the upper bounds to the ones used in the current build
+    $> cabal-bounds update --upper --ignore=base myproject.cabal dist/dist-sandbox-*/setup-config
+
+If you specify a haskell platform release and a setup config file at once, then the setup config library
+verions are only used for the libraries not present in the haskell platform release.
 
 Example: Bound Changes
 ======================
@@ -96,6 +133,7 @@ You can also restrict the modification of dependencies by specifing which depend
 * `--only=name`
 * `--ignore=name`
 
+You can also only update the dependencies without a bound by specifying the `--missing` flag.
 If you omit these options, then all dependencies are considered and modified.
 
 All options taking a name can be specified multiple times:
