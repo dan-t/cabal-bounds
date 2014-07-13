@@ -29,13 +29,12 @@ update bound sections deps libs pkgDescrp =
          pkgDescrp & CL.dependencyIf condVars section . filterDep %~ updateDep
 
       filterDep = filterDependency deps
-      updateDep = updateDependency bound ifMissing libs
+      updateDep = updateDependency bound libs
       condVars  = CL.fromDefaults pkgDescrp
-      ifMissing = deps == WithMissingBounds
 
 
-updateDependency :: UpdateBound -> Bool -> Libraries -> P.Dependency -> P.Dependency
-updateDependency (UpdateLower comp) ifMissing libs dep =
+updateDependency :: UpdateBound -> Libraries -> P.Dependency -> P.Dependency
+updateDependency (UpdateLower comp ifMissing) libs dep =
    fromMaybe dep $
       if ifMissing && lowerBound_ /= noLowerBound
          then return dep
@@ -54,7 +53,7 @@ updateDependency (UpdateLower comp) ifMissing libs dep =
       versionRange_ = versionRange dep
       lowerBound_   = fromMaybe noLowerBound $ V.asVersionIntervals versionRange_ ^? _head . lowerBound
 
-updateDependency (UpdateUpper comp) ifMissing libs dep =
+updateDependency (UpdateUpper comp ifMissing) libs dep =
    fromMaybe dep $
       if ifMissing && upperBound_ /= V.NoUpperBound
          then return dep
@@ -72,9 +71,9 @@ updateDependency (UpdateUpper comp) ifMissing libs dep =
       updateUpper newUpperBound []        = [(noLowerBound, newUpperBound)]
       updateUpper newUpperBound intervals = intervals & _last . upperBound .~ newUpperBound
 
-updateDependency (UpdateBoth lowerComp upperComp) ifMissing libs dep =
-    updateDependency (UpdateLower lowerComp) ifMissing libs $
-    updateDependency (UpdateUpper upperComp) ifMissing libs dep
+updateDependency (UpdateBoth lowerComp upperComp ifMissing) libs dep =
+    updateDependency (UpdateLower lowerComp ifMissing) libs $
+    updateDependency (UpdateUpper upperComp ifMissing) libs dep
 
 
 modifyVersionIntervals :: ([V.VersionInterval] -> [V.VersionInterval]) -> V.VersionRange -> Maybe V.VersionRange

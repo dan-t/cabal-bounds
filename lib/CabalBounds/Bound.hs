@@ -5,7 +5,7 @@ module CabalBounds.Bound
    , UpdateBound(..)
    , boundOfDrop
    , boundOfUpdate
-   ) where   
+   ) where
 
 import CabalBounds.Args (Args(Drop, Update))
 import qualified CabalBounds.Args as A
@@ -16,9 +16,16 @@ data DropBound = DropUpper
                | DropBoth
                deriving (Show, Eq)
 
-data UpdateBound = UpdateLower VersionComp
-                 | UpdateUpper VersionComp
-                 | UpdateBoth { lowerComp :: VersionComp, upperComp :: VersionComp }
+
+-- | The bound is only updated if it's missing.
+type IfMissing = Bool
+
+type LowerComp = VersionComp
+type UpperComp = VersionComp
+
+data UpdateBound = UpdateLower LowerComp IfMissing
+                 | UpdateUpper UpperComp IfMissing
+                 | UpdateBoth LowerComp UpperComp IfMissing
                  deriving (Show, Eq)
 
 
@@ -30,16 +37,16 @@ boundOfDrop _  = error "Expected Drop Args!"
 boundOfUpdate :: Args -> UpdateBound
 boundOfUpdate upd@Update {}
    | hasLower && hasUpper
-   = UpdateBoth lowerComp upperComp
+   = UpdateBoth lowerComp upperComp ifMissing
 
    | hasLower
-   = UpdateLower lowerComp
+   = UpdateLower lowerComp ifMissing
 
    | hasUpper
-   = UpdateUpper upperComp
+   = UpdateUpper upperComp ifMissing
 
    | otherwise
-   = UpdateBoth lowerComp upperComp
+   = UpdateBoth lowerComp upperComp ifMissing
    where
       lowerComp
          | Just comp <- A.lowerComp upd
@@ -54,6 +61,8 @@ boundOfUpdate upd@Update {}
 
          | otherwise
          = defaultUpperComp
+
+      ifMissing = A.missing upd
 
       hasLower = A.lower upd || (isJust . A.lowerComp $ upd)
       hasUpper = A.upper upd || (isJust . A.upperComp $ upd)
