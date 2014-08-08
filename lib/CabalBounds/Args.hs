@@ -24,8 +24,8 @@ data Args = Drop { upper      :: Bool
                  , benchmark  :: [String]
                  , only       :: [String]
                  , ignore     :: [String]
-                 , output     :: String
-                 , cabalFile  :: String
+                 , output     :: FilePath
+                 , cabalFile  :: FilePath
                  }
           | Update { lower           :: Bool
                    , upper           :: Bool
@@ -38,10 +38,10 @@ data Args = Drop { upper      :: Bool
                    , only            :: [String]
                    , ignore          :: [String]
                    , missing         :: Bool
-                   , output          :: String
+                   , output          :: FilePath
                    , haskellPlatform :: String
-                   , cabalFile       :: String
-                   , setupConfigFile :: [String]
+                   , cabalFile       :: FilePath
+                   , setupConfigFile :: [FilePath]
                    }
           deriving (Data, Typeable, Show, Eq)
 
