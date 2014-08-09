@@ -20,12 +20,16 @@ import qualified CabalBounds.Sections as S
 import qualified CabalBounds.Dependencies as DP
 import qualified CabalBounds.Drop as D
 import qualified CabalBounds.Update as U
+import qualified CabalBounds.Dump as D
 import qualified CabalBounds.HaskellPlatform as HP
 import qualified System.IO.Strict as SIO
 import Control.Applicative ((<$>))
 import Control.Monad.Trans.Either (EitherT, runEitherT, bimapEitherT, hoistEither, left, right)
 import Control.Monad.IO.Class
 import qualified Data.HashMap.Strict as HM
+import Data.List (foldl', sortBy)
+import Data.Function (on)
+import Data.Char (toLower)
 
 type Error = String
 
@@ -50,6 +54,18 @@ cabalBounds args@A.Update {} =
          | otherwise
          = ""
 
+cabalBounds args@A.Dump {} =
+   leftToJust <$> runEitherT (do
+      pkgDescrps <- packageDescriptions $ A.cabalFiles args
+      let libs = sortBy (compare `on` (map toLower . fst)) $ D.dump pkgDescrps
+      if (not . null . A.outputFile $ args)
+         then liftIO $ writeFile (A.outputFile args) (prettyPrint libs)
+         else liftIO $ putStrLn (prettyPrint libs))
+   where
+      prettyPrint []     = "[]"
+      prettyPrint (l:ls) =
+         "[ " ++ show l ++ "\n" ++ foldl' (\str l -> str ++ ", " ++ show l ++ "\n") "" ls ++ "]";
+
 
 packageDescription :: FilePath -> EitherT Error IO GenericPackageDescription
 packageDescription file = do
@@ -57,6 +73,11 @@ packageDescription file = do
    case parsePackageDescription contents of
         ParseFailed error   -> left $ show error
         ParseOk _ pkgDescrp -> right pkgDescrp
+
+
+packageDescriptions :: [FilePath] -> EitherT Error IO [GenericPackageDescription]
+packageDescriptions []    = left "Missing cabal file(s)"
+packageDescriptions files = mapM packageDescription files
 
 
 type SetupConfigFile = String

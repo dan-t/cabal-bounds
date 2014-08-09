@@ -60,6 +60,7 @@ library
         CabalBounds.Dependencies
         CabalBounds.Drop
         CabalBounds.Update
+        CabalBounds.Dump
         CabalBounds.HaskellPlatform
     ghc-options: -W
  

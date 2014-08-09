@@ -7,6 +7,7 @@ module CabalBounds.Args
    , outputFile
    , defaultDrop
    , defaultUpdate
+   , defaultDump
    ) where
 
 import System.Console.CmdArgs hiding (ignore)
@@ -43,11 +44,14 @@ data Args = Drop { upper      :: Bool
                    , cabalFile       :: FilePath
                    , setupConfigFile :: [FilePath]
                    }
+          | Dump { output     :: String
+                 , cabalFiles :: [FilePath]
+                 }
           deriving (Data, Typeable, Show, Eq)
 
 
 get :: IO Args
-get = cmdArgsRun . cmdArgsMode $ modes [dropArgs, updateArgs]
+get = cmdArgsRun . cmdArgsMode $ modes [dropArgs, updateArgs, dumpArgs]
    &= program "cabal-bounds"
    &= summary summaryInfo
    &= help "A command line program for managing the bounds/versions of the dependencies in a cabal file."
@@ -59,8 +63,10 @@ get = cmdArgsRun . cmdArgsMode $ modes [dropArgs, updateArgs]
 
 outputFile :: Args -> FilePath
 outputFile args
-   | null $ output args = cabalFile args
-   | otherwise          = output args
+   | not isDumpArgs && null (output args) = cabalFile args
+   | otherwise                            = output args
+   where
+      isDumpArgs = case args of Dump {} -> True; _ -> False
 
 
 defaultDrop :: Args
@@ -97,6 +103,13 @@ defaultUpdate = Update
    }
 
 
+defaultDump :: Args
+defaultDump = Dump
+   { output     = def
+   , cabalFiles = def
+   }
+
+
 dropArgs :: Args
 dropArgs = Drop
    { upper      = def &= explicit &= name "upper" &= name "U"
@@ -129,6 +142,14 @@ updateArgs = Update
    , haskellPlatform = def &= explicit &= typ "VERSION" &= name "haskell-platform"
                            &= help "Update bounds by the library versions of the specified haskell platform version"
    , setupConfigFile = def &= args &= typ "SETUP-CONFIG-FILE"
+   }
+
+
+dumpArgs :: Args
+dumpArgs = Dump
+   { output     = def &= explicit &= typ "FILE" &= name "output" &= name "o"
+                      &= help "Save libraries with lower bounds to file, if empty, then it's written to stdout."
+   , cabalFiles = def &= args &= typ "CABAL_FILE"
    }
 
 
