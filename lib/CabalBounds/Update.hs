@@ -36,7 +36,7 @@ update bound sections deps libs pkgDescrp =
 updateDependency :: UpdateBound -> Libraries -> P.Dependency -> P.Dependency
 updateDependency (UpdateLower comp ifMissing) libs dep =
    fromMaybe dep $
-      if ifMissing && lowerBound_ /= noLowerBound
+      if ifMissing && lowerBound_ /= CL.noLowerBound
          then return dep
          else do
             version <- HM.lookup pkgName_ libs
@@ -47,11 +47,11 @@ updateDependency (UpdateLower comp ifMissing) libs dep =
             return $ mkDependency pkgName_ vrange
    where
       updateLower newLowerBound []        = [(newLowerBound, V.NoUpperBound)]
-      updateLower newLowerBound intervals = intervals & _head . lowerBound .~ newLowerBound
+      updateLower newLowerBound intervals = intervals & _head . CL.lowerBound .~ newLowerBound
 
       pkgName_      = pkgName dep
       versionRange_ = versionRange dep
-      lowerBound_   = fromMaybe noLowerBound $ V.asVersionIntervals versionRange_ ^? _head . lowerBound
+      lowerBound_   = fromMaybe CL.noLowerBound $ V.asVersionIntervals versionRange_ ^? _head . CL.lowerBound
 
 updateDependency (UpdateUpper comp ifMissing) libs dep =
    fromMaybe dep $
@@ -66,10 +66,10 @@ updateDependency (UpdateUpper comp ifMissing) libs dep =
    where
       versionRange_ = versionRange dep
       pkgName_      = pkgName dep
-      upperBound_   = fromMaybe V.NoUpperBound $ V.asVersionIntervals versionRange_ ^? _head . upperBound
+      upperBound_   = fromMaybe V.NoUpperBound $ V.asVersionIntervals versionRange_ ^? _head . CL.upperBound
 
-      updateUpper newUpperBound []        = [(noLowerBound, newUpperBound)]
-      updateUpper newUpperBound intervals = intervals & _last . upperBound .~ newUpperBound
+      updateUpper newUpperBound []        = [(CL.noLowerBound, newUpperBound)]
+      updateUpper newUpperBound intervals = intervals & _last . CL.upperBound .~ newUpperBound
 
 updateDependency (UpdateBoth lowerComp upperComp ifMissing) libs dep =
     updateDependency (UpdateLower lowerComp ifMissing) libs $
@@ -110,15 +110,3 @@ versionRange (P.Dependency _ vrange) = vrange
 
 mkDependency :: PkgName -> V.VersionRange -> P.Dependency
 mkDependency name = P.Dependency (P.PackageName name)
-
-
-lowerBound :: Lens' V.VersionInterval V.LowerBound
-lowerBound = _1
-
-
-upperBound :: Lens' V.VersionInterval V.UpperBound
-upperBound = _2
-
-
-noLowerBound :: V.LowerBound
-noLowerBound = V.LowerBound (V.Version [0] []) V.InclusiveBound
