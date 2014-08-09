@@ -71,6 +71,7 @@ updateTests = T.testGroup "Update Tests"
    , test "UpdateOnlyMissing" $ defaultUpdate { missing = True }
    , testWithoutSetupConfig "UpdateByHaskellPlatform" $ defaultUpdate { haskellPlatform = "2013.2.0.0" }
    , test "UpdateByHaskellPlatformAndSetupConfig" $ defaultUpdate { haskellPlatform = "2013.2.0.0" }
+   , testWithoutSetupConfig "Dump" $ defaultDump
    ]
 
 
@@ -102,8 +103,13 @@ test_ testName args withSetupConfig =
                                 , setupConfigFile = [setupConfigFile | withSetupConfig]
                                 }
 
+              Dump {}   -> args { cabalFiles = [inputFile]
+                                , output     = outputFile
+                                }
+
       diff ref new    = ["diff", "-u", ref, new]
-      goldenFile      = "tests" </> "goldenFiles" </> testName <.> "cabal"
-      outputFile      = "tests" </> "outputFiles" </> testName <.> "cabal"
+      goldenFile      = "tests" </> "goldenFiles" </> testName <.> (if isDumpTest then "hs" else "cabal")
+      outputFile      = "tests" </> "outputFiles" </> testName <.> (if isDumpTest then "hs" else "cabal")
       inputFile       = "tests" </> "inputFiles"  </> "original.cabal"
       setupConfigFile = "tests" </> "inputFiles"  </> "setup-config"
+      isDumpTest      = case args of Dump {} -> True; _ -> False
