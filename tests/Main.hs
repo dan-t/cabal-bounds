@@ -61,16 +61,17 @@ updateTests = T.testGroup "Update Tests"
    , test "UpdateBothIgnoreBase" $ defaultUpdate { ignore = ["base"] }
    , test "UpdateLowerIgnoreBase" $ defaultUpdate { lower = True, ignore = ["base"] }
    , test "UpdateMinorLower" $ defaultUpdate { lowerComp = Just Minor }
-   , test "UpdateMajor2Lower" $ defaultUpdate {lowerComp = Just Major2 }
-   , test "UpdateMajor1Lower" $ defaultUpdate {lowerComp = Just Major1 }
+   , test "UpdateMajor2Lower" $ defaultUpdate { lowerComp = Just Major2 }
+   , test "UpdateMajor1Lower" $ defaultUpdate { lowerComp = Just Major1 }
    , test "UpdateMinorUpper" $ defaultUpdate { upperComp = Just Minor }
-   , test "UpdateMajor2Upper" $ defaultUpdate {upperComp = Just Major2 }
-   , test "UpdateMajor1Upper" $ defaultUpdate {upperComp = Just Major1 }
+   , test "UpdateMajor2Upper" $ defaultUpdate { upperComp = Just Major2 }
+   , test "UpdateMajor1Upper" $ defaultUpdate { upperComp = Just Major1 }
    , test "UpdateMinorLowerAndUpper" $ defaultUpdate { lowerComp = Just Minor, upperComp = Just Minor }
    , test "UpdateMajor1LowerAndUpper" $ defaultUpdate { lowerComp = Just Major1, upperComp = Just Major1 }
    , test "UpdateOnlyMissing" $ defaultUpdate { missing = True }
    , testWithoutSetupConfig "UpdateByHaskellPlatform" $ defaultUpdate { haskellPlatform = "2013.2.0.0" }
    , test "UpdateByHaskellPlatformAndSetupConfig" $ defaultUpdate { haskellPlatform = "2013.2.0.0" }
+   , testWithoutSetupConfig "FromFile" $ defaultUpdate { upper = True, fromFile = "tests" </> "inputFiles" </> "FromFile.hs" }
    , testWithoutSetupConfig "Dump" $ defaultDump
    ]
 
