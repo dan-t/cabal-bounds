@@ -1,0 +1,6 @@
+0.8
+---
+* Add command 'cabal-bounds dump'
+* Add option 'fromfile' to command 'cabal-bounds update'
+* Support Haskell Platform 2014.2.0.0
+* Bugfix for increasing the upper bounds version number

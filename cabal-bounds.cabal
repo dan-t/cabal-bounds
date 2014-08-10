@@ -22,6 +22,7 @@ category: Utils, Development
 author: Daniel Trstenjak
 extra-source-files:
     README.md
+    CHANGELOG
     tests/inputFiles/original.cabal
     tests/inputFiles/FromFile.hs
     tests/inputFiles/setup-config
