@@ -82,15 +82,29 @@ modifyVersionIntervals f = fmap V.fromVersionIntervals . V.mkVersionIntervals . 
 
 compOf :: VersionComp -> V.Version -> V.Version
 Major1 `compOf` version =
-   version & CL.versionBranchL %~ take 1
+   version & CL.versionBranchL %~ (take 1 . ensureMinimalVersionBranch Major1)
            & CL.versionTagsL   .~ []
 
 Major2 `compOf` version =
-   version & CL.versionBranchL %~ take 2
+   version & CL.versionBranchL %~ (take 2 . ensureMinimalVersionBranch Major2)
            & CL.versionTagsL   .~ []
 
 Minor `compOf` version =
-   version & CL.versionTagsL .~ []
+   version & CL.versionBranchL %~ ensureMinimalVersionBranch Minor
+           & CL.versionTagsL   .~ []
+
+
+ensureMinimalVersionBranch :: VersionComp -> [Int] -> [Int]
+ensureMinimalVersionBranch comp branch =
+   let numDigits  = numNeededVersionDigits comp
+       numMissing = numDigits - length branch
+       branch' | numMissing >= 0 = branch ++ replicate numMissing 0
+               | otherwise       = branch
+       in branch'
+   where
+      numNeededVersionDigits Major1 = 1
+      numNeededVersionDigits Major2 = 2
+      numNeededVersionDigits Minor  = 3
 
 
 nextVersion :: V.Version -> V.Version
