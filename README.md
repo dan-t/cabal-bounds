@@ -7,6 +7,7 @@ A command line program for managing the bounds/versions of the dependencies in a
 * drop them
 * update them by the library versions of the current cabal build
 * update them by the library versions of a haskell platform release
+* update them by the library versions specified by a file
 
 Example: Raise the Upper Bounds
 ===============================
