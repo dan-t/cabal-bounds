@@ -17,6 +17,8 @@ description:
     .
     * update them by the library versions of a haskell platform release
     .
+    * update them by the library versions specified by a file
+    .
     For further details please consult the <https://github.com/dan-t/cabal-bounds README>.
 category: Utils, Development
 author: Daniel Trstenjak

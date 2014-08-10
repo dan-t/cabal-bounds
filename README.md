@@ -69,6 +69,28 @@ test if your project builds and works with these, and then raise the upper bound
 If you specify a haskell platform release and a setup config file at once, then the setup config library
 verions are only used for the libraries not present in the haskell platform release.
 
+Example: Update Bounds by File
+==============================
+
+It's also possible to update the bounds by library versions specified in a file:
+
+    $> cabal-bounds update --fromfile=libs.hs myproject.cabal
+
+The `libs.hs` file has to be of the format:
+
+    [ ("libA", [0,2,1]), ("libB", [2,1]), ("libC", [1]) ]
+
+If you specify a library file, a haskell platform release and a setup config file at once, then first the
+haskell platform libraries and versions are considered, then the library file and at the end the setup
+config file.
+
+The library file can be created by the `dump` command:
+
+    $> cabal-bounds dump --output=libs.hs myproject.cabal
+
+The `dump` command will dump dependencies with their lower bound version. The command can take multiple cabal files.
+If the same dependencies is present in multiple files, then the lowest lower bound version is taken.
+
 Example: Bound Changes
 ======================
 
