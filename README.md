@@ -3,11 +3,12 @@ cabal-bounds
 
 A command line program for managing the bounds/versions of the dependencies in a cabal file.
 
-`cabal-bounds` is able to do three things with the bounds of the dependencies in the cabal file:
+`cabal-bounds` is able to do these things with the bounds of the dependencies in the cabal file:
 * drop them
 * update them by the library versions of the current cabal build
 * update them by the library versions of a haskell platform release
 * update them by the library versions specified by a file
+* dump the libraries/dependencies and their lower bound versions from the cabal file(s) into a file
 
 Example: Raise the Upper Bounds
 ===============================
