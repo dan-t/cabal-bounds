@@ -40,6 +40,7 @@ data Args = Drop { upper      :: Bool
                    , ignore          :: [String]
                    , missing         :: Bool
                    , output          :: FilePath
+                   , fromFile        :: FilePath
                    , haskellPlatform :: String
                    , cabalFile       :: FilePath
                    , setupConfigFile :: [FilePath]
@@ -97,6 +98,7 @@ defaultUpdate = Update
    , ignore          = def
    , missing         = def
    , output          = def
+   , fromFile        = def
    , haskellPlatform = def
    , cabalFile       = def
    , setupConfigFile = def
@@ -139,6 +141,7 @@ updateArgs = Update
    , upperComp       = def &= explicit &= name "uppercomp"
                            &= help "Only the upper bound is updated with the specified version component. (major1, major2 or minor)"
    , missing         = def &= help "Only the dependencies having missing bounds are updated."
+   , fromFile        = def &= typ "FILE" &= help "Update bounds by the library versions spedified in the given file."
    , haskellPlatform = def &= explicit &= typ "VERSION" &= name "haskell-platform"
                            &= help "Update bounds by the library versions of the specified haskell platform version"
    , setupConfigFile = def &= args &= typ "SETUP-CONFIG-FILE"

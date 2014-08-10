@@ -43,7 +43,7 @@ cabalBounds args@A.Drop {} =
 cabalBounds args@A.Update {} =
    leftToJust <$> runEitherT (do
       pkgDescrp <- packageDescription $ A.cabalFile args
-      libs      <- libraries setupConfigFile (A.haskellPlatform args)
+      libs      <- libraries (A.haskellPlatform args) (A.fromFile args) setupConfigFile
       let pkgDescrp' = U.update (B.boundOfUpdate args) (S.sections args pkgDescrp) (DP.dependencies args) libs pkgDescrp
       liftIO $ writeFile (A.outputFile args) (showGenericPackageDescription pkgDescrp'))
    where
@@ -76,25 +76,40 @@ packageDescription file = do
 
 
 packageDescriptions :: [FilePath] -> EitherT Error IO [GenericPackageDescription]
-packageDescriptions []    = left "Missing cabal file(s)"
+packageDescriptions []    = left "Missing cabal file"
 packageDescriptions files = mapM packageDescription files
 
 
 type SetupConfigFile = String
+type LibraryFile     = String
 
-libraries :: SetupConfigFile -> HP.HPVersion -> EitherT Error IO U.Libraries
-libraries "" ""              = left "Missing setup config file and haskell platform version"
-libraries confFile ""        = installedLibraries confFile
-libraries "" hpVersion       = haskellPlatformLibraries hpVersion
-libraries confFile hpVersion = do
-   instLibs <- installedLibraries confFile
-   hpLibs   <- haskellPlatformLibraries hpVersion
-   right $ HM.union hpLibs instLibs
+libraries :: HP.HPVersion -> LibraryFile -> SetupConfigFile -> EitherT Error IO U.Libraries
+libraries "" "" ""                   = left "Missing library file, haskell platform version and setup config file"
+libraries hpVersion libFile confFile = do
+   hpLibs       <- haskellPlatformLibraries hpVersion
+   libsFromFile <- librariesFromFile libFile
+   instLibs     <- installedLibraries confFile
+   right $ HM.union (HM.union hpLibs libsFromFile) instLibs
+
+
+librariesFromFile :: LibraryFile -> EitherT Error IO U.Libraries
+librariesFromFile ""      = right HM.empty
+librariesFromFile libFile = do
+   contents <- liftIO $ SIO.readFile libFile
+   libsFrom contents
+   where
+      libsFrom contents
+         | [(libs, _)] <- reads contents :: [([(String, [Int])], String)]
+         = right $ HM.fromList (map (\(pkgName, versBranch) -> (pkgName, V.Version versBranch [])) libs)
+
+         | otherwise
+         = left "Invalid format of library file given to '--fromfile'. Expected file with content of type '[(String, [Int])]'."
 
 
 haskellPlatformLibraries :: HP.HPVersion -> EitherT Error IO U.Libraries
 haskellPlatformLibraries hpVersion =
    case hpVersion of
+        ""         -> right HM.empty
         "current"  -> right . HM.fromList $ HP.currentLibraries
         "previous" -> right . HM.fromList $ HP.previousLibraries
         version | Just libs <- HP.librariesOf version -> right . HM.fromList $ libs
@@ -102,6 +117,7 @@ haskellPlatformLibraries hpVersion =
 
 
 installedLibraries :: SetupConfigFile -> EitherT Error IO U.Libraries
+installedLibraries ""       = right HM.empty
 installedLibraries confFile = do
    binfo <- liftIO $ tryGetConfigStateFile confFile
    bimapEitherT show buildInfoLibs (hoistEither binfo)
