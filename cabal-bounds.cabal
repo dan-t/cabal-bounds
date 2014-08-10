@@ -43,12 +43,12 @@ library
     build-depends:
         base >=3 && <5,
         cmdargs >=0.10.5 && <0.11,
-        lens >=4.0.1 && <4.3,
+        lens >=4.0.1 && <4.4,
         strict >=0.3.2 && <0.4,
         unordered-containers >=0.2.3.3 && <0.3,
         transformers >=0.3.0.0 && <0.5,
         either >=4.1.1 && <4.4,
-        cabal-lenses >=0.3 && <0.4,
+        cabal-lenses ==0.3.*,
         Cabal >=1.18.0 && <1.21
     exposed-modules:
         CabalBounds.Args
