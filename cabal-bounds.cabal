@@ -9,7 +9,7 @@ synopsis: A command line program for managing the bounds/versions of the depende
 description:
     A command line program for managing the bounds/versions of the dependencies in a cabal file.
     .
-    `cabal-bounds` is able to do these things with the bounds of the dependencies in the cabal file:
+    'cabal-bounds' is able to do these things with the bounds of the dependencies in the cabal file:
     .
     * drop them
     .
@@ -22,6 +22,28 @@ description:
     * dump the libraries/dependencies and their lower bound versions from the cabal file(s) into a file
     .
     For further details please consult the <https://github.com/dan-t/cabal-bounds README>.
+    .
+    /Installation/
+    .
+    You have to ensure, that the 'Cabal' library of 'cabal-bounds' matches the one used by the 'cabal' binary:
+    .
+    > $ cabal --version
+    > cabal-install version 1.18.0.2
+    > using version 1.18.1 of the Cabal library 
+    .
+    > $ cabal install --constraint="Cabal == 1.18.1" cabal-bounds
+    .
+    If you update the 'cabal' binary and the used 'Cabal' library changes, then you have to rebuild 'cabal-bounds'.
+    .
+    /Issues/
+    .
+    Perhaps the currently most annoying thing is, that you have to live with the reformating of your
+    'cabal' file done by the pretty printer of the 'Cabal' library.
+    .
+    To reformat your 'cabal' file without changing any bounds you can call 'cabal-bounds' with the name of
+    a section that isn't present in the 'cabal' file:
+    .
+    > $ cabal-bounds drop --executable=blub myproject.cabal
 category: Utils, Development
 author: Daniel Trstenjak
 extra-source-files:
