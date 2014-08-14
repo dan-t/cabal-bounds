@@ -1,3 +1,7 @@
+0.8.1
+-----
+* Automatically build the setup-config file for the tests
+
 0.8
 ---
 * Add command 'cabal-bounds dump'
