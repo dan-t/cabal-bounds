@@ -5,11 +5,42 @@ import qualified Test.Tasty as T
 import qualified Test.Tasty.Golden as G
 import System.IO (hPutStrLn, stderr)
 import System.FilePath ((</>), (<.>))
+import System.FilePath.Glob (glob)
+import qualified System.Directory as Dir
+import qualified System.Process as Proc
 import CabalBounds.Args
 import CabalBounds.Main (cabalBounds)
 import CabalBounds.VersionComp (VersionComp(..))
+import Control.Monad (when)
+import Control.Exception (finally)
 
-main = T.defaultMain tests
+main :: IO ()
+main = ensureSetupConfig >> T.defaultMain tests
+
+ensureSetupConfig :: IO ()
+ensureSetupConfig = do
+   configExists <- Dir.doesFileExist $ "tests" </> "inputFiles" </> "setup-config"
+   when (not configExists) $ do
+      curDir <- Dir.getCurrentDirectory
+      buildSetupConfig curDir `finally` cleanUp curDir
+   where
+      buildSetupConfig curDir = do
+         let inputFiles = curDir </> "tests" </> "inputFiles"
+         Dir.setCurrentDirectory $ inputFiles </> "setup-config-build-env"
+
+         Proc.runCommand "cabal sandbox init" >>= Proc.waitForProcess
+         Proc.runCommand "cabal install -j"   >>= Proc.waitForProcess
+
+         [distDir] <- glob $ "dist" </> "dist-sandbox-*"
+         Dir.copyFile (distDir </> "setup-config") (inputFiles </> "setup-config")
+
+      cleanUp prevDir = do
+         let buildDir = prevDir </> "tests" </> "inputFiles" </> "setup-config-build-env"
+         Dir.setCurrentDirectory buildDir
+         Proc.runCommand "cabal sandbox delete" >>= Proc.waitForProcess
+
+         Dir.removeDirectoryRecursive $ buildDir </> "dist"
+         Dir.setCurrentDirectory prevDir
 
 tests :: T.TestTree
 tests = T.testGroup "Tests" [dropTests, updateTests]
