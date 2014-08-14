@@ -17,6 +17,7 @@ import Control.Exception (finally)
 main :: IO ()
 main = ensureSetupConfig >> T.defaultMain tests
 
+
 ensureSetupConfig :: IO ()
 ensureSetupConfig = do
    configExists <- Dir.doesFileExist $ "tests" </> "inputFiles" </> "setup-config"
@@ -42,8 +43,10 @@ ensureSetupConfig = do
          Dir.removeDirectoryRecursive $ buildDir </> "dist"
          Dir.setCurrentDirectory prevDir
 
+
 tests :: T.TestTree
 tests = T.testGroup "Tests" [dropTests, updateTests, dumpTests]
+
 
 dropTests :: T.TestTree
 dropTests = T.testGroup "Drop Tests"
