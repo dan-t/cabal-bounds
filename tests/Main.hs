@@ -43,7 +43,7 @@ ensureSetupConfig = do
          Dir.setCurrentDirectory prevDir
 
 tests :: T.TestTree
-tests = T.testGroup "Tests" [dropTests, updateTests]
+tests = T.testGroup "Tests" [dropTests, updateTests, dumpTests]
 
 dropTests :: T.TestTree
 dropTests = T.testGroup "Drop Tests"
@@ -103,7 +103,12 @@ updateTests = T.testGroup "Update Tests"
    , testWithoutSetupConfig "UpdateByHaskellPlatform" $ defaultUpdate { haskellPlatform = "2013.2.0.0" }
    , test "UpdateByHaskellPlatformAndSetupConfig" $ defaultUpdate { haskellPlatform = "2013.2.0.0" }
    , testWithoutSetupConfig "FromFile" $ defaultUpdate { upper = True, fromFile = "tests" </> "inputFiles" </> "FromFile.hs" }
-   , testWithoutSetupConfig "Dump" $ defaultDump
+   ]
+
+
+dumpTests :: T.TestTree
+dumpTests = T.testGroup "Dump Tests"
+   [ testWithoutSetupConfig "Dump" $ defaultDump
    ]
 
 
