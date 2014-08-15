@@ -1,3 +1,7 @@
+0.8.2
+-----
+* Minor changes regarding tests
+
 0.8.1
 -----
 * Automatically build the setup-config file for the tests
