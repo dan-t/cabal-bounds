@@ -1,5 +1,5 @@
 name: cabal-bounds
-version: 0.8.2
+version: 0.8.3
 cabal-version: >=1.9.2
 build-type: Simple
 license: BSD3
@@ -52,6 +52,7 @@ extra-source-files:
     tests/inputFiles/original.cabal
     tests/inputFiles/FromFile.hs
     tests/inputFiles/.gitignore
+    tests/inputFiles/setup-config-build-env/cabal.config
     tests/inputFiles/setup-config-build-env/setup-config.cabal
     tests/inputFiles/setup-config-build-env/src/*.hs
     tests/inputFiles/setup-config-build-env/src/CabalBounds/*.hs
