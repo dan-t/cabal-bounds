@@ -52,7 +52,6 @@ extra-source-files:
     tests/inputFiles/original.cabal
     tests/inputFiles/FromFile.hs
     tests/inputFiles/.gitignore
-    tests/inputFiles/setup-config-build-env/cabal.config
     tests/inputFiles/setup-config-build-env/setup-config.cabal
     tests/inputFiles/setup-config-build-env/src/*.hs
     tests/inputFiles/setup-config-build-env/src/CabalBounds/*.hs
