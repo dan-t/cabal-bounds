@@ -108,10 +108,7 @@ ensureMinimalVersionBranch comp branch =
 
 
 nextVersion :: V.Version -> V.Version
-nextVersion version =
-   version & CL.versionBranchL %~ increaseLastComp
-   where
-      increaseLastComp = reverse . (& ix 0 %~ (+ 1)) . reverse
+nextVersion version = version & CL.versionBranchL . _last %~ (+ 1)
 
 
 pkgName :: P.Dependency -> PkgName
