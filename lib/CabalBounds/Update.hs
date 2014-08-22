@@ -98,8 +98,8 @@ ensureMinimalVersionBranch :: VersionComp -> [Int] -> [Int]
 ensureMinimalVersionBranch comp branch =
    let numDigits  = numNeededVersionDigits comp
        numMissing = numDigits - length branch
-       branch' | numMissing >= 0 = branch ++ replicate numMissing 0
-               | otherwise       = branch
+       branch' | numMissing > 0 = branch ++ replicate numMissing 0
+               | otherwise      = branch
        in branch'
    where
       numNeededVersionDigits Major1 = 1
