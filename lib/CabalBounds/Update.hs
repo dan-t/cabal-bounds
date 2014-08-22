@@ -37,7 +37,7 @@ updateDependency :: UpdateBound -> Libraries -> P.Dependency -> P.Dependency
 updateDependency (UpdateLower comp ifMissing) libs dep =
    fromMaybe dep $
       if ifMissing && lowerBound_ /= CL.noLowerBound
-         then return dep
+         then Nothing
          else do
             version <- HM.lookup pkgName_ libs
             let newLowerVersion = comp `compOf` version
@@ -56,7 +56,7 @@ updateDependency (UpdateLower comp ifMissing) libs dep =
 updateDependency (UpdateUpper comp ifMissing) libs dep =
    fromMaybe dep $
       if ifMissing && upperBound_ /= V.NoUpperBound
-         then return dep
+         then Nothing
          else do
             upperVersion <- HM.lookup pkgName_ libs
             let newUpperVersion = comp `compOf` upperVersion
