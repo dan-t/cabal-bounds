@@ -12,7 +12,7 @@ import qualified CabalLenses as CL
 import Data.List (foldl')
 import Distribution.PackageDescription (GenericPackageDescription)
 import Distribution.Package (Dependency(..))
-import Distribution.Version (mkVersionIntervals, fromVersionIntervals, asVersionIntervals, UpperBound(..), anyVersion)
+import Distribution.Version (UpperBound(..), anyVersion)
 
 
 drop :: DropBound -> [CL.Section] -> Dependencies -> GenericPackageDescription -> GenericPackageDescription
@@ -28,15 +28,5 @@ drop bound sections deps pkgDescrp =
 
 
 dropFromDependency :: DropBound -> Dependency -> Dependency
-dropFromDependency DropUpper (Dependency pkgName versionRange) = Dependency pkgName versionRange'
-   where
-      versionRange'
-         | Just vi <- mkVersionIntervals intervals'
-         = fromVersionIntervals vi
-
-         | otherwise
-         = versionRange
-
-      intervals' = map (& _2 .~ NoUpperBound) (asVersionIntervals versionRange)
-
-dropFromDependency DropBoth (Dependency pkgName _) = Dependency pkgName anyVersion
+dropFromDependency DropUpper dep = dep & CL.versionRange . CL.intervals . traversed . CL.upperBound .~ NoUpperBound
+dropFromDependency DropBoth  dep = dep & CL.versionRange .~ anyVersion

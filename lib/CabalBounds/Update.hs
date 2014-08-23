@@ -7,6 +7,7 @@ import qualified Distribution.PackageDescription as D
 import qualified Distribution.Package as P
 import qualified Distribution.Version as V
 import Control.Lens
+import Control.Applicative ((<$>))
 import CabalBounds.Bound (UpdateBound(..))
 import CabalBounds.Dependencies (Dependencies(..), filterDependency)
 import CabalBounds.VersionComp (VersionComp(..))
@@ -15,7 +16,6 @@ import Data.List (foldl')
 import qualified Data.HashMap.Strict as HM
 import Data.Maybe (fromMaybe)
 
-type PkgName    = String
 type LibName    = String
 type LibVersion = V.Version
 type Libraries  = HM.HashMap LibName LibVersion
@@ -39,19 +39,16 @@ updateDependency (UpdateLower comp ifMissing) libs dep =
       if ifMissing && lowerBound_ /= CL.noLowerBound
          then Nothing
          else do
-            version <- HM.lookup pkgName_ libs
-            let newLowerVersion = comp `compOf` version
+            lowerVersion <- HM.lookup pkgName_ libs
+            let newLowerVersion = comp `compOf` lowerVersion
                 newLowerBound   = V.LowerBound newLowerVersion V.InclusiveBound
-                vrange          = fromMaybe (V.orLaterVersion newLowerVersion)
-                                            (modifyVersionIntervals (updateLower newLowerBound) versionRange_)
-            return $ mkDependency pkgName_ vrange
+                newIntervals    = (versionRange_ ^. CL.intervals) & _head . CL.lowerBound .~ newLowerBound
+                vrange          = fromMaybe (V.orLaterVersion newLowerVersion) (mkVersionRange newIntervals)
+            return $ dep & CL.versionRange .~ vrange
    where
-      updateLower newLowerBound []        = [(newLowerBound, V.NoUpperBound)]
-      updateLower newLowerBound intervals = intervals & _head . CL.lowerBound .~ newLowerBound
-
-      pkgName_      = pkgName dep
-      versionRange_ = versionRange dep
-      lowerBound_   = fromMaybe CL.noLowerBound $ V.asVersionIntervals versionRange_ ^? _head . CL.lowerBound
+      pkgName_      = dep ^. CL.packageName . _Wrapped
+      versionRange_ = dep ^. CL.versionRange
+      lowerBound_   = fromMaybe CL.noLowerBound $ versionRange_ ^? CL.intervals . _head . CL.lowerBound
 
 updateDependency (UpdateUpper comp ifMissing) libs dep =
    fromMaybe dep $
@@ -61,23 +58,17 @@ updateDependency (UpdateUpper comp ifMissing) libs dep =
             upperVersion <- HM.lookup pkgName_ libs
             let newUpperVersion = comp `compOf` upperVersion
                 newUpperBound   = V.UpperBound (nextVersion newUpperVersion) V.ExclusiveBound
-            vrange <- modifyVersionIntervals (updateUpper newUpperBound) versionRange_
-            return $ mkDependency pkgName_ vrange
+                newIntervals    = (versionRange_ ^. CL.intervals) & _last . CL.upperBound .~ newUpperBound
+                vrange          = fromMaybe (V.earlierVersion newUpperVersion) (mkVersionRange newIntervals)
+            return $ dep & CL.versionRange .~ vrange
    where
-      versionRange_ = versionRange dep
-      pkgName_      = pkgName dep
-      upperBound_   = fromMaybe V.NoUpperBound $ V.asVersionIntervals versionRange_ ^? _head . CL.upperBound
-
-      updateUpper newUpperBound []        = [(CL.noLowerBound, newUpperBound)]
-      updateUpper newUpperBound intervals = intervals & _last . CL.upperBound .~ newUpperBound
+      versionRange_ = dep ^. CL.versionRange
+      pkgName_      = dep ^. CL.packageName . _Wrapped
+      upperBound_   = fromMaybe V.NoUpperBound $ versionRange_ ^? CL.intervals . _last . CL.upperBound
 
 updateDependency (UpdateBoth lowerComp upperComp ifMissing) libs dep =
     updateDependency (UpdateLower lowerComp ifMissing) libs $
     updateDependency (UpdateUpper upperComp ifMissing) libs dep
-
-
-modifyVersionIntervals :: ([V.VersionInterval] -> [V.VersionInterval]) -> V.VersionRange -> Maybe V.VersionRange
-modifyVersionIntervals f = fmap V.fromVersionIntervals . V.mkVersionIntervals . f . V.asVersionIntervals
 
 
 compOf :: VersionComp -> V.Version -> V.Version
@@ -111,13 +102,5 @@ nextVersion :: V.Version -> V.Version
 nextVersion version = version & CL.versionBranchL . _last %~ (+ 1)
 
 
-pkgName :: P.Dependency -> PkgName
-pkgName (P.Dependency (P.PackageName name) _) = name
-
-
-versionRange :: P.Dependency -> V.VersionRange
-versionRange (P.Dependency _ vrange) = vrange
-
-
-mkDependency :: PkgName -> V.VersionRange -> P.Dependency
-mkDependency name = P.Dependency (P.PackageName name)
+mkVersionRange :: [V.VersionInterval] -> Maybe V.VersionRange
+mkVersionRange vis = V.fromVersionIntervals <$> V.mkVersionIntervals vis

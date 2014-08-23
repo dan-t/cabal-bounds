@@ -72,7 +72,7 @@ library
         unordered-containers >=0.2.3.3 && <0.3,
         transformers >=0.3.0.0 && <0.5,
         either >=4.1.1 && <4.4,
-        cabal-lenses ==0.3.*,
+        cabal-lenses ==0.4.*,
         Cabal >=1.18.0 && <1.21
     exposed-modules:
         CabalBounds.Args

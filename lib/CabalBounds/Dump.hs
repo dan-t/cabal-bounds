@@ -4,7 +4,6 @@ module CabalBounds.Dump
    ) where
 
 import Distribution.PackageDescription (GenericPackageDescription)
-import qualified Distribution.Version as V
 import qualified Data.HashMap.Strict as HM
 import Data.List (foldl')
 import Data.Maybe (fromMaybe)
@@ -22,13 +21,12 @@ dump pkgDescrps = HM.toList $ foldl' addLibsFromPkgDescrp HM.empty pkgDescrps
       addLibsFromPkgDescrp libs pkgDescrp = foldl' addLibFromDep libs (pkgDescrp ^.. CL.allDependency)
 
       addLibFromDep libs dep
-         | depLowerBound /= CL.noLowerBound
-         = HM.insertWith min depPkgName lowerVersionBranch libs
+         | lowerBound_ /= CL.noLowerBound
+         = HM.insertWith min pkgName_ versionBranch_ libs
 
          | otherwise
          = libs
          where
-            depPkgName = dep ^. CL.depPackageName . CL.pkgNameString
-
-            depLowerBound@(V.LowerBound (V.Version { V.versionBranch = lowerVersionBranch }) _) =
-               fromMaybe CL.noLowerBound (dep ^? CL.depVersionRange . CL.rangeToIntervals . _head . CL.lowerBound)
+            pkgName_       = dep ^. CL.packageName . _Wrapped
+            versionBranch_ = lowerBound_ ^. CL.version . CL.versionBranchL
+            lowerBound_    = fromMaybe CL.noLowerBound (dep ^? CL.versionRange . CL.intervals . _head . CL.lowerBound)
