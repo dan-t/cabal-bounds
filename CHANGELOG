@@ -1,3 +1,7 @@
+0.8.5
+-----
+* Raise upper bounds of dependencies
+
 0.8.2-0.8.4
 -----------
 * Minor changes regarding tests
