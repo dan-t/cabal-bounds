@@ -29,7 +29,7 @@ description:
     .
     > $ cabal --version
     > cabal-install version 1.18.0.2
-    > using version 1.18.1 of the Cabal library 
+    > using version 1.18.1 of the Cabal library
     .
     > $ cabal install --constraint="Cabal == 1.18.1" cabal-bounds
     .
@@ -67,7 +67,7 @@ library
     build-depends:
         base >=3 && <5,
         cmdargs >=0.10.5 && <0.11,
-        lens >=4.0.1 && <4.4,
+        lens >=4.0.1 && <4.5,
         strict >=0.3.2 && <0.4,
         unordered-containers >=0.2.3.3 && <0.3,
         transformers >=0.3.0.0 && <0.5,
@@ -110,7 +110,7 @@ test-suite cabal-bounds-tests
         process >=1.1.0.2 && <1.3,
         filepath >=1.3.0.1 && <1.4,
         directory >=1.0.0.0 && <1.3,
-        Glob >=0.7 && <0.8,
+        Glob ==0.7.*,
         cabal-bounds -any
     type: exitcode-stdio-1.0
     main-is: Main.hs
