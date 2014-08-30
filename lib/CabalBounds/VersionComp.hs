@@ -6,7 +6,7 @@ module CabalBounds.VersionComp
    , defaultUpperComp
    ) where
 
-import Data.Data (Data(..), Typeable(..))
+import Data.Data (Data(..), Typeable)
 
 -- | The component of a version number A.B.C -> Major1.Major2.Minor
 data VersionComp = Major1
