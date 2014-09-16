@@ -1,5 +1,5 @@
 name: cabal-bounds
-version: 0.8.6
+version: 0.8.7
 cabal-version: >=1.9.2
 build-type: Simple
 license: BSD3
@@ -106,7 +106,7 @@ executable cabal-bounds
 test-suite cabal-bounds-tests
     build-depends:
         base >=3 && <5,
-        tasty >=0.7 && <0.9,
+        tasty >=0.9.0.1 && <0.11,
         tasty-golden >=2.2.0.2 && <2.3,
         process >=1.1.0.2 && <1.3,
         filepath >=1.3.0.1 && <1.4,
