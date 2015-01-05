@@ -59,28 +59,26 @@ extra-source-files:
     tests/goldenFiles/*.cabal
     tests/goldenFiles/*.hs
     tests/outputFiles/.gitignore
- 
+
 source-repository head
     type: git
     location: https://github.com/dan-t/cabal-bounds
- 
+
 library
     build-depends:
         base >=3 && <5,
         cmdargs >=0.10.5 && <0.11,
-        lens >=4.0.1 && <4.7,
+        lens >=4.0.1 && <4.8,
         strict >=0.3.2 && <0.4,
         unordered-containers >=0.2.3.3 && <0.3,
         transformers >=0.3.0.0 && <0.5,
         either >=4.1.1 && <4.4,
-        cabal-lenses ==0.4.*,
-        Cabal >=1.18.0 && <1.21
+        cabal-lenses >=0.4.4 && <0.5,
+        Cabal >=1.18.0 && <1.23
     exposed-modules:
         CabalBounds.Args
         CabalBounds.Main
         CabalBounds.VersionComp
-    exposed: True
-    buildable: True
     cpp-options: -DCABAL
     hs-source-dirs: lib
     other-modules:
@@ -93,16 +91,15 @@ library
         CabalBounds.Dump
         CabalBounds.HaskellPlatform
     ghc-options: -W
- 
+
 executable cabal-bounds
     build-depends:
         base >=3 && <5,
         cabal-bounds -any
     main-is: Main.hs
-    buildable: True
     hs-source-dirs: exe
     ghc-options: -W
- 
+
 test-suite cabal-bounds-tests
     build-depends:
         base >=3 && <5,
@@ -115,7 +112,5 @@ test-suite cabal-bounds-tests
         cabal-bounds -any
     type: exitcode-stdio-1.0
     main-is: Main.hs
-    buildable: True
     hs-source-dirs: tests
     ghc-options: -W
- 
