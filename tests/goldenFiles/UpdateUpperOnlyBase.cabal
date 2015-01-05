@@ -2,7 +2,7 @@ name: cabal-bounds
 version: 0.1
 cabal-version: >=1.9.2
 build-type: Simple
-license: AllRightsReserved
+license: UnspecifiedLicense
 maintainer: daniel.trstenjak@gmail.com
 synopsis: A command line program for managing the bounds/versions of the dependencies in a cabal file.
 description:
@@ -16,7 +16,7 @@ source-repository head
  
 library
     build-depends:
-        base >=3 && <4.7,
+        base >=3 && <4.8,
         cmdargs >=0.10.5 && <0.11,
         lens -any,
         pretty-show -any,
@@ -27,22 +27,19 @@ library
         CabalBounds.Command
         CabalBounds.Execute
         CabalBounds.Lenses
-    exposed: True
-    buildable: True
     hs-source-dirs: src
     other-modules:
         Paths_cabal_bounds
  
 executable cabal-bounds
     build-depends:
-        base >=3 && <4.7,
+        base >=3 && <4.8,
         cmdargs >=0.10.5 && <0.11,
         lens -any,
         pretty-show -any,
         strict -any,
         Cabal -any
     main-is: ExeMain1.hs
-    buildable: True
     cpp-options: -DCABAL
     hs-source-dirs: src
     other-modules:
@@ -55,14 +52,13 @@ executable cabal-bounds
  
 executable other-exe
     build-depends:
-        base >=3 && <4.7,
+        base >=3 && <4.8,
         cmdargs >=0.10.5 && <0.11,
         lens -any,
         pretty-show -any,
         strict -any,
         Cabal -any
     main-is: ExeMain2.hs
-    buildable: True
     cpp-options: -DCABAL
     hs-source-dirs: src
     other-modules:
@@ -75,7 +71,7 @@ executable other-exe
  
 test-suite some-test
     build-depends:
-        base >=3 && <4.7,
+        base >=3 && <4.8,
         cmdargs >=0.10.5 && <0.11,
         lens -any,
         pretty-show -any,
@@ -83,7 +79,6 @@ test-suite some-test
         Cabal -any
     type: exitcode-stdio-1.0
     main-is: TestMain1.hs
-    buildable: True
     hs-source-dirs: src
     other-modules:
         Paths_cabal_bounds
@@ -94,7 +89,7 @@ test-suite some-test
     ghc-options: -W
 test-suite other-test
     build-depends:
-        base >=3 && <4.7,
+        base >=3 && <4.8,
         cmdargs >=0.10.5 && <0.11,
         lens -any,
         pretty-show -any,
@@ -102,7 +97,6 @@ test-suite other-test
         Cabal -any
     type: exitcode-stdio-1.0
     main-is: TestMain2.hs
-    buildable: True
     hs-source-dirs: src
     other-modules:
         Paths_cabal_bounds
@@ -111,4 +105,3 @@ test-suite other-test
         CabalBounds.Execute
         CabalBounds.Lenses
     ghc-options: -W
- 

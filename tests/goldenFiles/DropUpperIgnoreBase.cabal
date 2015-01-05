@@ -2,7 +2,7 @@ name: cabal-bounds
 version: 0.1
 cabal-version: >=1.9.2
 build-type: Simple
-license: AllRightsReserved
+license: UnspecifiedLicense
 maintainer: daniel.trstenjak@gmail.com
 synopsis: A command line program for managing the bounds/versions of the dependencies in a cabal file.
 description:
@@ -27,8 +27,6 @@ library
         CabalBounds.Command
         CabalBounds.Execute
         CabalBounds.Lenses
-    exposed: True
-    buildable: True
     hs-source-dirs: src
     other-modules:
         Paths_cabal_bounds
@@ -42,7 +40,6 @@ executable cabal-bounds
         strict -any,
         Cabal -any
     main-is: ExeMain1.hs
-    buildable: True
     cpp-options: -DCABAL
     hs-source-dirs: src
     other-modules:
@@ -62,7 +59,6 @@ executable other-exe
         strict -any,
         Cabal -any
     main-is: ExeMain2.hs
-    buildable: True
     cpp-options: -DCABAL
     hs-source-dirs: src
     other-modules:
@@ -83,7 +79,6 @@ test-suite some-test
         Cabal -any
     type: exitcode-stdio-1.0
     main-is: TestMain1.hs
-    buildable: True
     hs-source-dirs: src
     other-modules:
         Paths_cabal_bounds
@@ -102,7 +97,6 @@ test-suite other-test
         Cabal -any
     type: exitcode-stdio-1.0
     main-is: TestMain2.hs
-    buildable: True
     hs-source-dirs: src
     other-modules:
         Paths_cabal_bounds
@@ -111,4 +105,3 @@ test-suite other-test
         CabalBounds.Execute
         CabalBounds.Lenses
     ghc-options: -W
- 
