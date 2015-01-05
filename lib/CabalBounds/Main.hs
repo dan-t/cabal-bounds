@@ -27,10 +27,12 @@ import qualified CabalBounds.Drop as D
 import qualified CabalBounds.Update as U
 import qualified CabalBounds.Dump as D
 import qualified CabalBounds.HaskellPlatform as HP
+import qualified CabalLenses as CL
 import qualified System.IO.Strict as SIO
 import Control.Applicative ((<$>))
 import Control.Monad.Trans.Either (EitherT, runEitherT, bimapEitherT, hoistEither, left, right)
 import Control.Monad.IO.Class
+import Control.Lens
 import qualified Data.HashMap.Strict as HM
 import Data.List (foldl', sortBy)
 import Data.Function (on)
@@ -43,14 +45,14 @@ cabalBounds args@A.Drop {} =
    leftToJust <$> runEitherT (do
       pkgDescrp <- packageDescription $ A.cabalFile args
       let pkgDescrp' = D.drop (B.boundOfDrop args) (S.sections args pkgDescrp) (DP.dependencies args) pkgDescrp
-      liftIO $ writeFile (A.outputFile args) (showGenericPackageDescription pkgDescrp'))
+      liftIO $ writeFile (A.outputFile args) (showGenericPackageDescription . clearTargetBuildDepends $ pkgDescrp'))
 
 cabalBounds args@A.Update {} =
    leftToJust <$> runEitherT (do
       pkgDescrp <- packageDescription $ A.cabalFile args
       libs      <- libraries (A.haskellPlatform args) (A.fromFile args) setupConfigFile
       let pkgDescrp' = U.update (B.boundOfUpdate args) (S.sections args pkgDescrp) (DP.dependencies args) libs pkgDescrp
-      liftIO $ writeFile (A.outputFile args) (showGenericPackageDescription pkgDescrp'))
+      liftIO $ writeFile (A.outputFile args) (showGenericPackageDescription . clearTargetBuildDepends $ pkgDescrp'))
    where
       setupConfigFile
          | (file:_) <- A.setupConfigFile args
@@ -78,6 +80,12 @@ packageDescription file = do
    case parsePackageDescription contents of
         ParseFailed error   -> left $ show error
         ParseOk _ pkgDescrp -> right pkgDescrp
+
+
+-- | clear the 'targetBuildDepends' field of all 'BuildInfo'
+clearTargetBuildDepends :: GenericPackageDescription -> GenericPackageDescription
+clearTargetBuildDepends pkgDescrp =
+   pkgDescrp & CL.allBuildInfo . CL.targetBuildDependsL .~ []
 
 
 packageDescriptions :: [FilePath] -> EitherT Error IO [GenericPackageDescription]
