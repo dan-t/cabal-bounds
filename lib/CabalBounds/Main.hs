@@ -1,4 +1,4 @@
-{-# Language StandaloneDeriving, PatternGuards #-}
+{-# Language StandaloneDeriving, PatternGuards, CPP #-}
 
 module CabalBounds.Main
    ( cabalBounds
@@ -7,7 +7,12 @@ module CabalBounds.Main
 import Distribution.PackageDescription (GenericPackageDescription)
 import Distribution.PackageDescription.Parse (parsePackageDescription, ParseResult(..))
 import Distribution.PackageDescription.PrettyPrint (showGenericPackageDescription)
-import Distribution.Simple.Configure (ConfigStateFileErrorType(..), tryGetConfigStateFile)
+import Distribution.Simple.Configure (tryGetConfigStateFile)
+
+#if MIN_VERSION_Cabal(1,22,0) == 0
+import Distribution.Simple.Configure (ConfigStateFileErrorType(..))
+#endif
+
 import Distribution.Simple.LocalBuildInfo (LocalBuildInfo)
 import qualified Distribution.Simple.LocalBuildInfo as BI
 import qualified Distribution.Package as P
@@ -135,5 +140,6 @@ installedLibraries confFile = do
 leftToJust :: Either a b -> Maybe a
 leftToJust = either Just (const Nothing)
 
-
+#if MIN_VERSION_Cabal(1,22,0) == 0
 deriving instance Show ConfigStateFileErrorType
+#endif
