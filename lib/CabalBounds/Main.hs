@@ -45,14 +45,14 @@ cabalBounds args@A.Drop {} =
    leftToJust <$> runEitherT (do
       pkgDescrp <- packageDescription $ A.cabalFile args
       let pkgDescrp' = D.drop (B.boundOfDrop args) (S.sections args pkgDescrp) (DP.dependencies args) pkgDescrp
-      liftIO $ writeFile (A.outputFile args) (showGenericPackageDescription . clearTargetBuildDepends $ pkgDescrp'))
+      liftIO $ writeFile (A.outputFile args) (showGenericPackageDescription pkgDescrp'))
 
 cabalBounds args@A.Update {} =
    leftToJust <$> runEitherT (do
       pkgDescrp <- packageDescription $ A.cabalFile args
       libs      <- libraries (A.haskellPlatform args) (A.fromFile args) setupConfigFile
       let pkgDescrp' = U.update (B.boundOfUpdate args) (S.sections args pkgDescrp) (DP.dependencies args) libs pkgDescrp
-      liftIO $ writeFile (A.outputFile args) (showGenericPackageDescription . clearTargetBuildDepends $ pkgDescrp'))
+      liftIO $ writeFile (A.outputFile args) (showGenericPackageDescription pkgDescrp'))
    where
       setupConfigFile
          | (file:_) <- A.setupConfigFile args
@@ -80,12 +80,6 @@ packageDescription file = do
    case parsePackageDescription contents of
         ParseFailed error   -> left $ show error
         ParseOk _ pkgDescrp -> right pkgDescrp
-
-
--- | clear the 'targetBuildDepends' field of all 'BuildInfo'
-clearTargetBuildDepends :: GenericPackageDescription -> GenericPackageDescription
-clearTargetBuildDepends pkgDescrp =
-   pkgDescrp & CL.allBuildInfo . CL.targetBuildDependsL .~ []
 
 
 packageDescriptions :: [FilePath] -> EitherT Error IO [GenericPackageDescription]
