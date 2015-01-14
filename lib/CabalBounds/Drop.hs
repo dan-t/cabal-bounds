@@ -20,7 +20,7 @@ drop bound sections deps pkgDescrp =
    foldl' dropFromSection pkgDescrp sections
    where
       dropFromSection pkgDescrp section =
-         pkgDescrp & CL.dependencyIf condVars section . filterDep %~ dropFromDep
+         pkgDescrp & CL.buildInfoIf condVars section . CL.targetBuildDependsL . traversed . filterDep %~ dropFromDep
 
       filterDep   = filterDependency deps
       dropFromDep = dropFromDependency bound

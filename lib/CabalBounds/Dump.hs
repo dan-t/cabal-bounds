@@ -18,7 +18,8 @@ type Library    = (LibName, LibVersion)
 dump :: [GenericPackageDescription] -> [Library]
 dump pkgDescrps = HM.toList $ foldl' addLibsFromPkgDescrp HM.empty pkgDescrps
    where
-      addLibsFromPkgDescrp libs pkgDescrp = foldl' addLibFromDep libs (pkgDescrp ^.. CL.allDependency)
+      addLibsFromPkgDescrp libs pkgDescrp =
+         foldl' addLibFromDep libs (pkgDescrp ^.. CL.allBuildInfo . CL.targetBuildDependsL . traversed)
 
       addLibFromDep libs dep
          | lowerBound_ /= CL.noLowerBound

@@ -26,7 +26,7 @@ update bound sections deps libs pkgDescrp =
    foldl' updateSection pkgDescrp sections
    where
       updateSection pkgDescrp section =
-         pkgDescrp & CL.dependencyIf condVars section . filterDep %~ updateDep
+         pkgDescrp & CL.buildInfoIf condVars section . CL.targetBuildDependsL . traversed . filterDep %~ updateDep
 
       filterDep = filterDependency deps
       updateDep = updateDependency bound libs
