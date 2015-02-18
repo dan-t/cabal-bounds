@@ -9,7 +9,7 @@ import qualified Distribution.Version as V
 import Control.Lens
 import Control.Applicative ((<$>))
 import CabalBounds.Bound (UpdateBound(..))
-import CabalBounds.Dependencies (Dependencies(..), filterDependency)
+import CabalBounds.Dependencies (Dependencies(..), filterDependency, dependencyIf)
 import CabalBounds.VersionComp (VersionComp(..))
 import qualified CabalLenses as CL
 import Data.List (foldl')
@@ -26,7 +26,7 @@ update bound sections deps libs pkgDescrp =
    foldl' updateSection pkgDescrp sections
    where
       updateSection pkgDescrp section =
-         pkgDescrp & CL.buildInfoIf condVars section . CL.targetBuildDependsL . traversed . filterDep %~ updateDep
+         pkgDescrp & dependencyIf condVars section . filterDep %~ updateDep
 
       filterDep = filterDependency deps
       updateDep = updateDependency bound libs

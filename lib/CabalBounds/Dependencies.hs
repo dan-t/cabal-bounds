@@ -1,14 +1,18 @@
-{-# LANGUAGE PatternGuards, Rank2Types #-}
+{-# LANGUAGE PatternGuards, Rank2Types, CPP #-}
 
 module CabalBounds.Dependencies
    ( Dependencies(..)
    , dependencies
    , filterDependency
+   , allDependency
+   , dependencyIf
    ) where
 
 import Control.Lens
 import qualified CabalBounds.Args as A
+import qualified CabalLenses as CL
 import Distribution.Package (Dependency(..), PackageName(..))
+import Distribution.PackageDescription (GenericPackageDescription)
 
 -- | Which dependencies in the cabal file should the considered.
 data Dependencies = AllDependencies              -- ^ all dependencies
@@ -38,3 +42,23 @@ filterDependency (OnlyDependencies deps) =
 
 filterDependency (IgnoreDependencies deps) =
    filtered (\(Dependency (PackageName pkgName) _) -> pkgName `notElem` deps)
+
+
+-- | A traversal for all 'Dependency' of all 'Section'.
+allDependency :: Traversal' GenericPackageDescription Dependency
+allDependency =
+#if MIN_VERSION_Cabal(1,22,0)
+   CL.allBuildInfo . CL.targetBuildDependsL . traversed
+#else
+   CL.allDependency
+#endif
+
+
+-- | A traversal for the 'Dependency' of 'Section' that match 'CondVars'.
+dependencyIf :: CL.CondVars -> CL.Section -> Traversal' GenericPackageDescription Dependency
+dependencyIf condVars section =
+#if MIN_VERSION_Cabal(1,22,0)
+   CL.buildInfoIf condVars section . CL.targetBuildDependsL . traversed
+#else
+   CL.dependencyIf
+#endif

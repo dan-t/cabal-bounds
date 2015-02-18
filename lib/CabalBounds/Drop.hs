@@ -7,7 +7,7 @@ module CabalBounds.Drop
 import Prelude hiding (drop)
 import Control.Lens
 import CabalBounds.Bound (DropBound(..))
-import CabalBounds.Dependencies (Dependencies, filterDependency)
+import CabalBounds.Dependencies (Dependencies, filterDependency, dependencyIf)
 import qualified CabalLenses as CL
 import Data.List (foldl')
 import Distribution.PackageDescription (GenericPackageDescription)
@@ -20,7 +20,7 @@ drop bound sections deps pkgDescrp =
    foldl' dropFromSection pkgDescrp sections
    where
       dropFromSection pkgDescrp section =
-         pkgDescrp & CL.buildInfoIf condVars section . CL.targetBuildDependsL . traversed . filterDep %~ dropFromDep
+         pkgDescrp & dependencyIf condVars section . filterDep %~ dropFromDep
 
       filterDep   = filterDependency deps
       dropFromDep = dropFromDependency bound

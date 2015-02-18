@@ -8,6 +8,7 @@ import qualified Data.HashMap.Strict as HM
 import Data.List (foldl')
 import Data.Maybe (fromMaybe)
 import qualified CabalLenses as CL
+import CabalBounds.Dependencies (allDependency)
 import Control.Lens
 
 type LibName    = String
@@ -19,7 +20,7 @@ dump :: [GenericPackageDescription] -> [Library]
 dump pkgDescrps = HM.toList $ foldl' addLibsFromPkgDescrp HM.empty pkgDescrps
    where
       addLibsFromPkgDescrp libs pkgDescrp =
-         foldl' addLibFromDep libs (pkgDescrp ^.. CL.allBuildInfo . CL.targetBuildDependsL . traversed)
+         foldl' addLibFromDep libs (pkgDescrp ^.. allDependency)
 
       addLibFromDep libs dep
          | lowerBound_ /= CL.noLowerBound
