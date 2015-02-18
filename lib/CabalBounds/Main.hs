@@ -6,7 +6,7 @@ module CabalBounds.Main
 
 import Distribution.PackageDescription (GenericPackageDescription)
 import Distribution.PackageDescription.Parse (parsePackageDescription, ParseResult(..))
-import Distribution.PackageDescription.PrettyPrint (showGenericPackageDescription)
+import qualified Distribution.PackageDescription.PrettyPrint as PP
 import Distribution.Simple.Configure (tryGetConfigStateFile)
 
 #if MIN_VERSION_Cabal(1,22,0) == 0
@@ -27,12 +27,16 @@ import qualified CabalBounds.Drop as D
 import qualified CabalBounds.Update as U
 import qualified CabalBounds.Dump as D
 import qualified CabalBounds.HaskellPlatform as HP
-import qualified CabalLenses as CL
 import qualified System.IO.Strict as SIO
 import Control.Applicative ((<$>))
 import Control.Monad.Trans.Either (EitherT, runEitherT, bimapEitherT, hoistEither, left, right)
 import Control.Monad.IO.Class
+
+#if MIN_VERSION_Cabal(1,22,0) && MIN_VERSION_Cabal(1,22,1) == 0
+import qualified CabalLenses as CL
 import Control.Lens
+#endif
+
 import qualified Data.HashMap.Strict as HM
 import Data.List (foldl', sortBy)
 import Data.Function (on)
@@ -141,6 +145,24 @@ installedLibraries confFile = do
 
 leftToJust :: Either a b -> Maybe a
 leftToJust = either Just (const Nothing)
+
+
+showGenericPackageDescription :: GenericPackageDescription -> String
+showGenericPackageDescription =
+#if MIN_VERSION_Cabal(1,22,1)
+   PP.showGenericPackageDescription
+#elif MIN_VERSION_Cabal(1,22,0)
+   PP.showGenericPackageDescription . clearTargetBuildDepends
+   where
+      clearTargetBuildDepends pkgDescrp =
+         pkgDescrp & CL.allBuildInfo . CL.targetBuildDependsL .~ []
+#else
+   ensureLastIsNewline . PP.showGenericPackageDescription
+   where
+      ensureLastIsNewline xs =
+         if last xs == '\n' then xs else xs ++ "\n"
+#endif
+
 
 #if MIN_VERSION_Cabal(1,22,0) == 0
 deriving instance Show ConfigStateFileErrorType
