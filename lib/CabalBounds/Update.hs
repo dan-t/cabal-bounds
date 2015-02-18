@@ -57,7 +57,7 @@ updateDependency (UpdateUpper comp ifMissing) libs dep =
          else do
             upperVersion <- HM.lookup pkgName_ libs
             let newUpperVersion = comp `compOf` upperVersion
-                newUpperBound   = V.UpperBound (nextVersion newUpperVersion) V.ExclusiveBound
+                newUpperBound   = V.UpperBound (nextVersion comp newUpperVersion) V.ExclusiveBound
                 newIntervals    = (versionRange_ ^. CL.intervals) & _last . CL.upperBound .~ newUpperBound
                 vrange          = fromMaybe (V.earlierVersion newUpperVersion) (mkVersionRange newIntervals)
             return $ dep & CL.versionRange .~ vrange
@@ -73,16 +73,21 @@ updateDependency (UpdateBoth lowerComp upperComp ifMissing) libs dep =
 
 compOf :: VersionComp -> V.Version -> V.Version
 Major1 `compOf` version =
-   version & CL.versionBranchL %~ (take 1 . ensureMinimalVersionBranch Major1)
+   version & CL.versionBranchL %~ take 1
            & CL.versionTagsL   .~ []
 
 Major2 `compOf` version =
-   version & CL.versionBranchL %~ (take 2 . ensureMinimalVersionBranch Major2)
+   version & CL.versionBranchL %~ take 2
            & CL.versionTagsL   .~ []
 
 Minor `compOf` version =
-   version & CL.versionBranchL %~ ensureMinimalVersionBranch Minor
-           & CL.versionTagsL   .~ []
+   version & CL.versionTagsL .~ []
+
+
+nextVersion :: VersionComp -> V.Version -> V.Version
+nextVersion comp version =
+   version & CL.versionBranchL         %~ ensureMinimalVersionBranch comp
+           & CL.versionBranchL . _last %~ (+ 1)
 
 
 ensureMinimalVersionBranch :: VersionComp -> [Int] -> [Int]
@@ -96,10 +101,6 @@ ensureMinimalVersionBranch comp branch =
       numNeededVersionDigits Major1 = 1
       numNeededVersionDigits Major2 = 2
       numNeededVersionDigits Minor  = 3
-
-
-nextVersion :: V.Version -> V.Version
-nextVersion version = version & CL.versionBranchL . _last %~ (+ 1)
 
 
 mkVersionRange :: [V.VersionInterval] -> Maybe V.VersionRange
