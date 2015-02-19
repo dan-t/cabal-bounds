@@ -47,7 +47,7 @@ filterDependency (IgnoreDependencies deps) =
 -- | A traversal for all 'Dependency' of all 'Section'.
 allDependency :: Traversal' GenericPackageDescription Dependency
 allDependency =
-#if MIN_VERSION_Cabal(1,22,0)
+#if MIN_VERSION_Cabal(1,22,1)
    CL.allBuildInfo . CL.targetBuildDependsL . traversed
 #else
    CL.allDependency
@@ -57,8 +57,8 @@ allDependency =
 -- | A traversal for the 'Dependency' of 'Section' that match 'CondVars'.
 dependencyIf :: CL.CondVars -> CL.Section -> Traversal' GenericPackageDescription Dependency
 dependencyIf condVars section =
-#if MIN_VERSION_Cabal(1,22,0)
+#if MIN_VERSION_Cabal(1,22,1)
    CL.buildInfoIf condVars section . CL.targetBuildDependsL . traversed
 #else
-   CL.dependencyIf
+   CL.dependencyIf condVars section
 #endif
