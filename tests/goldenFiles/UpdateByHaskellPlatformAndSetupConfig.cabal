@@ -18,7 +18,7 @@ library
     build-depends:
         base >=4.6.0.1 && <4.7,
         cmdargs >=0.10.7 && <0.11,
-        lens >=4.7.0 && <4.8,
+        lens ==4.7.*,
         pretty-show >=1.6.7 && <1.7,
         strict >=0.3.2 && <0.4,
         Cabal >=1.16.0 && <1.17
@@ -35,7 +35,7 @@ executable cabal-bounds
     build-depends:
         base >=4.6.0.1 && <4.7,
         cmdargs >=0.10.7 && <0.11,
-        lens >=4.7.0 && <4.8,
+        lens ==4.7.*,
         pretty-show >=1.6.7 && <1.7,
         strict >=0.3.2 && <0.4,
         Cabal >=1.16.0 && <1.17
@@ -54,7 +54,7 @@ executable other-exe
     build-depends:
         base >=4.6.0.1 && <4.7,
         cmdargs >=0.10.7 && <0.11,
-        lens >=4.7.0 && <4.8,
+        lens ==4.7.*,
         pretty-show >=1.6.7 && <1.7,
         strict >=0.3.2 && <0.4,
         Cabal >=1.16.0 && <1.17
@@ -73,7 +73,7 @@ test-suite some-test
     build-depends:
         base >=4.6.0.1 && <4.7,
         cmdargs >=0.10.7 && <0.11,
-        lens >=4.7.0 && <4.8,
+        lens ==4.7.*,
         pretty-show >=1.6.7 && <1.7,
         strict >=0.3.2 && <0.4,
         Cabal >=1.16.0 && <1.17
@@ -91,7 +91,7 @@ test-suite other-test
     build-depends:
         base >=4.6.0.1 && <4.7,
         cmdargs >=0.10.7 && <0.11,
-        lens >=4.7.0 && <4.8,
+        lens ==4.7.*,
         pretty-show >=1.6.7 && <1.7,
         strict >=0.3.2 && <0.4,
         Cabal >=1.16.0 && <1.17
