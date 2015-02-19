@@ -56,8 +56,8 @@ updateDependency (UpdateUpper comp ifMissing) libs dep =
          then Nothing
          else do
             upperVersion <- HM.lookup pkgName_ libs
-            let newUpperVersion = comp `compOf` upperVersion
-                newUpperBound   = V.UpperBound (nextVersion comp newUpperVersion) V.ExclusiveBound
+            let newUpperVersion = nextVersion comp upperVersion
+                newUpperBound   = V.UpperBound newUpperVersion V.ExclusiveBound
                 newIntervals    = (versionRange_ ^. CL.intervals) & _last . CL.upperBound .~ newUpperBound
                 vrange          = fromMaybe (V.earlierVersion newUpperVersion) (mkVersionRange newIntervals)
             return $ dep & CL.versionRange .~ vrange
@@ -86,8 +86,9 @@ Minor `compOf` version =
 
 nextVersion :: VersionComp -> V.Version -> V.Version
 nextVersion comp version =
-   version & CL.versionBranchL         %~ ensureMinimalVersionBranch comp
-           & CL.versionBranchL . _last %~ (+ 1)
+   (comp `compOf` version)
+      & CL.versionBranchL         %~ ensureMinimalVersionBranch comp
+      & CL.versionBranchL . _last %~ (+ 1)
 
 
 ensureMinimalVersionBranch :: VersionComp -> [Int] -> [Int]
