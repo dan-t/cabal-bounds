@@ -1,3 +1,7 @@
+0.9.3
+-----
+* Support GHC 7.10.1
+
 0.9.2
 -----
 * fix bugs introduced with 0.9.1
