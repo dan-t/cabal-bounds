@@ -8,11 +8,6 @@ import Distribution.PackageDescription (GenericPackageDescription)
 import Distribution.PackageDescription.Parse (parsePackageDescription, ParseResult(..))
 import qualified Distribution.PackageDescription.PrettyPrint as PP
 import Distribution.Simple.Configure (tryGetConfigStateFile)
-
-#if MIN_VERSION_Cabal(1,22,0) == 0
-import Distribution.Simple.Configure (ConfigStateFileErrorType(..))
-#endif
-
 import Distribution.Simple.LocalBuildInfo (LocalBuildInfo)
 import qualified Distribution.Simple.LocalBuildInfo as BI
 import qualified Distribution.Package as P
@@ -28,19 +23,26 @@ import qualified CabalBounds.Update as U
 import qualified CabalBounds.Dump as D
 import qualified CabalBounds.HaskellPlatform as HP
 import qualified System.IO.Strict as SIO
-import Control.Applicative ((<$>))
 import Control.Monad.Trans.Either (EitherT, runEitherT, bimapEitherT, hoistEither, left, right)
 import Control.Monad.IO.Class
+import qualified Data.HashMap.Strict as HM
+import Data.List (foldl', sortBy)
+import Data.Function (on)
+import Data.Char (toLower)
+
+#if MIN_VERSION_Cabal(1,22,0) == 0
+import Distribution.Simple.Configure (ConfigStateFileErrorType(..))
+#endif
 
 #if MIN_VERSION_Cabal(1,22,0) && MIN_VERSION_Cabal(1,22,1) == 0
 import qualified CabalLenses as CL
 import Control.Lens
 #endif
 
-import qualified Data.HashMap.Strict as HM
-import Data.List (foldl', sortBy)
-import Data.Function (on)
-import Data.Char (toLower)
+#if __GLASGOW_HASKELL__ < 710
+import Control.Applicative ((<$>))
+#endif
+
 
 type Error = String
 

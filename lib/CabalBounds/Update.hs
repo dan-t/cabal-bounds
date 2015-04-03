@@ -1,3 +1,5 @@
+{-# Language CPP #-}
+
 module CabalBounds.Update
    ( update
    , Libraries
@@ -7,7 +9,6 @@ import qualified Distribution.PackageDescription as D
 import qualified Distribution.Package as P
 import qualified Distribution.Version as V
 import Control.Lens
-import Control.Applicative ((<$>))
 import CabalBounds.Bound (UpdateBound(..))
 import CabalBounds.Dependencies (Dependencies(..), filterDependency, dependencyIf)
 import CabalBounds.VersionComp (VersionComp(..))
@@ -15,6 +16,11 @@ import qualified CabalLenses as CL
 import Data.List (foldl')
 import qualified Data.HashMap.Strict as HM
 import Data.Maybe (fromMaybe)
+
+#if __GLASGOW_HASKELL__ < 710
+import Control.Applicative ((<$>))
+#endif
+
 
 type LibName    = String
 type LibVersion = V.Version

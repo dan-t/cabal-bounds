@@ -1,3 +1,4 @@
+{-# Language CPP #-}
 
 module CabalBounds.HaskellPlatform
    ( librariesOf
@@ -8,8 +9,12 @@ module CabalBounds.HaskellPlatform
    ) where
 
 import qualified Distribution.Version as V
-import Control.Applicative ((<$>))
 import Data.List (find)
+
+#if __GLASGOW_HASKELL__ < 710
+import Control.Applicative ((<$>))
+#endif
+
 
 type LibName    = String
 type LibVersion = V.Version
