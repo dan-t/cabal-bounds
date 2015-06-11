@@ -1,3 +1,7 @@
+0.9.4
+-----
+* Fix misbehaving argument handling of 'dump' command
+
 0.9.3
 -----
 * Support GHC 7.10.1
