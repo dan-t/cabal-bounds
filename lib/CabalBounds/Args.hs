@@ -152,7 +152,7 @@ dumpArgs :: Args
 dumpArgs = Dump
    { output     = def &= explicit &= typ "FILE" &= name "output" &= name "o"
                       &= help "Save libraries with lower bounds to file, if empty, then it's written to stdout."
-   , cabalFiles = def &= args &= typ "CABAL_FILE"
+   , cabalFiles = def &= args &= typ "CABAL-FILE"
    }
 
 
