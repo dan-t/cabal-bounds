@@ -1,5 +1,5 @@
 {-# LANGUAGE DeriveDataTypeable, CPP #-}
-{-# OPTIONS_GHC -w #-}
+{-# OPTIONS_GHC -w -fno-cse #-}
 
 module CabalBounds.Args
    ( Args(..)
