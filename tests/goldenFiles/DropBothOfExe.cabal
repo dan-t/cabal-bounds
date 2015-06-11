@@ -15,11 +15,6 @@ source-repository head
     location: https://github.com/dan-t/cabal-bounds
 
 library
-    exposed-modules:
-        CabalBounds.Args
-        CabalBounds.Command
-        CabalBounds.Execute
-        CabalBounds.Lenses
     build-depends:
         base >=3 && <5,
         cmdargs >=0.10.5 && <0.11,
@@ -27,12 +22,16 @@ library
         pretty-show -any,
         strict -any,
         Cabal -any
+    exposed-modules:
+        CabalBounds.Args
+        CabalBounds.Command
+        CabalBounds.Execute
+        CabalBounds.Lenses
     hs-source-dirs: src
     other-modules:
         Paths_cabal_bounds
 
 executable cabal-bounds
-    main-is: ExeMain1.hs
     build-depends:
         base -any,
         cmdargs -any,
@@ -40,6 +39,7 @@ executable cabal-bounds
         pretty-show -any,
         strict -any,
         Cabal -any
+    main-is: ExeMain1.hs
     cpp-options: -DCABAL
     hs-source-dirs: src
     other-modules:
@@ -51,7 +51,6 @@ executable cabal-bounds
     ghc-options: -W
 
 executable other-exe
-    main-is: ExeMain2.hs
     build-depends:
         base >=3 && <5,
         cmdargs >=0.10.5 && <0.11,
@@ -59,6 +58,7 @@ executable other-exe
         pretty-show -any,
         strict -any,
         Cabal -any
+    main-is: ExeMain2.hs
     cpp-options: -DCABAL
     hs-source-dirs: src
     other-modules:
@@ -70,8 +70,6 @@ executable other-exe
     ghc-options: -W
 
 test-suite some-test
-    type: exitcode-stdio-1.0
-    main-is: TestMain1.hs
     build-depends:
         base >=3 && <5,
         cmdargs >=0.10.5 && <0.11,
@@ -79,6 +77,8 @@ test-suite some-test
         pretty-show -any,
         strict -any,
         Cabal -any
+    type: exitcode-stdio-1.0
+    main-is: TestMain1.hs
     hs-source-dirs: src
     other-modules:
         Paths_cabal_bounds
@@ -88,8 +88,6 @@ test-suite some-test
         CabalBounds.Lenses
     ghc-options: -W
 test-suite other-test
-    type: exitcode-stdio-1.0
-    main-is: TestMain2.hs
     build-depends:
         base >=3 && <5,
         cmdargs >=0.10.5 && <0.11,
@@ -97,6 +95,8 @@ test-suite other-test
         pretty-show -any,
         strict -any,
         Cabal -any
+    type: exitcode-stdio-1.0
+    main-is: TestMain2.hs
     hs-source-dirs: src
     other-modules:
         Paths_cabal_bounds
