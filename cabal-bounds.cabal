@@ -1,5 +1,5 @@
 name: cabal-bounds
-version: 0.9.4
+version: 0.9.5
 cabal-version: >=1.9.2
 build-type: Simple
 license: BSD3
