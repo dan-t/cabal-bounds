@@ -4,6 +4,11 @@
 * Ignore the base library by default
 * Add the only/ignore options to the 'dump' command
 
+0.9.5
+-----
+* Support Haskell Platform 7.10.2
+* Raise upper bounds of dependencies
+
 0.9.4
 -----
 * Fix misbehaving argument handling of 'dump' command
