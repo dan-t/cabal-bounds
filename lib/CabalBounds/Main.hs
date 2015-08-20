@@ -70,7 +70,7 @@ cabalBounds args@A.Update {} =
 cabalBounds args@A.Dump {} =
    leftToJust <$> runEitherT (do
       pkgDescrps <- packageDescriptions $ A.cabalFiles args
-      let libs = sortBy (compare `on` (map toLower . fst)) $ D.dump pkgDescrps
+      let libs = sortBy (compare `on` (map toLower . fst)) $ D.dump (DP.dependencies args) pkgDescrps
       if (not . null . A.outputFile $ args)
          then liftIO $ writeFile (A.outputFile args) (prettyPrint libs)
          else liftIO $ putStrLn (prettyPrint libs))

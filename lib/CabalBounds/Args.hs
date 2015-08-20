@@ -45,7 +45,9 @@ data Args = Drop { upper      :: Bool
                    , cabalFile       :: FilePath
                    , setupConfigFile :: [FilePath]
                    }
-          | Dump { output     :: String
+          | Dump { only       :: [String]
+                 , ignore     :: [String]
+                 , output     :: String
                  , cabalFiles :: [FilePath]
                  }
           deriving (Data, Typeable, Show, Eq)
@@ -107,7 +109,9 @@ defaultUpdate = Update
 
 defaultDump :: Args
 defaultDump = Dump
-   { output     = def
+   { only       = def
+   , ignore     = def
+   , output     = def
    , cabalFiles = def
    }
 
