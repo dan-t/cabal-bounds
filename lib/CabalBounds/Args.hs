@@ -4,13 +4,13 @@
 module CabalBounds.Args
    ( Args(..)
    , get
-   , outputFile
    , defaultDrop
    , defaultUpdate
    , defaultDump
    ) where
 
 import System.Console.CmdArgs hiding (ignore)
+import qualified System.Console.CmdArgs as CmdArgs
 import CabalBounds.VersionComp (VersionComp(..))
 
 #ifdef CABAL
@@ -25,8 +25,8 @@ data Args = Drop { upper      :: Bool
                  , benchmark  :: [String]
                  , only       :: [String]
                  , ignore     :: [String]
-                 , output     :: FilePath
-                 , cabalFile  :: FilePath
+                 , output     :: Maybe FilePath
+                 , cabalFile  :: Maybe FilePath
                  }
           | Update { lower           :: Bool
                    , upper           :: Bool
@@ -39,15 +39,15 @@ data Args = Drop { upper      :: Bool
                    , only            :: [String]
                    , ignore          :: [String]
                    , missing         :: Bool
-                   , output          :: FilePath
+                   , output          :: Maybe FilePath
                    , fromFile        :: FilePath
                    , haskellPlatform :: String
-                   , cabalFile       :: FilePath
-                   , setupConfigFile :: [FilePath]
+                   , cabalFile       :: Maybe FilePath
+                   , setupConfigFile :: Maybe FilePath
                    }
           | Dump { only       :: [String]
                  , ignore     :: [String]
-                 , output     :: String
+                 , output     :: Maybe String
                  , cabalFiles :: [FilePath]
                  }
           deriving (Data, Typeable, Show, Eq)
@@ -62,14 +62,6 @@ get = cmdArgsRun . cmdArgsMode $ modes [dropArgs, updateArgs, dumpArgs]
    &= versionArg [explicit, name "version", name "v", summary versionInfo]
    where
       summaryInfo = ""
-
-
-outputFile :: Args -> FilePath
-outputFile args
-   | not isDumpArgs && null (output args) = cabalFile args
-   | otherwise                            = output args
-   where
-      isDumpArgs = case args of Dump {} -> True; _ -> False
 
 
 defaultDrop :: Args
@@ -130,7 +122,7 @@ dropArgs = Drop
                       &= help "This dependency is ignored, not modified in any way."
    , output     = def &= explicit &= typ "FILE" &= name "output" &= name "o"
                       &= help "Save modified cabal file to file, if empty, the cabal file is modified inplace."
-   , cabalFile  = def &= argPos 0 &= typ "CABAL-FILE"
+   , cabalFile  = def &= CmdArgs.ignore
    }
 
 
@@ -148,7 +140,7 @@ updateArgs = Update
    , fromFile        = def &= typ "FILE" &= help "Update bounds by the library versions spedified in the given file."
    , haskellPlatform = def &= explicit &= typ "VERSION" &= name "haskell-platform"
                            &= help "Update bounds by the library versions of the specified haskell platform version"
-   , setupConfigFile = def &= args &= typ "SETUP-CONFIG-FILE"
+   , setupConfigFile = def &= CmdArgs.ignore
    }
 
 

@@ -135,16 +135,16 @@ test_ testName args withSetupConfig =
 
       argsWithFiles =
          case args of
-              Drop {}   -> args { cabalFile = inputFile
-                                , output    = outputFile
+              Drop {}   -> args { cabalFile = Just inputFile
+                                , output    = Just outputFile
                                 }
-              Update {} -> args { cabalFile       = inputFile
-                                , output          = outputFile
-                                , setupConfigFile = [setupConfigFile | withSetupConfig]
+              Update {} -> args { cabalFile       = Just inputFile
+                                , output          = Just outputFile
+                                , setupConfigFile = if withSetupConfig then Just setupConfigFile else Nothing
                                 }
 
               Dump {}   -> args { cabalFiles = [inputFile]
-                                , output     = outputFile
+                                , output     = Just outputFile
                                 }
 
       diff ref new    = ["diff", "-u", ref, new]

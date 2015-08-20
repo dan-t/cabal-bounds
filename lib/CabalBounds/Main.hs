@@ -22,20 +22,23 @@ import qualified CabalBounds.Drop as D
 import qualified CabalBounds.Update as U
 import qualified CabalBounds.Dump as D
 import qualified CabalBounds.HaskellPlatform as HP
+import qualified CabalLenses as CL
 import qualified System.IO.Strict as SIO
+import System.FilePath ((</>))
+import System.Directory (getCurrentDirectory)
 import Control.Monad.Trans.Either (EitherT, runEitherT, bimapEitherT, hoistEither, left, right)
 import Control.Monad.IO.Class
 import qualified Data.HashMap.Strict as HM
-import Data.List (foldl', sortBy)
+import Data.List (foldl', sortBy, find)
 import Data.Function (on)
 import Data.Char (toLower)
+import Data.Maybe (fromMaybe)
 
 #if MIN_VERSION_Cabal(1,22,0) == 0
 import Distribution.Simple.Configure (ConfigStateFileErrorType(..))
 #endif
 
 #if MIN_VERSION_Cabal(1,22,0) && MIN_VERSION_Cabal(1,22,1) == 0
-import qualified CabalLenses as CL
 import Control.Lens
 #endif
 
@@ -44,45 +47,69 @@ import Control.Applicative ((<$>))
 #endif
 
 
-type Error = String
+type Error           = String
+type SetupConfigFile = FilePath
+type LibraryFile     = FilePath
+type CabalFile       = FilePath
+
 
 cabalBounds :: A.Args -> IO (Maybe Error)
 cabalBounds args'@A.Drop {} =
    leftToJust <$> runEitherT (do
-      pkgDescrp <- packageDescription $ A.cabalFile args
+      cabalFile <- findCabalFile $ A.cabalFile args
+      pkgDescrp <- packageDescription cabalFile
       let pkgDescrp' = D.drop (B.boundOfDrop args) (S.sections args pkgDescrp) (DP.dependencies args) pkgDescrp
-      liftIO $ writeFile (A.outputFile args) (showGenericPackageDescription pkgDescrp'))
+      let outputFile = fromMaybe cabalFile (A.output args)
+      liftIO $ writeFile outputFile (showGenericPackageDescription pkgDescrp'))
    where
       args = ignoreBaseLibrary args'
 
 cabalBounds args'@A.Update {} =
    leftToJust <$> runEitherT (do
-      pkgDescrp <- packageDescription $ A.cabalFile args
-      libs      <- libraries (A.haskellPlatform args) (A.fromFile args) setupConfigFile
+      cabalFile <- findCabalFile $ A.cabalFile args
+      pkgDescrp <- packageDescription cabalFile
+      libs      <- libraries (A.haskellPlatform args) (A.fromFile args) (A.setupConfigFile args, cabalFile)
       let pkgDescrp' = U.update (B.boundOfUpdate args) (S.sections args pkgDescrp) (DP.dependencies args) libs pkgDescrp
-      liftIO $ writeFile (A.outputFile args) (showGenericPackageDescription pkgDescrp'))
+      let outputFile = fromMaybe cabalFile (A.output args)
+      liftIO $ writeFile outputFile (showGenericPackageDescription pkgDescrp'))
    where
-      setupConfigFile
-         | (file:_) <- A.setupConfigFile args
-         = file
-
-         | otherwise
-         = ""
       args = ignoreBaseLibrary args'
 
 cabalBounds args'@A.Dump {} =
    leftToJust <$> runEitherT (do
-      pkgDescrps <- packageDescriptions $ A.cabalFiles args
+      cabalFiles <- if null $ A.cabalFiles args
+                       then (: []) <$> findCabalFile Nothing
+                       else right $ A.cabalFiles args
+
+      pkgDescrps <- packageDescriptions cabalFiles
       let libs = sortBy (compare `on` (map toLower . fst)) $ D.dump (DP.dependencies args) pkgDescrps
-      if (not . null . A.outputFile $ args)
-         then liftIO $ writeFile (A.outputFile args) (prettyPrint libs)
-         else liftIO $ putStrLn (prettyPrint libs))
+      case A.output args of
+           Just file -> liftIO $ writeFile file (prettyPrint libs)
+           Nothing   -> liftIO $ putStrLn (prettyPrint libs))
    where
       prettyPrint []     = "[]"
       prettyPrint (l:ls) =
          "[ " ++ show l ++ "\n" ++ foldl' (\str l -> str ++ ", " ++ show l ++ "\n") "" ls ++ "]";
 
       args = ignoreBaseLibrary args'
+
+
+findCabalFile :: Maybe CabalFile -> EitherT Error IO CabalFile
+findCabalFile Nothing = do
+   curDir <- liftIO getCurrentDirectory
+   CL.findCabalFile curDir
+
+findCabalFile (Just file) = right file
+
+
+findSetupConfigFile :: Maybe SetupConfigFile -> CabalFile -> EitherT Error IO SetupConfigFile
+findSetupConfigFile Nothing cabalFile = do
+   distDir <- liftIO $ CL.findDistDir cabalFile
+   case distDir of
+        Just dir -> right $ dir </> "setup-config"
+        Nothing  -> left "Couldn't find 'dist' directory! Have you already build the project?"
+
+findSetupConfigFile (Just confFile) _ = right confFile
 
 
 ignoreBaseLibrary :: A.Args -> A.Args
@@ -105,16 +132,15 @@ packageDescriptions []    = left "Missing cabal file"
 packageDescriptions files = mapM packageDescription files
 
 
-type SetupConfigFile = String
-type LibraryFile     = String
+libraries :: HP.HPVersion -> LibraryFile -> (Maybe SetupConfigFile, CabalFile) -> EitherT Error IO U.Libraries
+libraries "" "" (maybeConfFile, cabalFile) = do
+   confFile <- findSetupConfigFile maybeConfFile cabalFile
+   installedLibraries confFile
 
-libraries :: HP.HPVersion -> LibraryFile -> SetupConfigFile -> EitherT Error IO U.Libraries
-libraries "" "" ""                   = left "Missing library file, haskell platform version and setup config file"
-libraries hpVersion libFile confFile = do
+libraries hpVersion libFile _ = do
    hpLibs       <- haskellPlatformLibraries hpVersion
    libsFromFile <- librariesFromFile libFile
-   instLibs     <- installedLibraries confFile
-   right $ HM.union (HM.union hpLibs libsFromFile) instLibs
+   right $ HM.union hpLibs libsFromFile
 
 
 librariesFromFile :: LibraryFile -> EitherT Error IO U.Libraries
