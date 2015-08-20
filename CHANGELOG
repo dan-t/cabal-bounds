@@ -1,3 +1,9 @@
+1.0.0
+-----
+* Automatically find the cabal and setup-config file
+* Ignore the base library by default
+* Add the only/ignore options to the 'dump' command
+
 0.9.4
 -----
 * Fix misbehaving argument handling of 'dump' command
