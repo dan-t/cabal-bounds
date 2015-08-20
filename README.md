@@ -10,6 +10,17 @@ A command line program for managing the bounds/versions of the dependencies in a
 * update them by the library versions specified by a file
 * dump the libraries/dependencies and their lower bound versions from the cabal file(s) into a file
 
+Example: Initialize Bounds
+==========================
+
+If you have started a new project, created a cabal file, added dependencies to it,
+build it, and now want to set the lower and upper bounds of the dependencies
+according to the currently used versions of the build, then you can just call:
+
+    $> cabal-bounds update
+
+This call will update the bounds of the dependencies of the cabal file in the working directory.
+
 Example: Raise the Upper Bounds
 ===============================
 
@@ -23,17 +34,19 @@ versions of the dependencies.
     # update the version infos of all libraries
     $> cabal update
 
-    # drops the upper bound of all dependencies in 'myproject.cabal', most likely you want to ignore 'base'
-    $> cabal-bounds drop --upper --ignore=base myproject.cabal
+    # drops the upper bound of all dependencies of the cabal file in the working directory
+    $> cabal-bounds drop --upper
 
-    # create a cabal sandbox for building of 'myproject'
+    # create a cabal sandbox for building your project, this ensures that you're really using
+    # the newest available versions of the dependencies, otherwise you would be constraint
+    # to the already installed versions
     $> cabal sandbox init
       
-    # build 'myproject'
+    # build your project
     $> cabal install
 
-    # update the upper bound of all dependencies in 'myproject.cabal' by the cabal build information
-    $> cabal-bounds update --upper --ignore=base myproject.cabal dist/dist-sandbox-*/setup-config 
+    # update the upper bound of all dependencies of the cabal file in the working directory
+    $> cabal-bounds update --upper
 
 Example: Update Bounds by Haskell Platform
 ==========================================
@@ -45,7 +58,7 @@ perhaps the last two ones - can make it, especially for beginners, a lot easier 
 
 To update the bounds to the haskell platform `2013.2.0.0`:
 
-    $> cabal-bounds update --haskell-platform=2013.2.0.0 myproject.cabal
+    $> cabal-bounds update --haskell-platform=2013.2.0.0
 
 There're two additional symbolic names for specifying a haskell platform release: `current` and `previous`.
 
@@ -53,42 +66,38 @@ So one use case might be to initialize the bounds to library versions used by a 
 test if your project builds and works with these, and then raise the upper bounds to the newest available versions:
 
     # intialize the bounds to the previous haskell platform release
-    $> cabal-bounds update --ignore=base --haskell-platform=previous myproject.cabal
+    $> cabal-bounds update --haskell-platform=previous
 
     # build and test the project
 
     # initialize the lower bounds of libraries not present in the haskell platform
-    $> cabal-bounds update --lower --missing --ignore=base myproject.cabal dist/dist-sandbox-*/setup-config
+    $> cabal-bounds update --lower --missing
 
     # drop the upper bounds to test your project with the newest available library versions
-    $> cabal-bounds drop --upper --ignore=base myproject.cabal
+    $> cabal-bounds drop --upper
 
     # build and test the project
 
     # set the upper bounds to the ones used in the current build
-    $> cabal-bounds update --upper --ignore=base myproject.cabal dist/dist-sandbox-*/setup-config
-
-If you specify a haskell platform release and a setup config file at once, then the setup config library
-verions are only used for the libraries not present in the haskell platform release.
+    $> cabal-bounds update --upper
 
 Example: Update Bounds by File
 ==============================
 
 It's also possible to update the bounds by library versions specified in a file:
 
-    $> cabal-bounds update --fromfile=libs.hs myproject.cabal
+    $> cabal-bounds update --fromfile=libs.hs
 
 The `libs.hs` file has to be of the format:
 
     [ ("libA", [0,2,1]), ("libB", [2,1]), ("libC", [1]) ]
 
-If you specify a library file, a haskell platform release and a setup config file at once, then first the
-haskell platform libraries and versions are considered, then the library file and at the end the setup
-config file.
+If you specify a library file and a haskell platform release at once, then first the
+haskell platform libraries and versions are considered and then the library file.
 
 The library file can be created by the `dump` command:
 
-    $> cabal-bounds dump --output=libs.hs myproject.cabal
+    $> cabal-bounds dump --output=libs.hs
 
 The `dump` command will dump dependencies with their lower bound version. The command can take multiple cabal files.
 If the same dependencies is present in multiple files, then the lowest lower bound version is taken.
@@ -187,4 +196,4 @@ Perhaps the currently most annoying thing is, that you have to live with the ref
 To reformat your `cabal` file without changing any bounds you can call `cabal-bounds` with the name of
 a section that isn't present in the `cabal` file:
 
-    $> cabal-bounds drop --executable=blub myproject.cabal
+    $> cabal-bounds drop --executable=blub
