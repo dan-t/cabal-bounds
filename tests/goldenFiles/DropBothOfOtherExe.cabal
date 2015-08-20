@@ -52,7 +52,7 @@ executable cabal-bounds
 
 executable other-exe
     build-depends:
-        base -any,
+        base >=3 && <5,
         cmdargs -any,
         lens -any,
         pretty-show -any,

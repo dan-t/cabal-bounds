@@ -33,7 +33,7 @@ library
 
 executable cabal-bounds
     build-depends:
-        base >=3 && <4.8,
+        base >=3 && <5,
         cmdargs >=0.10.5 && <0.11,
         lens <4.8,
         pretty-show <1.7,
@@ -52,7 +52,7 @@ executable cabal-bounds
 
 executable other-exe
     build-depends:
-        base >=3 && <4.8,
+        base >=3 && <5,
         cmdargs >=0.10.5 && <0.11,
         lens <4.8,
         pretty-show <1.7,

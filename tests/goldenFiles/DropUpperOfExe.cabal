@@ -33,7 +33,7 @@ library
 
 executable cabal-bounds
     build-depends:
-        base >=3,
+        base >=3 && <5,
         cmdargs >=0.10.5,
         lens -any,
         pretty-show -any,

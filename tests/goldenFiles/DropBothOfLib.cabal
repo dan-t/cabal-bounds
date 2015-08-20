@@ -16,7 +16,7 @@ source-repository head
 
 library
     build-depends:
-        base -any,
+        base >=3 && <5,
         cmdargs -any,
         lens -any,
         pretty-show -any,

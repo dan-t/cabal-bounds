@@ -47,13 +47,15 @@ import Control.Applicative ((<$>))
 type Error = String
 
 cabalBounds :: A.Args -> IO (Maybe Error)
-cabalBounds args@A.Drop {} =
+cabalBounds args'@A.Drop {} =
    leftToJust <$> runEitherT (do
       pkgDescrp <- packageDescription $ A.cabalFile args
       let pkgDescrp' = D.drop (B.boundOfDrop args) (S.sections args pkgDescrp) (DP.dependencies args) pkgDescrp
       liftIO $ writeFile (A.outputFile args) (showGenericPackageDescription pkgDescrp'))
+   where
+      args = ignoreBaseLibrary args'
 
-cabalBounds args@A.Update {} =
+cabalBounds args'@A.Update {} =
    leftToJust <$> runEitherT (do
       pkgDescrp <- packageDescription $ A.cabalFile args
       libs      <- libraries (A.haskellPlatform args) (A.fromFile args) setupConfigFile
@@ -66,8 +68,9 @@ cabalBounds args@A.Update {} =
 
          | otherwise
          = ""
+      args = ignoreBaseLibrary args'
 
-cabalBounds args@A.Dump {} =
+cabalBounds args'@A.Dump {} =
    leftToJust <$> runEitherT (do
       pkgDescrps <- packageDescriptions $ A.cabalFiles args
       let libs = sortBy (compare `on` (map toLower . fst)) $ D.dump (DP.dependencies args) pkgDescrps
@@ -78,6 +81,15 @@ cabalBounds args@A.Dump {} =
       prettyPrint []     = "[]"
       prettyPrint (l:ls) =
          "[ " ++ show l ++ "\n" ++ foldl' (\str l -> str ++ ", " ++ show l ++ "\n") "" ls ++ "]";
+
+      args = ignoreBaseLibrary args'
+
+
+ignoreBaseLibrary :: A.Args -> A.Args
+ignoreBaseLibrary args =
+   case find (== "base") (A.ignore args) of
+	Just _  -> args
+	Nothing -> args { A.ignore = "base" : A.ignore args }
 
 
 packageDescription :: FilePath -> EitherT Error IO GenericPackageDescription

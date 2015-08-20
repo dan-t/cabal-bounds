@@ -16,7 +16,7 @@ source-repository head
 
 library
     build-depends:
-        base -any,
+        base >=3 && <5,
         cmdargs -any,
         lens -any,
         pretty-show -any,
@@ -33,7 +33,7 @@ library
 
 executable cabal-bounds
     build-depends:
-        base -any,
+        base >=3 && <5,
         cmdargs -any,
         lens -any,
         pretty-show -any,
@@ -52,7 +52,7 @@ executable cabal-bounds
 
 executable other-exe
     build-depends:
-        base -any,
+        base >=3 && <5,
         cmdargs -any,
         lens -any,
         pretty-show -any,
@@ -71,7 +71,7 @@ executable other-exe
 
 test-suite some-test
     build-depends:
-        base -any,
+        base >=3 && <5,
         cmdargs -any,
         lens -any,
         pretty-show -any,
@@ -89,7 +89,7 @@ test-suite some-test
     ghc-options: -W
 test-suite other-test
     build-depends:
-        base -any,
+        base >=3 && <5,
         cmdargs -any,
         lens -any,
         pretty-show -any,
