@@ -1,3 +1,7 @@
+1.0.1
+-----
+* Make tests less dependent on the cabal/ghc version
+
 1.0.0
 -----
 * Automatically find the cabal and setup-config file
