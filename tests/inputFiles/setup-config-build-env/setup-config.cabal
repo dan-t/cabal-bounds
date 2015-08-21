@@ -1,105 +1,89 @@
-name: cabal-bounds
+name: setup-config
 version: 0.1
 cabal-version: >=1.9.2
 build-type: Simple
+license: UnspecifiedLicense
 maintainer: daniel.trstenjak@gmail.com
 author: Daniel Trstenjak
- 
+
 library
-    build-depends:
-        base >=3 && <5,
-        cmdargs ==0.10.7,
-        lens ==4.7,
-        pretty-show ==1.6.7,
-        strict ==0.3.2,
-        Cabal ==1.20.0.1
     exposed-modules:
         CabalBounds.Args
         CabalBounds.Command
         CabalBounds.Execute
         CabalBounds.Lenses
-    exposed: True
-    buildable: True
+    build-depends:
+        base >=3,
+        A ==0.3,
+        B ==0.3.0.1,
+        C ==0.2.5
     hs-source-dirs: src
     other-modules:
-        Paths_cabal_bounds
- 
+        Paths_setup_config
+
 executable cabal-bounds
-    build-depends:
-        base >=3 && <5,
-        cmdargs ==0.10.7,
-        lens ==4.7,
-        pretty-show ==1.6.7,
-        strict ==0.3.2,
-        Cabal ==1.20.0.1
     main-is: ExeMain1.hs
-    buildable: True
+    build-depends:
+        base >=3,
+        A ==0.3,
+        B ==0.3.0.1,
+        C ==0.2.5
     cpp-options: -DCABAL
     hs-source-dirs: src
     other-modules:
-        Paths_cabal_bounds
+        Paths_setup_config
         CabalBounds.Args
         CabalBounds.Command
         CabalBounds.Execute
         CabalBounds.Lenses
     ghc-options: -W
- 
+
 executable other-exe
-    build-depends:
-        base >=3 && <5,
-        cmdargs ==0.10.7,
-        lens ==4.7,
-        pretty-show ==1.6.7,
-        strict ==0.3.2,
-        Cabal ==1.20.0.1
     main-is: ExeMain2.hs
-    buildable: True
+    build-depends:
+        base >=3,
+        A ==0.3,
+        B ==0.3.0.1,
+        C ==0.2.5
     cpp-options: -DCABAL
     hs-source-dirs: src
     other-modules:
-        Paths_cabal_bounds
+        Paths_setup_config
         CabalBounds.Args
         CabalBounds.Command
         CabalBounds.Execute
         CabalBounds.Lenses
     ghc-options: -W
- 
+
 test-suite some-test
-    build-depends:
-        base >=3 && <5,
-        cmdargs ==0.10.7,
-        lens ==4.7,
-        pretty-show ==1.6.7,
-        strict ==0.3.2,
-        Cabal ==1.20.0.1
     type: exitcode-stdio-1.0
     main-is: TestMain1.hs
-    buildable: True
+    build-depends:
+        base >=3,
+        A ==0.3,
+        B ==0.3.0.1,
+        C ==0.2.5
     hs-source-dirs: src
     other-modules:
-        Paths_cabal_bounds
+        Paths_setup_config
         CabalBounds.Args
         CabalBounds.Command
         CabalBounds.Execute
         CabalBounds.Lenses
     ghc-options: -W
 test-suite other-test
-    build-depends:
-        base >=3 && <5,
-        cmdargs ==0.10.7,
-        lens ==4.7,
-        pretty-show ==1.6.7,
-        strict ==0.3.2,
-        Cabal ==1.20.0.1
     type: exitcode-stdio-1.0
     main-is: TestMain2.hs
-    buildable: True
+    build-depends:
+        base >=3,
+        A ==0.3,
+        B ==0.3.0.1,
+        C ==0.2.5
     hs-source-dirs: src
     other-modules:
-        Paths_cabal_bounds
+        Paths_setup_config
         CabalBounds.Args
         CabalBounds.Command
         CabalBounds.Execute
         CabalBounds.Lenses
     ghc-options: -W
- 

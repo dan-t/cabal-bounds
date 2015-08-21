@@ -1,0 +1,16 @@
+name: A
+version: 0.3
+cabal-version: >=1.9.2
+build-type: Simple
+maintainer: daniel.trstenjak@gmail.com
+author: Daniel Trstenjak
+ 
+library
+    build-depends:
+        base >=3
+    exposed-modules:
+        A
+    exposed: True
+    buildable: True
+    other-modules:
+        Paths_A

@@ -115,8 +115,8 @@ findSetupConfigFile (Just confFile) _ = right confFile
 ignoreBaseLibrary :: A.Args -> A.Args
 ignoreBaseLibrary args =
    case find (== "base") (A.ignore args) of
-	Just _  -> args
-	Nothing -> args { A.ignore = "base" : A.ignore args }
+        Just _  -> args
+        Nothing -> args { A.ignore = "base" : A.ignore args }
 
 
 packageDescription :: FilePath -> EitherT Error IO GenericPackageDescription

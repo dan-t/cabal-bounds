@@ -27,10 +27,15 @@ ensureSetupConfig = do
    where
       buildSetupConfig curDir = do
          let inputFiles = curDir </> "tests" </> "inputFiles"
-         Dir.setCurrentDirectory $ inputFiles </> "setup-config-build-env"
+         let buildDir   = inputFiles </> "setup-config-build-env"
+         let libsDir    = buildDir </> "libs"
+         Dir.setCurrentDirectory buildDir
 
          Proc.runCommand "cabal sandbox init" >>= Proc.waitForProcess
-         Proc.runCommand "cabal install -j"   >>= Proc.waitForProcess
+         Proc.runCommand ("cabal sandbox add-source " ++ (libsDir </> "A")) >>= Proc.waitForProcess
+         Proc.runCommand ("cabal sandbox add-source " ++ (libsDir </> "B")) >>= Proc.waitForProcess
+         Proc.runCommand ("cabal sandbox add-source " ++ (libsDir </> "C")) >>= Proc.waitForProcess
+         Proc.runCommand "cabal install" >>= Proc.waitForProcess
 
          [distDir] <- glob $ "dist" </> "dist-sandbox-*"
          Dir.copyFile (distDir </> "setup-config") (inputFiles </> "setup-config")
@@ -64,8 +69,8 @@ dropTests = T.testGroup "Drop Tests"
    , test "DropUpperOfTest" $ defaultDrop { upper = True, testSuite = ["some-test"] }
    , test "DropBothOnlyBase" $ defaultDrop { only = ["base"] }
    , test "DropUpperOnlyBase" $ defaultDrop { upper = True, only = ["base"] }
-   , test "DropBothIgnoreBase" $ defaultDrop { ignore = ["base"] }
-   , test "DropUpperIgnoreBase" $ defaultDrop { upper = True, ignore = ["base"] }
+   , test "DropBothIgnoreA" $ defaultDrop { ignore = ["A"] }
+   , test "DropUpperIgnoreA" $ defaultDrop { upper = True, ignore = ["A"] }
    ]
 
 
@@ -90,10 +95,7 @@ updateTests = T.testGroup "Update Tests"
    , test "UpdateUpperOfLibrary" $ defaultUpdate { upper = True, library = True }
    , test "UpdateUpperOfOtherExe" $ defaultUpdate { upper = True, executable = ["other-exe"] }
    , test "UpdateUpperOfTest" $ defaultUpdate { upper = True, testSuite = ["some-test"] }
-   , test "UpdateBothOnlyBase" $ defaultUpdate { only = ["base"] }
-   , test "UpdateUpperOnlyBase" $ defaultUpdate { upper = True, only = ["base"] }
-   , test "UpdateBothIgnoreBase" $ defaultUpdate { ignore = ["base"] }
-   , test "UpdateLowerIgnoreBase" $ defaultUpdate { lower = True, ignore = ["base"] }
+   , test "UpdateBothIgnoreA" $ defaultUpdate { ignore = ["A"] }
    , test "UpdateMinorLower" $ defaultUpdate { lowerComp = Just Minor }
    , test "UpdateMajor2Lower" $ defaultUpdate { lowerComp = Just Major2 }
    , test "UpdateMajor1Lower" $ defaultUpdate { lowerComp = Just Major1 }
@@ -103,27 +105,19 @@ updateTests = T.testGroup "Update Tests"
    , test "UpdateMinorLowerAndUpper" $ defaultUpdate { lowerComp = Just Minor, upperComp = Just Minor }
    , test "UpdateMajor1LowerAndUpper" $ defaultUpdate { lowerComp = Just Major1, upperComp = Just Major1 }
    , test "UpdateOnlyMissing" $ defaultUpdate { missing = True }
-   , testWithoutSetupConfig "UpdateByHaskellPlatform" $ defaultUpdate { haskellPlatform = "2013.2.0.0" }
-   , testWithoutSetupConfig "FromFile" $ defaultUpdate { upper = True, fromFile = "tests" </> "inputFiles" </> "FromFile.hs" }
+   , test "UpdateByHaskellPlatform" $ defaultUpdate { haskellPlatform = "2013.2.0.0" }
+   , test "UpdateUpperFromFile" $ defaultUpdate { upper = True, fromFile = "tests" </> "inputFiles" </> "FromFile.hs" }
    ]
 
 
 dumpTests :: T.TestTree
 dumpTests = T.testGroup "Dump Tests"
-   [ testWithoutSetupConfig "Dump" $ defaultDump
+   [ test "Dump" $ defaultDump
    ]
 
 
 test :: String -> Args -> T.TestTree
-test testName args = test_ testName args True
-
-
-testWithoutSetupConfig :: String -> Args -> T.TestTree
-testWithoutSetupConfig testName args = test_ testName args False
-
-
-test_ :: String -> Args -> Bool -> T.TestTree
-test_ testName args withSetupConfig =
+test testName args =
    G.goldenVsFileDiff testName diff goldenFile outputFile command
    where
       command = do
@@ -139,7 +133,7 @@ test_ testName args withSetupConfig =
                                 }
               Update {} -> args { cabalFile       = Just inputFile
                                 , output          = Just outputFile
-                                , setupConfigFile = if withSetupConfig then Just setupConfigFile else Nothing
+                                , setupConfigFile = Just setupConfigFile
                                 }
 
               Dump {}   -> args { cabalFiles = [inputFile]
@@ -149,6 +143,12 @@ test_ testName args withSetupConfig =
       diff ref new    = ["diff", "-u", ref, new]
       goldenFile      = "tests" </> "goldenFiles" </> testName <.> (if isDumpTest then "hs" else "cabal")
       outputFile      = "tests" </> "outputFiles" </> testName <.> (if isDumpTest then "hs" else "cabal")
-      inputFile       = "tests" </> "inputFiles"  </> "original.cabal"
+
+      inputFile       = "tests" </> "inputFiles" </> (inputFileName testName)
+         where
+            inputFileName "UpdateByHaskellPlatform" = "hp-original.cabal"
+            inputFileName "UpdateOnlyMissing"       = "missing-original.cabal"
+            inputFileName _                         = "original.cabal"
+
       setupConfigFile = "tests" </> "inputFiles"  </> "setup-config"
       isDumpTest      = case args of Dump {} -> True; _ -> False
