@@ -43,7 +43,7 @@ description:
     To reformat your 'cabal' file without changing any bounds you can call 'cabal-bounds' with the name of
     a section that isn't present in the 'cabal' file:
     .
-    > $ cabal-bounds drop --executable=blub myproject.cabal
+    > $ cabal-bounds drop --executable=blub
 category: Utils, Development
 author: Daniel Trstenjak
 tested-with: GHC ==7.6.2 GHC ==7.6.3 GHC ==7.8.3 GHC ==7.10.1
