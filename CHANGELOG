@@ -1,3 +1,8 @@
+1.0.4
+-----
+* Raise upper bounds of dependencies
+* Support GHC 8.0.1
+
 1.0.2
 -----
 * Raise upper bounds of dependencies
