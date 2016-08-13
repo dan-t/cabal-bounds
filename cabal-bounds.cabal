@@ -46,7 +46,8 @@ description:
     > $ cabal-bounds drop --executable=blub
 category: Utils, Development
 author: Daniel Trstenjak
-tested-with: GHC ==7.6.2 GHC ==7.6.3 GHC ==7.8.3 GHC ==7.10.1 GHC ==8.0.1
+tested-with: GHC ==7.6.2 GHC ==7.6.3 GHC ==7.8.3 GHC ==7.10.1
+             GHC ==8.0.1
 extra-source-files:
     README.md
     CHANGELOG
@@ -75,7 +76,7 @@ library
         lens >=4.0.1 && <4.15,
         strict >=0.3.2 && <0.4,
         unordered-containers >=0.2.3.3 && <0.3,
-        transformers >=0.3.0.0 && <0.5,
+        transformers >=0.3.0.0 && <0.6,
         either >=4.1.1 && <4.5,
         cabal-lenses >=0.4.6 && <0.5,
         Cabal >=1.18.0 && <1.25,
@@ -109,7 +110,7 @@ test-suite cabal-bounds-tests
         base >=3 && <5,
         tasty >=0.9.0.1 && <0.12,
         tasty-golden >=2.2.0.2 && <2.4,
-        process >=1.1.0.2 && <1.3,
+        process >=1.1.0.2 && <1.5,
         filepath >=1.3 && <1.5,
         directory ==1.2.*,
         Glob ==0.7.*,
