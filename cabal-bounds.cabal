@@ -1,5 +1,5 @@
 name: cabal-bounds
-version: 1.0.4
+version: 1.0.5
 cabal-version: >=1.9.2
 build-type: Simple
 license: BSD3
@@ -73,7 +73,7 @@ library
     build-depends:
         base >=3 && <5,
         cmdargs >=0.10.5 && <0.11,
-        lens >=4.0.1 && <4.15,
+        lens >=4.0.1 && <4.16,
         strict >=0.3.2 && <0.4,
         unordered-containers >=0.2.3.3 && <0.3,
         transformers >=0.3.0.0 && <0.6,
