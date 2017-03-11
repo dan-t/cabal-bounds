@@ -48,13 +48,18 @@ updateDependency (UpdateLower comp ifMissing) libs dep =
             lowerVersion <- HM.lookup pkgName_ libs
             let newLowerVersion = comp `compOf` lowerVersion
                 newLowerBound   = V.LowerBound newLowerVersion V.InclusiveBound
-                newIntervals    = (versionRange_ ^. CL.intervals) & _head . CL.lowerBound .~ newLowerBound
+                newIntervals    = (versionRange_ ^. CL.intervals) & _head . CL.lowerBound %~ updateIf (>) newLowerBound
                 vrange          = fromMaybe (V.orLaterVersion newLowerVersion) (mkVersionRange newIntervals)
             return $ dep & CL.versionRange .~ vrange
    where
       pkgName_      = dep ^. CL.packageName . _Wrapped
       versionRange_ = dep ^. CL.versionRange
       lowerBound_   = fromMaybe CL.noLowerBound $ versionRange_ ^? CL.intervals . _head . CL.lowerBound
+
+      updateIf f newBound oldBound
+         | f oldBound newBound = newBound
+         | otherwise           = oldBound
+
 
 updateDependency (UpdateUpper comp ifMissing) libs dep =
    fromMaybe dep $
@@ -64,13 +69,17 @@ updateDependency (UpdateUpper comp ifMissing) libs dep =
             upperVersion <- HM.lookup pkgName_ libs
             let newUpperVersion = nextVersion comp upperVersion
                 newUpperBound   = V.UpperBound newUpperVersion V.ExclusiveBound
-                newIntervals    = (versionRange_ ^. CL.intervals) & _last . CL.upperBound .~ newUpperBound
+                newIntervals    = (versionRange_ ^. CL.intervals) & _last . CL.upperBound %~ updateIf (<) newUpperBound
                 vrange          = fromMaybe (V.earlierVersion newUpperVersion) (mkVersionRange newIntervals)
             return $ dep & CL.versionRange .~ vrange
    where
       versionRange_ = dep ^. CL.versionRange
       pkgName_      = dep ^. CL.packageName . _Wrapped
       upperBound_   = fromMaybe V.NoUpperBound $ versionRange_ ^? CL.intervals . _last . CL.upperBound
+
+      updateIf f newBound oldBound
+         | f oldBound newBound = newBound
+         | otherwise           = oldBound
 
 updateDependency (UpdateBoth lowerComp upperComp ifMissing) libs dep =
     updateDependency (UpdateLower lowerComp ifMissing) libs $
