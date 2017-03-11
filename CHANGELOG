@@ -1,3 +1,9 @@
+1.1.0
+-----
+* By default 'update' now only widens the lower and upper bounds.
+  So it's easier to raise the upper bounds by just calling
+  'cabal install --allow-newer' and then 'cabal-bounds update'.
+
 1.0.4
 -----
 * Raise upper bounds of dependencies

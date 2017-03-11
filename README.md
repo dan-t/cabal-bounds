@@ -34,19 +34,20 @@ versions of the dependencies.
     # update the version infos of all libraries
     $> cabal update
 
-    # drops the upper bound of all dependencies of the cabal file in the working directory
-    $> cabal-bounds drop --upper
-
     # create a cabal sandbox for building your project, this ensures that you're really using
     # the newest available versions of the dependencies, otherwise you would be constraint
     # to the already installed versions
     $> cabal sandbox init
       
-    # build your project
-    $> cabal install
+    # build your project and allow newer library versions used as specified by the cabal file.
+    $> cabal install --allow-newer
 
     # update the upper bound of all dependencies of the cabal file in the working directory
+    # if their upper bound is lower then the version used by the build
     $> cabal-bounds update --upper
+
+If you're leaving out the `--upper` flag then `update` will widen the bounds on both directions.
+So the upper bound will only be updated it it's lower and the lower bound only if it's greater.
 
 Example: Update Bounds by Haskell Platform
 ==========================================
@@ -70,16 +71,8 @@ test if your project builds and works with these, and then raise the upper bound
 
     # build and test the project
 
-    # initialize the lower bounds of libraries not present in the haskell platform
-    $> cabal-bounds update --lower --missing
-
-    # drop the upper bounds to test your project with the newest available library versions
-    $> cabal-bounds drop --upper
-
-    # build and test the project
-
-    # set the upper bounds to the ones used in the current build
-    $> cabal-bounds update --upper
+    # initialize the bounds not present in the haskell platform
+    $> cabal-bounds update
 
 Example: Update Bounds by File
 ==============================
