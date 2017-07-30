@@ -81,7 +81,7 @@ library
         cabal-lenses >=0.4.6 && <0.5,
         Cabal >=1.18.0 && <1.25,
         filepath >=1.3 && <1.5,
-        directory ==1.2.*
+        directory >=1.2 && <1.4
     cpp-options: -DCABAL
     hs-source-dirs: lib
     other-modules:
