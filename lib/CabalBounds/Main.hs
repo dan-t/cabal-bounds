@@ -1,4 +1,4 @@
-{-# Language StandaloneDeriving, PatternGuards, CPP #-}
+{-# Language StandaloneDeriving, PatternGuards, CPP, OverloadedStrings #-}
 
 module CabalBounds.Main
    ( cabalBounds
@@ -28,11 +28,16 @@ import System.FilePath ((</>))
 import System.Directory (getCurrentDirectory)
 import Control.Monad.Trans.Either (EitherT, runEitherT, bimapEitherT, hoistEither, left, right)
 import Control.Monad.IO.Class
+import Control.Lens
 import qualified Data.HashMap.Strict as HM
 import Data.List (foldl', sortBy, find)
 import Data.Function (on)
 import Data.Char (toLower)
 import Data.Maybe (fromMaybe)
+import qualified Data.Aeson as Aeson
+import Data.Aeson.Lens
+import qualified Data.ByteString.Lazy as BS
+import qualified Data.Text as T
 
 #if MIN_VERSION_Cabal(1,22,0) == 0
 import Distribution.Simple.Configure (ConfigStateFileErrorType(..))
@@ -47,10 +52,11 @@ import Control.Applicative ((<$>))
 #endif
 
 
-type Error           = String
+type Error = String
 type SetupConfigFile = FilePath
-type LibraryFile     = FilePath
-type CabalFile       = FilePath
+type PlanFile = FilePath
+type LibraryFile = FilePath
+type CabalFile = FilePath
 
 
 cabalBounds :: A.Args -> IO (Maybe Error)
@@ -102,16 +108,6 @@ findCabalFile Nothing = do
 findCabalFile (Just file) = right file
 
 
-findSetupConfigFile :: Maybe SetupConfigFile -> CabalFile -> EitherT Error IO SetupConfigFile
-findSetupConfigFile Nothing cabalFile = do
-   distDir <- liftIO $ CL.findDistDir cabalFile
-   case distDir of
-        Just dir -> right $ dir </> "setup-config"
-        Nothing  -> left "Couldn't find 'dist' directory! Have you already build the project?"
-
-findSetupConfigFile (Just confFile) _ = right confFile
-
-
 ignoreBaseLibrary :: A.Args -> A.Args
 ignoreBaseLibrary args =
    case find (== "base") (A.ignore args) of
@@ -133,9 +129,18 @@ packageDescriptions files = mapM packageDescription files
 
 
 libraries :: HP.HPVersion -> LibraryFile -> (Maybe SetupConfigFile, CabalFile) -> EitherT Error IO U.Libraries
-libraries "" "" (maybeConfFile, cabalFile) = do
-   confFile <- findSetupConfigFile maybeConfFile cabalFile
-   installedLibraries confFile
+libraries "" "" (Just confFile, _) = do
+   librariesFromSetupConfig confFile
+
+libraries "" "" (Nothing, cabalFile) = do
+   distDir <- liftIO $ CL.findDistDir cabalFile
+   case distDir of
+        Just distDir -> librariesFromSetupConfig $ distDir </> "setup-config"
+        Nothing      -> do
+           newDistDir <- liftIO $ CL.findNewDistDir cabalFile
+           case newDistDir of
+                Just newDistDir -> librariesFromPlanFile $ newDistDir </> "cache" </> "plan.json"
+                Nothing         -> left "Couldn't find 'dist' nor 'dist-newstyle' directory! Have you already build the cabal project?"
 
 libraries hpVersion libFile _ = do
    hpLibs       <- haskellPlatformLibraries hpVersion
@@ -167,9 +172,9 @@ haskellPlatformLibraries hpVersion =
                 | otherwise                           -> left $ "Invalid haskell platform version '" ++ version ++ "'"
 
 
-installedLibraries :: SetupConfigFile -> EitherT Error IO U.Libraries
-installedLibraries ""       = right HM.empty
-installedLibraries confFile = do
+librariesFromSetupConfig :: SetupConfigFile -> EitherT Error IO U.Libraries
+librariesFromSetupConfig ""       = right HM.empty
+librariesFromSetupConfig confFile = do
    binfo <- liftIO $ tryGetConfigStateFile confFile
    bimapEitherT show buildInfoLibs (hoistEither binfo)
    where
@@ -181,6 +186,37 @@ installedLibraries confFile = do
 
       newestVersion :: [PI.InstalledPackageInfo] -> V.Version
       newestVersion = maximum . map (P.pkgVersion . PI.sourcePackageId)
+
+
+librariesFromPlanFile :: PlanFile -> EitherT Error IO U.Libraries
+librariesFromPlanFile planFile = do
+   contents <- liftIO $ BS.readFile planFile
+   let json = Aeson.decode contents :: Maybe Aeson.Value
+   case json of
+        Just json -> do
+           -- get all ids: ["bytestring-0.10.6.0-2362d1f36f12553920ce3710ae4a4ecb432374f4e5feb33a61b7414b43605a0df", ...]
+           let ids = json ^.. key "install-plan" . _Array . traversed . key "id" . _String
+
+           -- transform ids into: [["2362d1f36f12553920ce3710ae4a4ecb432374f4e5feb33a61b7414b43605a0df", "0.10.6.0", "bytestring"], ...]
+           let ids' = map (reverse . T.split (== '-')) ids
+
+           let ids'' = filter (\id -> length id >= 3) ids'
+
+           -- drop the hash: [["0.10.6.0", "bytestring"], ...]
+           let ids''' = map (drop 1) ids''
+
+           -- transform verions into: [[0, 10, 6, 0], ...]
+           let versions = map (T.split (== '.') . head) ids'''
+           let versions' = map (map (\s -> read (T.unpack s) :: Int)) versions
+           let versions'' = map (\v -> V.Version { V.versionBranch = v, V.versionTags = [] }) versions'
+
+           let names = map (reverse . tail) ids'''
+           let names' = map (T.intercalate "-") names
+           let names'' = map T.unpack names'
+
+           right . HM.fromList $ zip names'' versions''
+
+        Nothing   -> left $ "Couldn't parse json file '" ++ planFile ++ "'"
 
 
 leftToJust :: Either a b -> Maybe a
