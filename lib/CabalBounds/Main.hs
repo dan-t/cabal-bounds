@@ -22,6 +22,7 @@ import qualified CabalBounds.Drop as D
 import qualified CabalBounds.Update as U
 import qualified CabalBounds.Dump as D
 import qualified CabalBounds.HaskellPlatform as HP
+import CabalBounds.Types
 import qualified CabalLenses as CL
 import qualified System.IO.Strict as SIO
 import System.FilePath ((</>))
@@ -88,16 +89,31 @@ cabalBounds args'@A.Dump {} =
                        else right $ A.cabalFiles args
 
       pkgDescrps <- packageDescriptions cabalFiles
-      let libs = sortBy (compare `on` (map toLower . fst)) $ D.dump (DP.dependencies args) pkgDescrps
+      let libs = sortLibraries $ D.dump (DP.dependencies args) pkgDescrps
       case A.output args of
            Just file -> liftIO $ writeFile file (prettyPrint libs)
            Nothing   -> liftIO $ putStrLn (prettyPrint libs))
    where
-      prettyPrint []     = "[]"
-      prettyPrint (l:ls) =
-         "[ " ++ show l ++ "\n" ++ foldl' (\str l -> str ++ ", " ++ show l ++ "\n") "" ls ++ "]";
-
       args = ignoreBaseLibrary args'
+
+cabalBounds args@A.Libs {} =
+   leftToJust <$> runEitherT (do
+      cabalFile <- findCabalFile Nothing
+      libs      <- sortLibraries . toList <$> libraries (A.haskellPlatform args) (A.fromFile args) (Nothing, cabalFile)
+      let libs' = filter ((/= "base") . fst) libs
+      case A.output args of
+           Just file -> liftIO $ writeFile file (prettyPrint libs')
+           Nothing   -> liftIO $ putStrLn (prettyPrint libs'))
+
+
+sortLibraries :: [Library] -> [Library]
+sortLibraries = sortBy (compare `on` (map toLower . fst))
+
+
+prettyPrint :: [Library] -> String
+prettyPrint []     = "[]"
+prettyPrint (l:ls) =
+   "[ " ++ show l ++ "\n" ++ foldl' (\str l -> str ++ ", " ++ show l ++ "\n") "" ls ++ "]";
 
 
 findCabalFile :: Maybe CabalFile -> EitherT Error IO CabalFile
@@ -128,7 +144,7 @@ packageDescriptions []    = left "Missing cabal file"
 packageDescriptions files = mapM packageDescription files
 
 
-libraries :: HP.HPVersion -> LibraryFile -> (Maybe SetupConfigFile, CabalFile) -> EitherT Error IO U.Libraries
+libraries :: HP.HPVersion -> LibraryFile -> (Maybe SetupConfigFile, CabalFile) -> EitherT Error IO Libraries
 libraries "" "" (Just confFile, _) = do
    librariesFromSetupConfig confFile
 
@@ -148,7 +164,7 @@ libraries hpVersion libFile _ = do
    right $ HM.union hpLibs libsFromFile
 
 
-librariesFromFile :: LibraryFile -> EitherT Error IO U.Libraries
+librariesFromFile :: LibraryFile -> EitherT Error IO Libraries
 librariesFromFile ""      = right HM.empty
 librariesFromFile libFile = do
    contents <- liftIO $ SIO.readFile libFile
@@ -162,7 +178,7 @@ librariesFromFile libFile = do
          = left "Invalid format of library file given to '--fromfile'. Expected file with content of type '[(String, [Int])]'."
 
 
-haskellPlatformLibraries :: HP.HPVersion -> EitherT Error IO U.Libraries
+haskellPlatformLibraries :: HP.HPVersion -> EitherT Error IO Libraries
 haskellPlatformLibraries hpVersion =
    case hpVersion of
         ""         -> right HM.empty
@@ -172,13 +188,13 @@ haskellPlatformLibraries hpVersion =
                 | otherwise                           -> left $ "Invalid haskell platform version '" ++ version ++ "'"
 
 
-librariesFromSetupConfig :: SetupConfigFile -> EitherT Error IO U.Libraries
+librariesFromSetupConfig :: SetupConfigFile -> EitherT Error IO Libraries
 librariesFromSetupConfig ""       = right HM.empty
 librariesFromSetupConfig confFile = do
    binfo <- liftIO $ tryGetConfigStateFile confFile
    bimapEitherT show buildInfoLibs (hoistEither binfo)
    where
-      buildInfoLibs :: LocalBuildInfo -> U.Libraries
+      buildInfoLibs :: LocalBuildInfo -> Libraries
       buildInfoLibs = HM.fromList
                     . map (\(P.PackageName n, v) -> (n, newestVersion v))
                     . filter ((not . null) . snd)
@@ -188,7 +204,7 @@ librariesFromSetupConfig confFile = do
       newestVersion = maximum . map (P.pkgVersion . PI.sourcePackageId)
 
 
-librariesFromPlanFile :: PlanFile -> EitherT Error IO U.Libraries
+librariesFromPlanFile :: PlanFile -> EitherT Error IO Libraries
 librariesFromPlanFile planFile = do
    contents <- liftIO $ BS.readFile planFile
    let json = Aeson.decode contents :: Maybe Aeson.Value

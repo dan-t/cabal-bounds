@@ -12,6 +12,7 @@ import Control.Lens
 import CabalBounds.Bound (UpdateBound(..))
 import CabalBounds.Dependencies (Dependencies(..), filterDependency, dependencyIf)
 import CabalBounds.VersionComp (VersionComp(..))
+import CabalBounds.Types
 import qualified CabalLenses as CL
 import Data.List (foldl')
 import qualified Data.HashMap.Strict as HM
@@ -20,11 +21,6 @@ import Data.Maybe (fromMaybe)
 #if __GLASGOW_HASKELL__ < 710
 import Control.Applicative ((<$>))
 #endif
-
-
-type LibName    = String
-type LibVersion = V.Version
-type Libraries  = HM.HashMap LibName LibVersion
 
 
 update :: UpdateBound -> [CL.Section] -> Dependencies -> Libraries -> D.GenericPackageDescription -> D.GenericPackageDescription

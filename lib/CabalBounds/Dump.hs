@@ -9,11 +9,8 @@ import Data.List (foldl')
 import Data.Maybe (fromMaybe)
 import qualified CabalLenses as CL
 import CabalBounds.Dependencies (Dependencies(..), allDependency, filterDependency)
+import CabalBounds.Types
 import Control.Lens
-
-type LibName    = String
-type LibVersion = [Int]
-type Library    = (LibName, LibVersion)
 
 
 dump :: Dependencies -> [GenericPackageDescription] -> [Library]

@@ -7,6 +7,7 @@ module CabalBounds.Args
    , defaultDrop
    , defaultUpdate
    , defaultDump
+   , defaultLibs
    ) where
 
 import System.Console.CmdArgs hiding (ignore)
@@ -50,11 +51,15 @@ data Args = Drop { upper      :: Bool
                  , output     :: Maybe String
                  , cabalFiles :: [FilePath]
                  }
+          | Libs { output          :: Maybe String
+                 , fromFile        :: FilePath
+                 , haskellPlatform :: String
+                 }
           deriving (Data, Typeable, Show, Eq)
 
 
 get :: IO Args
-get = cmdArgsRun . cmdArgsMode $ modes [dropArgs, updateArgs, dumpArgs]
+get = cmdArgsRun . cmdArgsMode $ modes [dropArgs, updateArgs, dumpArgs, libsArgs]
    &= program "cabal-bounds"
    &= summary summaryInfo
    &= help "A command line program for managing the bounds/versions of the dependencies in a cabal file."
@@ -108,6 +113,14 @@ defaultDump = Dump
    }
 
 
+defaultLibs :: Args
+defaultLibs = Libs
+   { output          = def
+   , fromFile        = def
+   , haskellPlatform = def
+   }
+
+
 dropArgs :: Args
 dropArgs = Drop
    { upper      = def &= explicit &= name "upper" &= name "U"
@@ -137,7 +150,7 @@ updateArgs = Update
    , upperComp       = def &= explicit &= name "uppercomp"
                            &= help "Only the upper bound is updated with the specified version component. (major1, major2 or minor)"
    , missing         = def &= help "Only the dependencies having missing bounds are updated."
-   , fromFile        = def &= typ "FILE" &= help "Update bounds by the library versions spedified in the given file."
+   , fromFile        = def &= typ "FILE" &= help "Update bounds by the library versions specified in the given file."
    , haskellPlatform = def &= explicit &= typ "VERSION" &= name "haskell-platform"
                            &= help "Update bounds by the library versions of the specified haskell platform version"
    , setupConfigFile = def &= CmdArgs.ignore
@@ -149,6 +162,16 @@ dumpArgs = Dump
    { output     = def &= explicit &= typ "FILE" &= name "output" &= name "o"
                       &= help "Save libraries with lower bounds to file, if empty, then it's written to stdout."
    , cabalFiles = def &= args &= typ "CABAL-FILE"
+   }
+
+
+libsArgs :: Args
+libsArgs = Libs
+   { output     = def &= explicit &= typ "FILE" &= name "output" &= name "o"
+                      &= help "Save the libraries cabal-bounds would use for its update run to file, if empty, then they're written to stdout."
+   , fromFile        = def &= typ "FILE" &= help "Use the library versions specified in the given file."
+   , haskellPlatform = def &= explicit &= typ "VERSION" &= name "haskell-platform"
+                           &= help "Use the library versions of the specified haskell platform version"
    }
 
 
