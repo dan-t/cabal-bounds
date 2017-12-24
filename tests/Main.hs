@@ -35,6 +35,7 @@ ensureSetupConfig = do
          Proc.runCommand ("cabal sandbox add-source " ++ (libsDir </> "A")) >>= Proc.waitForProcess
          Proc.runCommand ("cabal sandbox add-source " ++ (libsDir </> "B")) >>= Proc.waitForProcess
          Proc.runCommand ("cabal sandbox add-source " ++ (libsDir </> "C")) >>= Proc.waitForProcess
+         Proc.runCommand ("cabal sandbox add-source " ++ (libsDir </> "D")) >>= Proc.waitForProcess
          Proc.runCommand "cabal install" >>= Proc.waitForProcess
 
          [distDir] <- glob $ "dist" </> "dist-sandbox-*"
@@ -45,7 +46,6 @@ ensureSetupConfig = do
          Dir.setCurrentDirectory buildDir
          Proc.runCommand "cabal sandbox delete" >>= Proc.waitForProcess
 
-         Dir.removeDirectoryRecursive $ buildDir </> "dist"
          Dir.setCurrentDirectory prevDir
 
 

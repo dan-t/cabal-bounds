@@ -1,0 +1,16 @@
+name: D
+version: 0.8.2
+cabal-version: >=1.9.2
+build-type: Simple
+maintainer: daniel.trstenjak@gmail.com
+author: Daniel Trstenjak
+ 
+library
+    build-depends:
+        base >=3
+    exposed-modules:
+        D
+    exposed: True
+    buildable: True
+    other-modules:
+        Paths_D
