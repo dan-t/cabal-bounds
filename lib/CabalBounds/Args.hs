@@ -54,6 +54,8 @@ data Args = Drop { upper      :: Bool
           | Libs { output          :: Maybe String
                  , fromFile        :: FilePath
                  , haskellPlatform :: String
+                 , cabalFile       :: Maybe FilePath
+                 , setupConfigFile :: Maybe FilePath
                  }
           deriving (Data, Typeable, Show, Eq)
 
@@ -118,6 +120,8 @@ defaultLibs = Libs
    { output          = def
    , fromFile        = def
    , haskellPlatform = def
+   , cabalFile       = def
+   , setupConfigFile = def
    }
 
 

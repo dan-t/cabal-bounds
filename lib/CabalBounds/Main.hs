@@ -98,8 +98,8 @@ cabalBounds args'@A.Dump {} =
 
 cabalBounds args@A.Libs {} =
    leftToJust <$> runEitherT (do
-      cabalFile <- findCabalFile Nothing
-      libs      <- sortLibraries . toList <$> libraries (A.haskellPlatform args) (A.fromFile args) (Nothing, cabalFile)
+      cabalFile <- findCabalFile $ A.cabalFile args
+      libs      <- sortLibraries . toList <$> libraries (A.haskellPlatform args) (A.fromFile args) (A.setupConfigFile args, cabalFile)
       let libs' = filter ((/= "base") . fst) libs
       case A.output args of
            Just file -> liftIO $ writeFile file (prettyPrint libs')

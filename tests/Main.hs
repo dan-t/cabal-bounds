@@ -50,7 +50,7 @@ ensureSetupConfig = do
 
 
 tests :: T.TestTree
-tests = T.testGroup "Tests" [dropTests, updateTests, dumpTests]
+tests = T.testGroup "Tests" [dropTests, updateTests, dumpTests, libsTests]
 
 
 dropTests :: T.TestTree
@@ -116,6 +116,12 @@ dumpTests = T.testGroup "Dump Tests"
    ]
 
 
+libsTests :: T.TestTree
+libsTests = T.testGroup "Libs Tests"
+   [ test "Libs" $ defaultLibs
+   ]
+
+
 test :: String -> Args -> T.TestTree
 test testName args =
    G.goldenVsFileDiff testName diff goldenFile outputFile command
@@ -140,9 +146,14 @@ test testName args =
                                 , output     = Just outputFile
                                 }
 
+              Libs {}   -> args { cabalFile       = Just inputFile
+                                , output          = Just outputFile
+                                , setupConfigFile = Just setupConfigFile
+                                }
+
       diff ref new    = ["diff", "-u", ref, new]
-      goldenFile      = "tests" </> "goldenFiles" </> testName <.> (if isDumpTest then "hs" else "cabal")
-      outputFile      = "tests" </> "outputFiles" </> testName <.> (if isDumpTest then "hs" else "cabal")
+      goldenFile      = "tests" </> "goldenFiles" </> testName <.> (if hasHsOutput then "hs" else "cabal")
+      outputFile      = "tests" </> "outputFiles" </> testName <.> (if hasHsOutput then "hs" else "cabal")
 
       inputFile       = "tests" </> "inputFiles" </> (inputFileName testName)
          where
@@ -151,4 +162,9 @@ test testName args =
             inputFileName _                         = "original.cabal"
 
       setupConfigFile = "tests" </> "inputFiles"  </> "setup-config"
-      isDumpTest      = case args of Dump {} -> True; _ -> False
+
+      hasHsOutput =
+         case args of
+              Dump {} -> True
+              Libs {} -> True
+              _       -> False
