@@ -1,3 +1,9 @@
+1.3.0
+-----
+* Support 'cabal new-build'
+* Add 'libs' subcommand for outputing the libs used by an 'update' run
+* Bugfix for missing upper/lower bounds
+
 1.1.0
 -----
 * By default 'update' now only widens the lower and upper bounds.
