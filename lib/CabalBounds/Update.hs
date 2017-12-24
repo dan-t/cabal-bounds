@@ -53,8 +53,13 @@ updateDependency (UpdateLower comp ifMissing) libs dep =
       lowerBound_   = fromMaybe CL.noLowerBound $ versionRange_ ^? CL.intervals . _head . CL.lowerBound
 
       updateIf f newBound oldBound
-         | f oldBound newBound = newBound
-         | otherwise           = oldBound
+         | oldBound /= CL.noLowerBound
+         = if f oldBound newBound
+              then newBound
+              else oldBound
+
+         | otherwise
+         = newBound
 
 
 updateDependency (UpdateUpper comp ifMissing) libs dep =
@@ -74,8 +79,14 @@ updateDependency (UpdateUpper comp ifMissing) libs dep =
       upperBound_   = fromMaybe V.NoUpperBound $ versionRange_ ^? CL.intervals . _last . CL.upperBound
 
       updateIf f newBound oldBound
-         | f oldBound newBound = newBound
-         | otherwise           = oldBound
+         | oldBound /= V.NoUpperBound
+         = if f oldBound newBound
+              then newBound
+              else oldBound
+
+         | otherwise
+         = newBound
+
 
 updateDependency (UpdateBoth lowerComp upperComp ifMissing) libs dep =
     updateDependency (UpdateLower lowerComp ifMissing) libs $
