@@ -16,7 +16,7 @@ library
         base >=3,
         A >=0.1 && <0.2,
         B >=0.2 && <0.3,
-        C >=0.2.5 && <0.3
+        C -any
     hs-source-dirs: src
     other-modules:
         Paths_setup_config

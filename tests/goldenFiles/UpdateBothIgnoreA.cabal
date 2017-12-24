@@ -15,8 +15,8 @@ library
     build-depends:
         base >=3,
         A >=0.1 && <0.2,
-        B >=0.3.0.1 && <0.4,
-        C >=0.2.5 && <0.3
+        B >=0.2 && <0.4,
+        C >=0.1 && <0.4
     hs-source-dirs: src
     other-modules:
         Paths_setup_config
@@ -26,8 +26,8 @@ executable cabal-bounds
     build-depends:
         base >=3,
         A >=0.1 && <0.2,
-        B >=0.3.0.1 && <0.4,
-        C >=0.2.5 && <0.3
+        B >=0.2 && <0.4,
+        C >=0.1 && <0.4
     cpp-options: -DCABAL
     hs-source-dirs: src
     other-modules:
@@ -43,8 +43,8 @@ executable other-exe
     build-depends:
         base >=3,
         A >=0.1 && <0.2,
-        B >=0.3.0.1 && <0.4,
-        C >=0.2.5 && <0.3
+        B >=0.2 && <0.4,
+        C >=0.1 && <0.4
     cpp-options: -DCABAL
     hs-source-dirs: src
     other-modules:
@@ -61,8 +61,8 @@ test-suite some-test
     build-depends:
         base >=3,
         A >=0.1 && <0.2,
-        B >=0.3.0.1 && <0.4,
-        C >=0.2.5 && <0.3
+        B >=0.2 && <0.4,
+        C >=0.1 && <0.4
     hs-source-dirs: src
     other-modules:
         Paths_setup_config
@@ -77,8 +77,8 @@ test-suite other-test
     build-depends:
         base >=3,
         A >=0.1 && <0.2,
-        B >=0.3.0.1 && <0.4,
-        C >=0.2.5 && <0.3
+        B >=0.2 && <0.4,
+        C >=0.1 && <0.4
     hs-source-dirs: src
     other-modules:
         Paths_setup_config
