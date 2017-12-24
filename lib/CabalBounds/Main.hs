@@ -216,7 +216,8 @@ librariesFromPlanFile planFile = do
            -- transform ids into: [["2362d1f36f12553920ce3710ae4a4ecb432374f4e5feb33a61b7414b43605a0df", "0.10.6.0", "bytestring"], ...]
            let ids' = map (reverse . T.split (== '-')) ids
 
-           let ids'' = filter (\id -> length id >= 3) ids'
+           -- remove too short ids or ids of inplace libs
+           let ids'' = filter (\id -> length id >= 3 && (id !! 0) /= "inplace") ids'
 
            -- drop the hash: [["0.10.6.0", "bytestring"], ...]
            let ids''' = map (drop 1) ids''
