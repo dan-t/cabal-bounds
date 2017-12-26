@@ -15,7 +15,10 @@ import Control.Monad (when)
 import Control.Exception (finally)
 
 main :: IO ()
-main = ensureSetupConfig >> T.defaultMain tests
+main = do
+   ensureSetupConfig
+   T.defaultMain tests
+   deleteSetupConfig
 
 
 ensureSetupConfig :: IO ()
@@ -46,7 +49,17 @@ ensureSetupConfig = do
          Dir.setCurrentDirectory buildDir
          Proc.runCommand "cabal sandbox delete" >>= Proc.waitForProcess
 
+         Dir.removeDirectoryRecursive $ buildDir </> "dist"
          Dir.setCurrentDirectory prevDir
+
+
+deleteSetupConfig :: IO ()
+deleteSetupConfig = do
+   let config = "tests" </> "inputFiles" </> "setup-config"
+   configExists <- Dir.doesFileExist
+   when configExists $ do
+      Dir.removeFile config
+
 
 
 tests :: T.TestTree
