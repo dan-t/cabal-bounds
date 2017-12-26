@@ -11,24 +11,25 @@ import qualified System.Process as Proc
 import CabalBounds.Args
 import CabalBounds.Main (cabalBounds)
 import CabalBounds.VersionComp (VersionComp(..))
-import Control.Monad (when)
 import Control.Exception (finally)
+
+
+data LibsSource = SetupConfig | PlanFile
+   deriving (Show, Eq)
+
 
 main :: IO ()
 main = do
-   ensureSetupConfig
+   buildSource SetupConfig
    T.defaultMain tests
-   deleteSetupConfig
 
 
-ensureSetupConfig :: IO ()
-ensureSetupConfig = do
-   configExists <- Dir.doesFileExist $ "tests" </> "inputFiles" </> "setup-config"
-   when (not configExists) $ do
-      curDir <- Dir.getCurrentDirectory
-      buildSetupConfig curDir `finally` cleanUp curDir
+buildSource :: LibsSource -> IO ()
+buildSource source = do
+   curDir <- Dir.getCurrentDirectory
+   build source curDir `finally` cleanUp source curDir
    where
-      buildSetupConfig curDir = do
+      build SetupConfig curDir = do
          let inputFiles = curDir </> "tests" </> "inputFiles"
          let buildDir   = inputFiles </> "setup-config-build-env"
          let libsDir    = buildDir </> "libs"
@@ -44,99 +45,98 @@ ensureSetupConfig = do
          [distDir] <- glob $ "dist" </> "dist-sandbox-*"
          Dir.copyFile (distDir </> "setup-config") (inputFiles </> "setup-config")
 
-      cleanUp prevDir = do
-         let buildDir = prevDir </> "tests" </> "inputFiles" </> "setup-config-build-env"
+      build PlanFile _ = return ()
+
+
+      cleanUp SetupConfig curDir = do
+         let buildDir = curDir </> "tests" </> "inputFiles" </> "setup-config-build-env"
          Dir.setCurrentDirectory buildDir
          Proc.runCommand "cabal sandbox delete" >>= Proc.waitForProcess
 
-         Dir.removeDirectoryRecursive $ buildDir </> "dist"
-         Dir.setCurrentDirectory prevDir
+         Proc.runCommand "cabal clean" >>= Proc.waitForProcess
+         Dir.setCurrentDirectory curDir
 
-
-deleteSetupConfig :: IO ()
-deleteSetupConfig = do
-   let config = "tests" </> "inputFiles" </> "setup-config"
-   configExists <- Dir.doesFileExist
-   when configExists $ do
-      Dir.removeFile config
-
+      cleanUp PlanFile _ = return ()
 
 
 tests :: T.TestTree
-tests = T.testGroup "Tests" [dropTests, updateTests, dumpTests, libsTests]
+tests = T.testGroup "Tests" [ T.testGroup "Sourceless Tests" [dropTests, dumpTests]
+                            , T.testGroup "SetupConfig Tests" [updateTests SetupConfig, libsTests SetupConfig]
+                            , T.testGroup "PlanFile Tests" [updateTests PlanFile, libsTests PlanFile]
+                            ]
 
 
 dropTests :: T.TestTree
 dropTests = T.testGroup "Drop Tests"
-   [ test "DropBothOfAll" defaultDrop
-   , test "DropUpperOfAll" $ defaultDrop { upper = True }
-   , test "DropBothOfLib" $ defaultDrop { library = True }
-   , test "DropUpperOfLib" $ defaultDrop { upper = True, library = True }
-   , test "DropBothOfExe" $ defaultDrop { executable = ["cabal-bounds"] }
-   , test "DropUpperOfExe" $ defaultDrop { upper = True, executable = ["cabal-bounds"] }
-   , test "DropBothOfOtherExe" $ defaultDrop { executable = ["other-exe"] }
-   , test "DropUpperOfOtherExe" $ defaultDrop { upper = True, executable = ["other-exe"] }
-   , test "DropBothOfAllExes" $ defaultDrop { executable = ["cabal-bounds", "other-exe"] }
-   , test "DropUpperOfAllExes" $ defaultDrop { upper = True, executable = ["cabal-bounds", "other-exe"] }
-   , test "DropBothOfTest" $ defaultDrop { testSuite = ["some-test"] }
-   , test "DropUpperOfTest" $ defaultDrop { upper = True, testSuite = ["some-test"] }
-   , test "DropBothOnlyBase" $ defaultDrop { only = ["base"] }
-   , test "DropUpperOnlyBase" $ defaultDrop { upper = True, only = ["base"] }
-   , test "DropBothIgnoreA" $ defaultDrop { ignore = ["A"] }
-   , test "DropUpperIgnoreA" $ defaultDrop { upper = True, ignore = ["A"] }
+   [ test Nothing "DropBothOfAll" defaultDrop
+   , test Nothing "DropUpperOfAll" $ defaultDrop { upper = True }
+   , test Nothing "DropBothOfLib" $ defaultDrop { library = True }
+   , test Nothing "DropUpperOfLib" $ defaultDrop { upper = True, library = True }
+   , test Nothing "DropBothOfExe" $ defaultDrop { executable = ["cabal-bounds"] }
+   , test Nothing "DropUpperOfExe" $ defaultDrop { upper = True, executable = ["cabal-bounds"] }
+   , test Nothing "DropBothOfOtherExe" $ defaultDrop { executable = ["other-exe"] }
+   , test Nothing "DropUpperOfOtherExe" $ defaultDrop { upper = True, executable = ["other-exe"] }
+   , test Nothing "DropBothOfAllExes" $ defaultDrop { executable = ["cabal-bounds", "other-exe"] }
+   , test Nothing "DropUpperOfAllExes" $ defaultDrop { upper = True, executable = ["cabal-bounds", "other-exe"] }
+   , test Nothing "DropBothOfTest" $ defaultDrop { testSuite = ["some-test"] }
+   , test Nothing "DropUpperOfTest" $ defaultDrop { upper = True, testSuite = ["some-test"] }
+   , test Nothing "DropBothOnlyBase" $ defaultDrop { only = ["base"] }
+   , test Nothing "DropUpperOnlyBase" $ defaultDrop { upper = True, only = ["base"] }
+   , test Nothing "DropBothIgnoreA" $ defaultDrop { ignore = ["A"] }
+   , test Nothing "DropUpperIgnoreA" $ defaultDrop { upper = True, ignore = ["A"] }
    ]
 
 
-updateTests :: T.TestTree
-updateTests = T.testGroup "Update Tests"
-   [ test "UpdateBothOfAll" defaultUpdate
-   , test "UpdateBothOfAll" $ defaultUpdate { lower = True, upper = True }
-   , test "UpdateBothOfAllExes" $ defaultUpdate { executable = ["cabal-bounds", "other-exe"] }
-   , test "UpdateBothOfExe" $ defaultUpdate { executable = ["cabal-bounds"] }
-   , test "UpdateBothOfLibrary" $ defaultUpdate { library = True }
-   , test "UpdateBothOfOtherExe" $ defaultUpdate { executable = ["other-exe"] }
-   , test "UpdateBothOfTest" $ defaultUpdate { testSuite = ["some-test"] }
-   , test "UpdateLowerOfAll" $ defaultUpdate { lower = True }
-   , test "UpdateLowerOfAllExes" $ defaultUpdate { lower = True, executable = ["cabal-bounds", "other-exe"] }
-   , test "UpdateLowerOfExe" $ defaultUpdate { lower = True, executable = ["cabal-bounds"] }
-   , test "UpdateLowerOfLibrary" $ defaultUpdate { lower = True, library = True }
-   , test "UpdateLowerOfOtherExe" $ defaultUpdate { lower = True, executable = ["other-exe"] }
-   , test "UpdateLowerOfTest" $ defaultUpdate { lower = True, testSuite = ["some-test"] }
-   , test "UpdateUpperOfAll" $ defaultUpdate { upper = True }
-   , test "UpdateUpperOfAllExes" $ defaultUpdate { upper = True, executable = ["cabal-bounds", "other-exe"] }
-   , test "UpdateUpperOfExe" $ defaultUpdate { upper = True, executable = ["cabal-bounds"] }
-   , test "UpdateUpperOfLibrary" $ defaultUpdate { upper = True, library = True }
-   , test "UpdateUpperOfOtherExe" $ defaultUpdate { upper = True, executable = ["other-exe"] }
-   , test "UpdateUpperOfTest" $ defaultUpdate { upper = True, testSuite = ["some-test"] }
-   , test "UpdateBothIgnoreA" $ defaultUpdate { ignore = ["A"] }
-   , test "UpdateMinorLower" $ defaultUpdate { lowerComp = Just Minor }
-   , test "UpdateMajor2Lower" $ defaultUpdate { lowerComp = Just Major2 }
-   , test "UpdateMajor1Lower" $ defaultUpdate { lowerComp = Just Major1 }
-   , test "UpdateMinorUpper" $ defaultUpdate { upperComp = Just Minor }
-   , test "UpdateMajor2Upper" $ defaultUpdate { upperComp = Just Major2 }
-   , test "UpdateMajor1Upper" $ defaultUpdate { upperComp = Just Major1 }
-   , test "UpdateMinorLowerAndUpper" $ defaultUpdate { lowerComp = Just Minor, upperComp = Just Minor }
-   , test "UpdateMajor1LowerAndUpper" $ defaultUpdate { lowerComp = Just Major1, upperComp = Just Major1 }
-   , test "UpdateOnlyMissing" $ defaultUpdate { missing = True }
-   , test "UpdateByHaskellPlatform" $ defaultUpdate { haskellPlatform = "2013.2.0.0" }
-   , test "UpdateUpperFromFile" $ defaultUpdate { upper = True, fromFile = "tests" </> "inputFiles" </> "FromFile.hs" }
+updateTests :: LibsSource -> T.TestTree
+updateTests source = T.testGroup "Update Tests"
+   [ test (Just source) "UpdateBothOfAll" defaultUpdate
+   , test (Just source) "UpdateBothOfAll" $ defaultUpdate { lower = True, upper = True }
+   , test (Just source) "UpdateBothOfAllExes" $ defaultUpdate { executable = ["cabal-bounds", "other-exe"] }
+   , test (Just source) "UpdateBothOfExe" $ defaultUpdate { executable = ["cabal-bounds"] }
+   , test (Just source) "UpdateBothOfLibrary" $ defaultUpdate { library = True }
+   , test (Just source) "UpdateBothOfOtherExe" $ defaultUpdate { executable = ["other-exe"] }
+   , test (Just source) "UpdateBothOfTest" $ defaultUpdate { testSuite = ["some-test"] }
+   , test (Just source) "UpdateLowerOfAll" $ defaultUpdate { lower = True }
+   , test (Just source) "UpdateLowerOfAllExes" $ defaultUpdate { lower = True, executable = ["cabal-bounds", "other-exe"] }
+   , test (Just source) "UpdateLowerOfExe" $ defaultUpdate { lower = True, executable = ["cabal-bounds"] }
+   , test (Just source) "UpdateLowerOfLibrary" $ defaultUpdate { lower = True, library = True }
+   , test (Just source) "UpdateLowerOfOtherExe" $ defaultUpdate { lower = True, executable = ["other-exe"] }
+   , test (Just source) "UpdateLowerOfTest" $ defaultUpdate { lower = True, testSuite = ["some-test"] }
+   , test (Just source) "UpdateUpperOfAll" $ defaultUpdate { upper = True }
+   , test (Just source) "UpdateUpperOfAllExes" $ defaultUpdate { upper = True, executable = ["cabal-bounds", "other-exe"] }
+   , test (Just source) "UpdateUpperOfExe" $ defaultUpdate { upper = True, executable = ["cabal-bounds"] }
+   , test (Just source) "UpdateUpperOfLibrary" $ defaultUpdate { upper = True, library = True }
+   , test (Just source) "UpdateUpperOfOtherExe" $ defaultUpdate { upper = True, executable = ["other-exe"] }
+   , test (Just source) "UpdateUpperOfTest" $ defaultUpdate { upper = True, testSuite = ["some-test"] }
+   , test (Just source) "UpdateBothIgnoreA" $ defaultUpdate { ignore = ["A"] }
+   , test (Just source) "UpdateMinorLower" $ defaultUpdate { lowerComp = Just Minor }
+   , test (Just source) "UpdateMajor2Lower" $ defaultUpdate { lowerComp = Just Major2 }
+   , test (Just source) "UpdateMajor1Lower" $ defaultUpdate { lowerComp = Just Major1 }
+   , test (Just source) "UpdateMinorUpper" $ defaultUpdate { upperComp = Just Minor }
+   , test (Just source) "UpdateMajor2Upper" $ defaultUpdate { upperComp = Just Major2 }
+   , test (Just source) "UpdateMajor1Upper" $ defaultUpdate { upperComp = Just Major1 }
+   , test (Just source) "UpdateMinorLowerAndUpper" $ defaultUpdate { lowerComp = Just Minor, upperComp = Just Minor }
+   , test (Just source) "UpdateMajor1LowerAndUpper" $ defaultUpdate { lowerComp = Just Major1, upperComp = Just Major1 }
+   , test (Just source) "UpdateOnlyMissing" $ defaultUpdate { missing = True }
+   , test (Just source) "UpdateByHaskellPlatform" $ defaultUpdate { haskellPlatform = "2013.2.0.0" }
+   , test (Just source) "UpdateUpperFromFile" $ defaultUpdate { upper = True, fromFile = "tests" </> "inputFiles" </> "FromFile.hs" }
    ]
 
 
 dumpTests :: T.TestTree
 dumpTests = T.testGroup "Dump Tests"
-   [ test "Dump" $ defaultDump
+   [ test Nothing "Dump" defaultDump
    ]
 
 
-libsTests :: T.TestTree
-libsTests = T.testGroup "Libs Tests"
-   [ test "Libs" $ defaultLibs
+libsTests :: LibsSource -> T.TestTree
+libsTests source = T.testGroup "Libs Tests"
+   [ test (Just source) "Libs" defaultLibs
    ]
 
 
-test :: String -> Args -> T.TestTree
-test testName args =
+test :: Maybe LibsSource -> String -> Args -> T.TestTree
+test source testName args =
    G.goldenVsFileDiff testName diff goldenFile outputFile command
    where
       command = do
@@ -152,7 +152,8 @@ test testName args =
                                 }
               Update {} -> args { cabalFile       = Just inputFile
                                 , output          = Just outputFile
-                                , setupConfigFile = Just setupConfigFile
+                                , setupConfigFile = setupConfigFile
+                                , planFile        = planFile
                                 }
 
               Dump {}   -> args { cabalFiles = [inputFile]
@@ -161,12 +162,21 @@ test testName args =
 
               Libs {}   -> args { cabalFile       = Just inputFile
                                 , output          = Just outputFile
-                                , setupConfigFile = Just setupConfigFile
+                                , setupConfigFile = setupConfigFile
+                                , planFile        = planFile
                                 }
 
       diff ref new    = ["diff", "-u", ref, new]
-      goldenFile      = "tests" </> "goldenFiles" </> testName <.> (if hasHsOutput then "hs" else "cabal")
-      outputFile      = "tests" </> "outputFiles" </> testName <.> (if hasHsOutput then "hs" else "cabal")
+
+      goldenFile      =
+         if source == Just PlanFile && testName == "Libs"
+            then "tests" </> "goldenFiles" </> "PlanFile" </> "Libs.hs"
+            else "tests" </> "goldenFiles" </> testName <.> (if hasHsOutput then "hs" else "cabal")
+
+      outputFile      =
+         case source of
+              Nothing  -> "tests" </> "outputFiles" </> testName <.> (if hasHsOutput then "hs" else "cabal")
+              Just src -> "tests" </> "outputFiles" </> (show src) </> testName <.> (if hasHsOutput then "hs" else "cabal")
 
       inputFile       = "tests" </> "inputFiles" </> (inputFileName testName)
          where
@@ -174,7 +184,15 @@ test testName args =
             inputFileName "UpdateOnlyMissing"       = "missing-original.cabal"
             inputFileName _                         = "original.cabal"
 
-      setupConfigFile = "tests" </> "inputFiles"  </> "setup-config"
+      setupConfigFile =
+         case source of
+              Just SetupConfig -> Just $ "tests" </> "inputFiles" </> "setup-config"
+              _                -> Nothing
+
+      planFile =
+         case source of
+              Just PlanFile -> Just $ "tests" </> "inputFiles" </> "plan.json"
+              _             -> Nothing
 
       hasHsOutput =
          case args of

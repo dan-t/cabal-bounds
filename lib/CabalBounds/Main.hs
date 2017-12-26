@@ -75,7 +75,11 @@ cabalBounds args'@A.Update {} =
    leftToJust <$> runEitherT (do
       cabalFile <- findCabalFile $ A.cabalFile args
       pkgDescrp <- packageDescription cabalFile
-      libs      <- libraries (A.haskellPlatform args) (A.fromFile args) (A.setupConfigFile args, cabalFile)
+      let haskelPlatform = A.haskellPlatform args
+          libFile        = A.fromFile args
+          configFile     = A.setupConfigFile args
+          planFile       = A.planFile args
+      libs      <- libraries haskelPlatform libFile configFile planFile cabalFile
       let pkgDescrp' = U.update (B.boundOfUpdate args) (S.sections args pkgDescrp) (DP.dependencies args) libs pkgDescrp
       let outputFile = fromMaybe cabalFile (A.output args)
       liftIO $ writeFile outputFile (showGenericPackageDescription pkgDescrp'))
@@ -99,7 +103,11 @@ cabalBounds args'@A.Dump {} =
 cabalBounds args@A.Libs {} =
    leftToJust <$> runEitherT (do
       cabalFile <- findCabalFile $ A.cabalFile args
-      libs      <- sortLibraries . toList <$> libraries (A.haskellPlatform args) (A.fromFile args) (A.setupConfigFile args, cabalFile)
+      let haskelPlatform = A.haskellPlatform args
+          libFile        = A.fromFile args
+          configFile     = A.setupConfigFile args
+          planFile       = A.planFile args
+      libs      <- sortLibraries . toList <$> libraries haskelPlatform libFile configFile planFile cabalFile
       let libs' = filter ((/= "base") . fst) libs
       case A.output args of
            Just file -> liftIO $ writeFile file (prettyPrint libs')
@@ -113,7 +121,7 @@ sortLibraries = sortBy (compare `on` (map toLower . fst))
 prettyPrint :: [Library] -> String
 prettyPrint []     = "[]"
 prettyPrint (l:ls) =
-   "[ " ++ show l ++ "\n" ++ foldl' (\str l -> str ++ ", " ++ show l ++ "\n") "" ls ++ "]";
+   "[ " ++ show l ++ "\n" ++ foldl' (\str l -> str ++ ", " ++ show l ++ "\n") "" ls ++ "]\n";
 
 
 findCabalFile :: Maybe CabalFile -> EitherT Error IO CabalFile
@@ -144,11 +152,14 @@ packageDescriptions []    = left "Missing cabal file"
 packageDescriptions files = mapM packageDescription files
 
 
-libraries :: HP.HPVersion -> LibraryFile -> (Maybe SetupConfigFile, CabalFile) -> EitherT Error IO Libraries
-libraries "" "" (Just confFile, _) = do
+libraries :: HP.HPVersion -> LibraryFile -> Maybe SetupConfigFile -> Maybe PlanFile -> CabalFile -> EitherT Error IO Libraries
+libraries "" "" (Just confFile) _ _ = do
    librariesFromSetupConfig confFile
 
-libraries "" "" (Nothing, cabalFile) = do
+libraries "" "" _ (Just planFile) _ = do
+   librariesFromPlanFile planFile
+
+libraries "" "" Nothing Nothing cabalFile = do
    distDir <- liftIO $ CL.findDistDir cabalFile
    case distDir of
         Just distDir -> librariesFromSetupConfig $ distDir </> "setup-config"
@@ -158,7 +169,7 @@ libraries "" "" (Nothing, cabalFile) = do
                 Just newDistDir -> librariesFromPlanFile $ newDistDir </> "cache" </> "plan.json"
                 Nothing         -> left "Couldn't find 'dist' nor 'dist-newstyle' directory! Have you already build the cabal project?"
 
-libraries hpVersion libFile _ = do
+libraries hpVersion libFile _ _ _ = do
    hpLibs       <- haskellPlatformLibraries hpVersion
    libsFromFile <- librariesFromFile libFile
    right $ HM.union hpLibs libsFromFile

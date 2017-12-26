@@ -45,6 +45,7 @@ data Args = Drop { upper      :: Bool
                    , haskellPlatform :: String
                    , cabalFile       :: Maybe FilePath
                    , setupConfigFile :: Maybe FilePath
+                   , planFile        :: Maybe FilePath
                    }
           | Dump { only       :: [String]
                  , ignore     :: [String]
@@ -56,6 +57,7 @@ data Args = Drop { upper      :: Bool
                  , haskellPlatform :: String
                  , cabalFile       :: Maybe FilePath
                  , setupConfigFile :: Maybe FilePath
+                 , planFile        :: Maybe FilePath
                  }
           deriving (Data, Typeable, Show, Eq)
 
@@ -103,6 +105,7 @@ defaultUpdate = Update
    , haskellPlatform = def
    , cabalFile       = def
    , setupConfigFile = def
+   , planFile        = def
    }
 
 
@@ -122,6 +125,7 @@ defaultLibs = Libs
    , haskellPlatform = def
    , cabalFile       = def
    , setupConfigFile = def
+   , planFile        = def
    }
 
 
@@ -158,6 +162,7 @@ updateArgs = Update
    , haskellPlatform = def &= explicit &= typ "VERSION" &= name "haskell-platform"
                            &= help "Update bounds by the library versions of the specified haskell platform version"
    , setupConfigFile = def &= CmdArgs.ignore
+   , planFile        = def &= CmdArgs.ignore
    }
 
 

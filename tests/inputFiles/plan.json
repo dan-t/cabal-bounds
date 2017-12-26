@@ -1,0 +1,19 @@
+{
+  "install-plan": [
+    {
+      "id": "A-0.3-DGDFHRHSGASFAFAFAF"
+    },
+    {
+      "id": "B-0.3.0.1-DGDFHRHSGASFAFAFAF"
+    },
+    {
+      "id": "C-0.2.5-DGDFHRHSGASFAFAFAF"
+    },
+    {
+      "id": "D-0.8.2-DGDFHRHSGASFAFAFAF"
+    },
+    {
+      "id": "E-1.8.2-inplace"
+    }
+  ]
+}

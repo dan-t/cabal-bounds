@@ -51,15 +51,28 @@ tested-with: GHC ==7.6.2 GHC ==7.6.3 GHC ==7.8.3 GHC ==7.10.1
 extra-source-files:
     README.md
     CHANGELOG
-    tests/inputFiles/original.cabal
     tests/inputFiles/FromFile.hs
+    tests/inputFiles/hp-original.cabal
+    tests/inputFiles/missing-original.cabal
+    tests/inputFiles/original.cabal
+    tests/inputFiles/plan.json
     tests/inputFiles/.gitignore
     tests/inputFiles/setup-config-build-env/setup-config.cabal
     tests/inputFiles/setup-config-build-env/src/*.hs
     tests/inputFiles/setup-config-build-env/src/CabalBounds/*.hs
+    tests/inputFiles/setup-config-build-env/libs/A/A.cabal
+    tests/inputFiles/setup-config-build-env/libs/A/A.hs
+    tests/inputFiles/setup-config-build-env/libs/B/B.cabal
+    tests/inputFiles/setup-config-build-env/libs/B/B.hs
+    tests/inputFiles/setup-config-build-env/libs/C/C.cabal
+    tests/inputFiles/setup-config-build-env/libs/C/C.hs
+    tests/inputFiles/setup-config-build-env/libs/D/D.cabal
+    tests/inputFiles/setup-config-build-env/libs/D/D.hs
     tests/goldenFiles/*.cabal
     tests/goldenFiles/*.hs
-    tests/outputFiles/.gitignore
+    tests/goldenFiles/PlanFile/Libs.hs
+    tests/outputFiles/SetupConfig/.gitignore
+    tests/outputFiles/PlanFile/.gitignore
 
 source-repository head
     type: git
