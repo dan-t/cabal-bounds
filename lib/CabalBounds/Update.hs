@@ -96,14 +96,12 @@ updateDependency (UpdateBoth lowerComp upperComp ifMissing) libs dep =
 compOf :: VersionComp -> V.Version -> V.Version
 Major1 `compOf` version =
    version & CL.versionBranchL %~ take 1
-           & CL.versionTagsL   .~ []
 
 Major2 `compOf` version =
    version & CL.versionBranchL %~ take 2
-           & CL.versionTagsL   .~ []
 
 Minor `compOf` version =
-   version & CL.versionTagsL .~ []
+   version
 
 
 nextVersion :: VersionComp -> V.Version -> V.Version

@@ -11,7 +11,7 @@ module CabalBounds.Dependencies
 import Control.Lens
 import qualified CabalBounds.Args as A
 import qualified CabalLenses as CL
-import Distribution.Package (Dependency(..), PackageName(..))
+import Distribution.Package (Dependency(..), unPackageName)
 import Distribution.PackageDescription (GenericPackageDescription)
 
 -- | Which dependencies in the cabal file should the considered.
@@ -38,10 +38,10 @@ filterDependency AllDependencies =
    filtered (const True)
 
 filterDependency (OnlyDependencies deps) =
-   filtered (\(Dependency (PackageName pkgName) _) -> pkgName `elem` deps)
+   filtered (\(Dependency pkg _) -> (unPackageName pkg) `elem` deps)
 
 filterDependency (IgnoreDependencies deps) =
-   filtered (\(Dependency (PackageName pkgName) _) -> pkgName `notElem` deps)
+   filtered (\(Dependency pkg _) -> (unPackageName pkg) `notElem` deps)
 
 
 -- | A traversal for all 'Dependency' of all 'Section'.
