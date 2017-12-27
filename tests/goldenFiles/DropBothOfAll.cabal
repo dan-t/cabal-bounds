@@ -1,10 +1,10 @@
 name: setup-config
 version: 0.1
-cabal-version: >=1.9.2
-build-type: Simple
 license: UnspecifiedLicense
 maintainer: daniel.trstenjak@gmail.com
 author: Daniel Trstenjak
+cabal-version: >=1.9.2
+build-type: Simple
 
 library
     exposed-modules:
@@ -12,24 +12,19 @@ library
         CabalBounds.Command
         CabalBounds.Execute
         CabalBounds.Lenses
+    hs-source-dirs: src
+    other-modules:
+        Paths_setup_config
     build-depends:
         base >=3,
         A -any,
         B -any,
         C -any,
         D -any
-    hs-source-dirs: src
-    other-modules:
-        Paths_setup_config
 
 executable cabal-bounds
     main-is: ExeMain1.hs
-    build-depends:
-        base >=3,
-        A -any,
-        B -any,
-        C -any,
-        D -any
+    scope: unknown
     cpp-options: -DCABAL
     hs-source-dirs: src
     other-modules:
@@ -39,15 +34,16 @@ executable cabal-bounds
         CabalBounds.Execute
         CabalBounds.Lenses
     ghc-options: -W
+    build-depends:
+        base >=3,
+        A -any,
+        B -any,
+        C -any,
+        D -any
 
 executable other-exe
     main-is: ExeMain2.hs
-    build-depends:
-        base >=3,
-        A -any,
-        B -any,
-        C -any,
-        D -any
+    scope: unknown
     cpp-options: -DCABAL
     hs-source-dirs: src
     other-modules:
@@ -57,16 +53,16 @@ executable other-exe
         CabalBounds.Execute
         CabalBounds.Lenses
     ghc-options: -W
+    build-depends:
+        base >=3,
+        A -any,
+        B -any,
+        C -any,
+        D -any
 
 test-suite some-test
     type: exitcode-stdio-1.0
     main-is: TestMain1.hs
-    build-depends:
-        base >=3,
-        A -any,
-        B -any,
-        C -any,
-        D -any
     hs-source-dirs: src
     other-modules:
         Paths_setup_config
@@ -75,15 +71,16 @@ test-suite some-test
         CabalBounds.Execute
         CabalBounds.Lenses
     ghc-options: -W
+    build-depends:
+        base >=3,
+        A -any,
+        B -any,
+        C -any,
+        D -any
+
 test-suite other-test
     type: exitcode-stdio-1.0
     main-is: TestMain2.hs
-    build-depends:
-        base >=3,
-        A -any,
-        B -any,
-        C -any,
-        D -any
     hs-source-dirs: src
     other-modules:
         Paths_setup_config
@@ -92,3 +89,9 @@ test-suite other-test
         CabalBounds.Execute
         CabalBounds.Lenses
     ghc-options: -W
+    build-depends:
+        base >=3,
+        A -any,
+        B -any,
+        C -any,
+        D -any
