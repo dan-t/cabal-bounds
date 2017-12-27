@@ -45,7 +45,7 @@ updateDependency (UpdateLower comp ifMissing) libs dep =
             let newLowerVersion = comp `compOf` lowerVersion
                 newLowerBound   = V.LowerBound newLowerVersion V.InclusiveBound
                 newIntervals    = (versionRange_ ^. CL.intervals) & _head . CL.lowerBound %~ updateIf (>) newLowerBound
-                vrange          = fromMaybe (V.orLaterVersion newLowerVersion) (mkVersionRange newIntervals)
+                vrange          = mkVersionRange newIntervals
             return $ dep & CL.versionRange .~ vrange
    where
       pkgName_      = dep ^. CL.packageName . _Wrapped
@@ -71,7 +71,7 @@ updateDependency (UpdateUpper comp ifMissing) libs dep =
             let newUpperVersion = nextVersion comp upperVersion
                 newUpperBound   = V.UpperBound newUpperVersion V.ExclusiveBound
                 newIntervals    = (versionRange_ ^. CL.intervals) & _last . CL.upperBound %~ updateIf (<) newUpperBound
-                vrange          = fromMaybe (V.earlierVersion newUpperVersion) (mkVersionRange newIntervals)
+                vrange          = mkVersionRange newIntervals
             return $ dep & CL.versionRange .~ vrange
    where
       versionRange_ = dep ^. CL.versionRange
@@ -124,5 +124,6 @@ ensureMinimalVersionBranch comp branch =
       numNeededVersionDigits Minor  = 3
 
 
-mkVersionRange :: [V.VersionInterval] -> Maybe V.VersionRange
-mkVersionRange vis = V.fromVersionIntervals <$> V.mkVersionIntervals vis
+mkVersionRange :: [V.VersionInterval] -> V.VersionRange
+mkVersionRange []  = V.anyVersion
+mkVersionRange vis = V.fromVersionIntervals . V.mkVersionIntervals $ vis
