@@ -52,7 +52,9 @@ data Args = Drop { upper      :: Bool
                  , output     :: Maybe String
                  , cabalFiles :: [FilePath]
                  }
-          | Libs { output          :: Maybe String
+          | Libs { only            :: [String]
+                 , ignore          :: [String]
+                 , output          :: Maybe String
                  , fromFile        :: FilePath
                  , haskellPlatform :: String
                  , cabalFile       :: Maybe FilePath
@@ -120,7 +122,9 @@ defaultDump = Dump
 
 defaultLibs :: Args
 defaultLibs = Libs
-   { output          = def
+   { only            = def
+   , ignore          = def
+   , output          = def
    , fromFile        = def
    , haskellPlatform = def
    , cabalFile       = def

@@ -6,11 +6,13 @@ module CabalBounds.Dependencies
    , filterDependency
    , allDependency
    , dependencyIf
+   , filterLibrary
    ) where
 
 import Control.Lens
 import qualified CabalBounds.Args as A
 import qualified CabalLenses as CL
+import CabalBounds.Types
 import Distribution.Package (Dependency(..), PackageName(..))
 import Distribution.PackageDescription (GenericPackageDescription)
 
@@ -62,3 +64,14 @@ dependencyIf condVars section =
 #else
    CL.dependencyIf condVars section
 #endif
+
+
+filterLibrary :: Dependencies -> Traversal' Library Library
+filterLibrary AllDependencies =
+   filtered (const True)
+
+filterLibrary (OnlyDependencies deps) =
+   filtered (\(libName, _) -> libName `elem` deps)
+
+filterLibrary (IgnoreDependencies deps) =
+   filtered (\(libName, _) -> libName `notElem` deps)

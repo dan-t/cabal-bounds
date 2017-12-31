@@ -107,8 +107,8 @@ cabalBounds args@A.Libs {} =
           libFile        = A.fromFile args
           configFile     = A.setupConfigFile args
           planFile       = A.planFile args
-      libs      <- sortLibraries . toList <$> libraries haskelPlatform libFile configFile planFile cabalFile
-      let libs' = filter ((/= "base") . fst) libs
+      libs <- sortLibraries . toList <$> libraries haskelPlatform libFile configFile planFile cabalFile
+      let libs' = libs ^.. traversed . DP.filterLibrary (DP.dependencies args)
       case A.output args of
            Just file -> liftIO $ writeFile file (prettyPrint libs')
            Nothing   -> liftIO $ putStrLn (prettyPrint libs'))
