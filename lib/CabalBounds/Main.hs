@@ -34,11 +34,14 @@ import qualified Data.HashMap.Strict as HM
 import Data.List (foldl', sortBy)
 import Data.Function (on)
 import Data.Char (toLower)
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, catMaybes)
 import qualified Data.Aeson as Aeson
 import Data.Aeson.Lens
 import qualified Data.ByteString.Lazy as BS
 import qualified Data.Text as T
+import Data.Text (Text)
+import Text.Read (readMaybe)
+
 
 #if MIN_VERSION_Cabal(1,22,0) == 0
 import Distribution.Simple.Configure (ConfigStateFileErrorType(..))
@@ -210,28 +213,29 @@ librariesFromPlanFile planFile = do
         Just json -> do
            -- get all ids: ["bytestring-0.10.6.0-2362d1f36f12553920ce3710ae4a4ecb432374f4e5feb33a61b7414b43605a0df", ...]
            let ids = json ^.. key "install-plan" . _Array . traversed . key "id" . _String
-
-           -- transform ids into: [["2362d1f36f12553920ce3710ae4a4ecb432374f4e5feb33a61b7414b43605a0df", "0.10.6.0", "bytestring"], ...]
-           let ids' = map (reverse . T.split (== '-')) ids
-
-           -- remove too short ids or ids of inplace libs
-           let ids'' = filter (\id -> length id >= 3 && (id !! 0) /= "inplace") ids'
-
-           -- drop the hash: [["0.10.6.0", "bytestring"], ...]
-           let ids''' = map (drop 1) ids''
-
-           -- transform verions into: [[0, 10, 6, 0], ...]
-           let versions = map (T.split (== '.') . head) ids'''
-           let versions' = map (map (\s -> read (T.unpack s) :: Int)) versions
-           let versions'' = map (\v -> V.Version { V.versionBranch = v, V.versionTags = [] }) versions'
-
-           let names = map (reverse . tail) ids'''
-           let names' = map (T.intercalate "-") names
-           let names'' = map T.unpack names'
-
-           right . HM.fromList $ zip names'' versions''
+           let libs = catMaybes $ map parseLibrary ids
+           right . HM.fromList $ libs
 
         Nothing   -> left $ "Couldn't parse json file '" ++ planFile ++ "'"
+   where
+      parseLibrary :: Text -> Maybe (LibName, V.Version)
+      parseLibrary text =
+         case T.breakOnEnd "-" text of
+              (_, "")         -> Nothing
+              (_, "inplace")  -> Nothing
+              (before, after) ->
+                 case parseVersion after of
+                      Just vers -> Just (T.unpack . stripSuffix "-" $ before, vers)
+                      _         -> parseLibrary $ stripSuffix "-" before
+
+      parseVersion :: Text -> Maybe V.Version
+      parseVersion text =
+         case catMaybes $ map (readMaybe . T.unpack) $ T.split (== '.') text of
+              []   -> Nothing
+              nums -> Just $ V.Version { V.versionBranch = nums, V.versionTags = [] }
+
+      stripSuffix :: Text -> Text -> Text
+      stripSuffix suffix text = fromMaybe text (T.stripSuffix suffix text)
 
 
 leftToJust :: Either a b -> Maybe a
