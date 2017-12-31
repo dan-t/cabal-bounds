@@ -1,3 +1,4 @@
+{-# Language PatternGuards #-}
 
 module Main where
 
@@ -172,7 +173,14 @@ test source testName args =
 
       diff ref new    = ["diff", "-u", ref, new]
 
-      goldenFile      = "tests" </> "goldenFiles" </> testName <.> (if hasHsOutput then "hs" else "cabal")
+      goldenFile
+         | Just src <- source
+         , src == PlanFile
+         , testName == "Libs"
+         = "tests" </> "goldenFiles" </> (show src) </> "Libs.hs"
+
+         | otherwise
+         = "tests" </> "goldenFiles" </> testName <.> (if hasHsOutput then "hs" else "cabal")
 
       outputFile      =
          case source of
