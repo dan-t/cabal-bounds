@@ -232,7 +232,7 @@ librariesFromPlanFile planFile = do
       parseVersion text =
          case catMaybes $ map (readMaybe . T.unpack) $ T.split (== '.') text of
               []   -> Nothing
-              nums -> Just $ V.Version { V.versionBranch = nums, V.versionTags = [] }
+              nums -> Just $ V.mkVersion nums
 
       stripSuffix :: Text -> Text -> Text
       stripSuffix suffix text = fromMaybe text (T.stripSuffix suffix text)
