@@ -5,7 +5,7 @@ module CabalBounds.Main
    ) where
 
 import Distribution.PackageDescription (GenericPackageDescription)
-import Distribution.PackageDescription.Parse (parsePackageDescription, ParseResult(..))
+import Distribution.PackageDescription.Parse (parseGenericPackageDescription, ParseResult(..))
 import qualified Distribution.PackageDescription.PrettyPrint as PP
 import Distribution.Simple.Configure (tryGetConfigStateFile)
 import Distribution.Simple.LocalBuildInfo (LocalBuildInfo)
@@ -132,7 +132,7 @@ findCabalFile (Just file) = right file
 packageDescription :: FilePath -> EitherT Error IO GenericPackageDescription
 packageDescription file = do
    contents <- liftIO $ SIO.readFile file
-   case parsePackageDescription contents of
+   case parseGenericPackageDescription contents of
         ParseFailed error   -> left $ show error
         ParseOk _ pkgDescrp -> right pkgDescrp
 
@@ -173,7 +173,7 @@ librariesFromFile libFile = do
    where
       libsFrom contents
          | [(libs, _)] <- reads contents :: [([(String, [Int])], String)]
-         = right $ HM.fromList (map (\(pkgName, versBranch) -> (pkgName, V.Version versBranch [])) libs)
+         = right $ HM.fromList (map (\(pkgName, versBranch) -> (pkgName, V.mkVersion versBranch)) libs)
 
          | otherwise
          = left "Invalid format of library file given to '--fromfile'. Expected file with content of type '[(String, [Int])]'."
@@ -197,7 +197,7 @@ librariesFromSetupConfig confFile = do
    where
       buildInfoLibs :: LocalBuildInfo -> LibraryMap
       buildInfoLibs = HM.fromList
-                    . map (\(P.PackageName n, v) -> (n, newestVersion v))
+                    . map (\(pkg, v) -> (P.unPackageName pkg, newestVersion v))
                     . filter ((not . null) . snd)
                     . PX.allPackagesByName . BI.installedPkgs
 

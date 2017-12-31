@@ -1,7 +1,33 @@
 #!/usr/bin/env bash
 for output in `ls outputFiles` ; do
+   if [ -f "outputFiles/$output" ]; then
+      # only call gvimdiff on files having a difference
+      outputFile=outputFiles/$output
+      goldenFile=goldenFiles/$output
+      diff $outputFile $goldenFile > /dev/null || gvimdiff -f $outputFile $goldenFile
+   fi
+done
+
+planFiles=outputFiles/PlanFile
+for output in `ls $planFiles` ; do
    # only call gvimdiff on files having a difference
-   outputFile=outputFiles/$output
+   outputFile=outputFiles/PlanFile/$output
    goldenFile=goldenFiles/$output
+   if [ -f "goldenFiles/PlanFile/$output" ]; then
+      goldenFile=goldenFiles/PlanFile/$output
+   fi
+
+   diff $outputFile $goldenFile > /dev/null || gvimdiff -f $outputFile $goldenFile
+done
+
+setupConfigFiles=outputFiles/SetupConfig
+for output in `ls setupConfigFiles` ; do
+   # only call gvimdiff on files having a difference
+   outputFile=outputFiles/SetupConfig/$output
+   goldenFile=goldenFiles/$output
+   if [ -f "goldenFiles/SetupConfig/$output" ]; then
+      goldenFile=goldenFiles/SetupConfig/$output
+   fi
+
    diff $outputFile $goldenFile > /dev/null || gvimdiff -f $outputFile $goldenFile
 done

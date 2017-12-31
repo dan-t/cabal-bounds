@@ -44,7 +44,7 @@ updateDependency (UpdateLower comp ifMissing) libs dep =
             let newLowerVersion = comp `compOf` lowerVersion
                 newLowerBound   = V.LowerBound newLowerVersion V.InclusiveBound
                 newIntervals    = (versionRange_ ^. CL.intervals) & _head . CL.lowerBound %~ updateIf (>) newLowerBound
-                vrange          = fromMaybe (V.orLaterVersion newLowerVersion) (mkVersionRange newIntervals)
+                vrange          = mkVersionRange newIntervals
             return $ dep & CL.versionRange .~ vrange
    where
       pkgName_      = dep ^. CL.packageName . _Wrapped
@@ -70,7 +70,7 @@ updateDependency (UpdateUpper comp ifMissing) libs dep =
             let newUpperVersion = nextVersion comp upperVersion
                 newUpperBound   = V.UpperBound newUpperVersion V.ExclusiveBound
                 newIntervals    = (versionRange_ ^. CL.intervals) & _last . CL.upperBound %~ updateIf (<) newUpperBound
-                vrange          = fromMaybe (V.earlierVersion newUpperVersion) (mkVersionRange newIntervals)
+                vrange          = mkVersionRange newIntervals
             return $ dep & CL.versionRange .~ vrange
    where
       versionRange_ = dep ^. CL.versionRange
@@ -95,14 +95,12 @@ updateDependency (UpdateBoth lowerComp upperComp ifMissing) libs dep =
 compOf :: VersionComp -> V.Version -> V.Version
 Major1 `compOf` version =
    version & CL.versionBranchL %~ take 1
-           & CL.versionTagsL   .~ []
 
 Major2 `compOf` version =
    version & CL.versionBranchL %~ take 2
-           & CL.versionTagsL   .~ []
 
 Minor `compOf` version =
-   version & CL.versionTagsL .~ []
+   version
 
 
 nextVersion :: VersionComp -> V.Version -> V.Version
@@ -125,5 +123,6 @@ ensureMinimalVersionBranch comp branch =
       numNeededVersionDigits Minor  = 3
 
 
-mkVersionRange :: [V.VersionInterval] -> Maybe V.VersionRange
-mkVersionRange vis = V.fromVersionIntervals <$> V.mkVersionIntervals vis
+mkVersionRange :: [V.VersionInterval] -> V.VersionRange
+mkVersionRange []  = V.anyVersion
+mkVersionRange vis = V.fromVersionIntervals . V.mkVersionIntervals $ vis

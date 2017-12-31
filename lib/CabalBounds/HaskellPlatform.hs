@@ -503,4 +503,4 @@ libs_7_10_2 =
 type VersionBranch = [Int]
 
 lib :: LibName -> VersionBranch -> Library
-lib libName branch = (libName, V.Version { V.versionBranch = branch , V.versionTags = [] })
+lib libName branch = (libName, V.mkVersion branch)

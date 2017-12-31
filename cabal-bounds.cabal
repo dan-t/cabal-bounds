@@ -1,5 +1,5 @@
 name: cabal-bounds
-version: 1.4.0
+version: 2.0.0
 cabal-version: >=1.9.2
 build-type: Simple
 license: BSD3
@@ -90,13 +90,13 @@ library
         unordered-containers >=0.2.3.3 && <0.3,
         transformers >=0.3.0.0 && <0.6,
         either >=4.1.1 && <4.5,
-        cabal-lenses >=0.5.0 && <0.6,
-        Cabal >=1.18.0 && <1.25,
+        cabal-lenses >=0.6.0 && <0.7,
+        Cabal >=2.1.0.0 && <2.2,
         filepath >=1.3 && <1.5,
         directory >=1.2 && <1.4,
         aeson >=1.2.3.0 && <1.3,
         lens-aeson >=1.0.2 && <1.1,
-        bytestring >= 0.10.8.2 && <1.0,
+        bytestring >=0.10.8.2 && <1.0,
         text >=1.1.0.1 && <1.3
     cpp-options: -DCABAL
     hs-source-dirs: lib
@@ -112,7 +112,7 @@ library
         CabalBounds.Types
     ghc-options: -W
 
-executable cabal-bounds
+executable  cabal-bounds
     main-is: Main.hs
     build-depends:
         base >=3 && <5,
@@ -120,7 +120,7 @@ executable cabal-bounds
     hs-source-dirs: exe
     ghc-options: -W
 
-test-suite cabal-bounds-tests
+test-suite  cabal-bounds-tests
     type: exitcode-stdio-1.0
     main-is: Main.hs
     build-depends:
