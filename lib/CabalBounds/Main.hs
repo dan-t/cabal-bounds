@@ -18,9 +18,9 @@ import qualified CabalBounds.Args as A
 import qualified CabalBounds.Bound as B
 import qualified CabalBounds.Sections as S
 import qualified CabalBounds.Dependencies as DP
-import qualified CabalBounds.Drop as D
+import qualified CabalBounds.Drop as DR
 import qualified CabalBounds.Update as U
-import qualified CabalBounds.Dump as D
+import qualified CabalBounds.Dump as DU
 import qualified CabalBounds.HaskellPlatform as HP
 import CabalBounds.Types
 import qualified CabalLenses as CL
@@ -31,7 +31,7 @@ import Control.Monad.Trans.Either (EitherT, runEitherT, bimapEitherT, hoistEithe
 import Control.Monad.IO.Class
 import Control.Lens
 import qualified Data.HashMap.Strict as HM
-import Data.List (foldl', sortBy, find)
+import Data.List (foldl', sortBy)
 import Data.Function (on)
 import Data.Char (toLower)
 import Data.Maybe (fromMaybe)
@@ -61,17 +61,15 @@ type CabalFile = FilePath
 
 
 cabalBounds :: A.Args -> IO (Maybe Error)
-cabalBounds args'@A.Drop {} =
+cabalBounds args@A.Drop {} =
    leftToJust <$> runEitherT (do
       cabalFile <- findCabalFile $ A.cabalFile args
       pkgDescrp <- packageDescription cabalFile
-      let pkgDescrp' = D.drop (B.boundOfDrop args) (S.sections args pkgDescrp) (DP.dependencies args) pkgDescrp
+      let pkgDescrp' = DR.drop (B.boundOfDrop args) (S.sections args pkgDescrp) (DP.dependencies args) pkgDescrp
       let outputFile = fromMaybe cabalFile (A.output args)
       liftIO $ writeFile outputFile (showGenericPackageDescription pkgDescrp'))
-   where
-      args = ignoreBaseLibrary args'
 
-cabalBounds args'@A.Update {} =
+cabalBounds args@A.Update {} =
    leftToJust <$> runEitherT (do
       cabalFile <- findCabalFile $ A.cabalFile args
       pkgDescrp <- packageDescription cabalFile
@@ -83,22 +81,18 @@ cabalBounds args'@A.Update {} =
       let pkgDescrp' = U.update (B.boundOfUpdate args) (S.sections args pkgDescrp) (DP.dependencies args) libs pkgDescrp
       let outputFile = fromMaybe cabalFile (A.output args)
       liftIO $ writeFile outputFile (showGenericPackageDescription pkgDescrp'))
-   where
-      args = ignoreBaseLibrary args'
 
-cabalBounds args'@A.Dump {} =
+cabalBounds args@A.Dump {} =
    leftToJust <$> runEitherT (do
       cabalFiles <- if null $ A.cabalFiles args
                        then (: []) <$> findCabalFile Nothing
                        else right $ A.cabalFiles args
 
       pkgDescrps <- packageDescriptions cabalFiles
-      let libs = sortLibraries $ D.dump (DP.dependencies args) pkgDescrps
+      let libs = sortLibraries $ DU.dump (DP.dependencies args) pkgDescrps
       case A.output args of
            Just file -> liftIO $ writeFile file (prettyPrint libs)
            Nothing   -> liftIO $ putStrLn (prettyPrint libs))
-   where
-      args = ignoreBaseLibrary args'
 
 cabalBounds args@A.Libs {} =
    leftToJust <$> runEitherT (do
@@ -130,13 +124,6 @@ findCabalFile Nothing = do
    CL.findCabalFile curDir
 
 findCabalFile (Just file) = right file
-
-
-ignoreBaseLibrary :: A.Args -> A.Args
-ignoreBaseLibrary args =
-   case find (== "base") (A.ignore args) of
-        Just _  -> args
-        Nothing -> args { A.ignore = "base" : A.ignore args }
 
 
 packageDescription :: FilePath -> EitherT Error IO GenericPackageDescription

@@ -149,29 +149,30 @@ test source testName args =
          case args of
               Drop {}   -> args { cabalFile = Just inputFile
                                 , output    = Just outputFile
+                                , ignore    = ["base"] ++ ignore args
                                 }
               Update {} -> args { cabalFile       = Just inputFile
                                 , output          = Just outputFile
                                 , setupConfigFile = setupConfigFile
                                 , planFile        = planFile
+                                , ignore          = ["base"] ++ ignore args
                                 }
 
               Dump {}   -> args { cabalFiles = [inputFile]
                                 , output     = Just outputFile
+                                , ignore     = ["base"] ++ ignore args
                                 }
 
               Libs {}   -> args { cabalFile       = Just inputFile
                                 , output          = Just outputFile
                                 , setupConfigFile = setupConfigFile
                                 , planFile        = planFile
+                                , ignore          = ["base", "ghc-prim", "integer-gmp", "rts"] ++ ignore args
                                 }
 
       diff ref new    = ["diff", "-u", ref, new]
 
-      goldenFile      =
-         if source == Just PlanFile && testName == "Libs"
-            then "tests" </> "goldenFiles" </> "PlanFile" </> "Libs.hs"
-            else "tests" </> "goldenFiles" </> testName <.> (if hasHsOutput then "hs" else "cabal")
+      goldenFile      = "tests" </> "goldenFiles" </> testName <.> (if hasHsOutput then "hs" else "cabal")
 
       outputFile      =
          case source of
