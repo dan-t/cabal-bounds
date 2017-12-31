@@ -70,7 +70,6 @@ extra-source-files:
     tests/inputFiles/setup-config-build-env/libs/D/D.hs
     tests/goldenFiles/*.cabal
     tests/goldenFiles/*.hs
-    tests/goldenFiles/PlanFile/Libs.hs
     tests/outputFiles/SetupConfig/.gitignore
     tests/outputFiles/PlanFile/.gitignore
 
