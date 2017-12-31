@@ -9,8 +9,9 @@ import qualified CabalLenses as CL
 type LibName    = String
 type LibVersion = [Int]
 type Library    = (LibName, LibVersion)
-type Libraries  = HM.HashMap LibName V.Version
+type Libraries  = [Library]
+type LibraryMap = HM.HashMap LibName V.Version
 
-toList :: Libraries -> [Library]
+toList :: LibraryMap -> Libraries
 toList libs =
    map (\(name, version) -> (name, version ^. CL.versionBranchL)) $ HM.toList libs

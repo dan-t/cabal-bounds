@@ -2,7 +2,6 @@
 
 module CabalBounds.Update
    ( update
-   , Libraries
    ) where
 
 import qualified Distribution.PackageDescription as D
@@ -23,7 +22,7 @@ import Control.Applicative ((<$>))
 #endif
 
 
-update :: UpdateBound -> [CL.Section] -> Dependencies -> Libraries -> D.GenericPackageDescription -> D.GenericPackageDescription
+update :: UpdateBound -> [CL.Section] -> Dependencies -> LibraryMap -> D.GenericPackageDescription -> D.GenericPackageDescription
 update bound sections deps libs pkgDescrp =
    foldl' updateSection pkgDescrp sections
    where
@@ -35,7 +34,7 @@ update bound sections deps libs pkgDescrp =
       condVars  = CL.fromDefaults pkgDescrp
 
 
-updateDependency :: UpdateBound -> Libraries -> P.Dependency -> P.Dependency
+updateDependency :: UpdateBound -> LibraryMap -> P.Dependency -> P.Dependency
 updateDependency (UpdateLower comp ifMissing) libs dep =
    fromMaybe dep $
       if ifMissing && lowerBound_ /= CL.noLowerBound

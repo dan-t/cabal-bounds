@@ -13,7 +13,7 @@ import CabalBounds.Types
 import Control.Lens
 
 
-dump :: Dependencies -> [GenericPackageDescription] -> [Library]
+dump :: Dependencies -> [GenericPackageDescription] -> Libraries
 dump deps pkgDescrps = HM.toList $ foldl' addLibsFromPkgDescrp HM.empty pkgDescrps
    where
       addLibsFromPkgDescrp libs pkgDescrp =

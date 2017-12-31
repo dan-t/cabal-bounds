@@ -114,11 +114,11 @@ cabalBounds args@A.Libs {} =
            Nothing   -> liftIO $ putStrLn (prettyPrint libs'))
 
 
-sortLibraries :: [Library] -> [Library]
+sortLibraries :: Libraries -> Libraries
 sortLibraries = sortBy (compare `on` (map toLower . fst))
 
 
-prettyPrint :: [Library] -> String
+prettyPrint :: Libraries -> String
 prettyPrint []     = "[]"
 prettyPrint (l:ls) =
    "[ " ++ show l ++ "\n" ++ foldl' (\str l -> str ++ ", " ++ show l ++ "\n") "" ls ++ "]\n";
@@ -152,7 +152,7 @@ packageDescriptions []    = left "Missing cabal file"
 packageDescriptions files = mapM packageDescription files
 
 
-libraries :: HP.HPVersion -> LibraryFile -> Maybe SetupConfigFile -> Maybe PlanFile -> CabalFile -> EitherT Error IO Libraries
+libraries :: HP.HPVersion -> LibraryFile -> Maybe SetupConfigFile -> Maybe PlanFile -> CabalFile -> EitherT Error IO LibraryMap
 libraries "" "" (Just confFile) _ _ = do
    librariesFromSetupConfig confFile
 
@@ -175,7 +175,7 @@ libraries hpVersion libFile _ _ _ = do
    right $ HM.union hpLibs libsFromFile
 
 
-librariesFromFile :: LibraryFile -> EitherT Error IO Libraries
+librariesFromFile :: LibraryFile -> EitherT Error IO LibraryMap
 librariesFromFile ""      = right HM.empty
 librariesFromFile libFile = do
    contents <- liftIO $ SIO.readFile libFile
@@ -189,7 +189,7 @@ librariesFromFile libFile = do
          = left "Invalid format of library file given to '--fromfile'. Expected file with content of type '[(String, [Int])]'."
 
 
-haskellPlatformLibraries :: HP.HPVersion -> EitherT Error IO Libraries
+haskellPlatformLibraries :: HP.HPVersion -> EitherT Error IO LibraryMap
 haskellPlatformLibraries hpVersion =
    case hpVersion of
         ""         -> right HM.empty
@@ -199,13 +199,13 @@ haskellPlatformLibraries hpVersion =
                 | otherwise                           -> left $ "Invalid haskell platform version '" ++ version ++ "'"
 
 
-librariesFromSetupConfig :: SetupConfigFile -> EitherT Error IO Libraries
+librariesFromSetupConfig :: SetupConfigFile -> EitherT Error IO LibraryMap
 librariesFromSetupConfig ""       = right HM.empty
 librariesFromSetupConfig confFile = do
    binfo <- liftIO $ tryGetConfigStateFile confFile
    bimapEitherT show buildInfoLibs (hoistEither binfo)
    where
-      buildInfoLibs :: LocalBuildInfo -> Libraries
+      buildInfoLibs :: LocalBuildInfo -> LibraryMap
       buildInfoLibs = HM.fromList
                     . map (\(P.PackageName n, v) -> (n, newestVersion v))
                     . filter ((not . null) . snd)
@@ -215,7 +215,7 @@ librariesFromSetupConfig confFile = do
       newestVersion = maximum . map (P.pkgVersion . PI.sourcePackageId)
 
 
-librariesFromPlanFile :: PlanFile -> EitherT Error IO Libraries
+librariesFromPlanFile :: PlanFile -> EitherT Error IO LibraryMap
 librariesFromPlanFile planFile = do
    contents <- liftIO $ BS.readFile planFile
    let json = Aeson.decode contents :: Maybe Aeson.Value
