@@ -5,7 +5,8 @@ module CabalBounds.Main
    ) where
 
 import Distribution.PackageDescription (GenericPackageDescription)
-import Distribution.PackageDescription.Parse (parseGenericPackageDescription, ParseResult(..))
+import Distribution.PackageDescription.Parsec (parseGenericPackageDescription, runParseResult, ParseResult(..))
+import Distribution.Parsec.Common (PWarning)
 import qualified Distribution.PackageDescription.PrettyPrint as PP
 import Distribution.Simple.Configure (tryGetConfigStateFile)
 import Distribution.Simple.LocalBuildInfo (LocalBuildInfo)
@@ -37,9 +38,11 @@ import Data.Char (toLower)
 import Data.Maybe (fromMaybe, catMaybes)
 import qualified Data.Aeson as Aeson
 import Data.Aeson.Lens
-import qualified Data.ByteString.Lazy as BS
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Lazy as LBS
 import qualified Data.Text as T
 import Data.Text (Text)
+import qualified Data.List as L
 import Text.Read (readMaybe)
 
 
@@ -131,10 +134,17 @@ findCabalFile (Just file) = right file
 
 packageDescription :: FilePath -> EitherT Error IO GenericPackageDescription
 packageDescription file = do
-   contents <- liftIO $ SIO.readFile file
-   case parseGenericPackageDescription contents of
-        ParseFailed error   -> left $ show error
-        ParseOk _ pkgDescrp -> right pkgDescrp
+   contents <- liftIO $ BS.readFile file
+   let (warnings, result) = runParseResult $ parseGenericPackageDescription contents
+   liftIO $ showWarnings warnings
+   case result of
+        Left (_, errors) -> left $ show errors
+        Right pkgDescrp  -> right pkgDescrp
+
+   where
+      showWarnings :: [PWarning] -> IO ()
+      showWarnings [] = return ()
+      showWarnings ws = putStrLn $ "cabal-bounds: " ++ (L.intercalate ", " $ map show ws)
 
 
 packageDescriptions :: [FilePath] -> EitherT Error IO [GenericPackageDescription]
@@ -207,7 +217,7 @@ librariesFromSetupConfig confFile = do
 
 librariesFromPlanFile :: PlanFile -> EitherT Error IO LibraryMap
 librariesFromPlanFile planFile = do
-   contents <- liftIO $ BS.readFile planFile
+   contents <- liftIO $ LBS.readFile planFile
    let json = Aeson.decode contents :: Maybe Aeson.Value
    case json of
         Just json -> do
