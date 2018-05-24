@@ -5,7 +5,7 @@ module CabalBounds.Main
    ) where
 
 import Distribution.PackageDescription (GenericPackageDescription)
-import Distribution.PackageDescription.Parsec (parseGenericPackageDescription, runParseResult, ParseResult(..))
+import Distribution.PackageDescription.Parsec (parseGenericPackageDescription, runParseResult)
 import Distribution.Parsec.Common (PWarning)
 import qualified Distribution.PackageDescription.PrettyPrint as PP
 import Distribution.Simple.Configure (tryGetConfigStateFile)
