@@ -1,3 +1,9 @@
+1.6.0
+-----
+* Support Cabal 2.2
+* Tested with GHC 8.4.2
+* Added cabal-bounds command 'format', for just reformating the cabal file
+
 1.5.0
 -----
 * Support Cabal 2.1

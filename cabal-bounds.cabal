@@ -1,10 +1,12 @@
-name: cabal-bounds
-version: 1.5.0
 cabal-version: >=1.9.2
-build-type: Simple
+name: cabal-bounds
+version: 1.6.0
 license: BSD3
 license-file: LICENSE
 maintainer: daniel.trstenjak@gmail.com
+author: Daniel Trstenjak
+tested-with: ghc ==7.6.2 ghc ==7.6.3 ghc ==7.8.3 ghc ==7.10.1
+             ghc ==8.0.1 ghc ==8.2.1 ghc ==8.4.2
 synopsis: A command line program for managing the bounds/versions of the dependencies in a cabal file.
 description:
     A command line program for managing the bounds/versions of the dependencies in a cabal file.
@@ -45,9 +47,7 @@ description:
     .
     > $ cabal-bounds drop --executable=blub
 category: Utils, Development
-author: Daniel Trstenjak
-tested-with: GHC ==7.6.2 GHC ==7.6.3 GHC ==7.8.3 GHC ==7.10.1
-             GHC ==8.0.1 GHC ==8.2.1
+build-type: Simple
 extra-source-files:
     README.md
     CHANGELOG
@@ -83,6 +83,19 @@ library
         CabalBounds.Args
         CabalBounds.Main
         CabalBounds.VersionComp
+    cpp-options: -DCABAL
+    hs-source-dirs: lib
+    other-modules:
+        Paths_cabal_bounds
+        CabalBounds.Bound
+        CabalBounds.Sections
+        CabalBounds.Dependencies
+        CabalBounds.Drop
+        CabalBounds.Update
+        CabalBounds.Dump
+        CabalBounds.HaskellPlatform
+        CabalBounds.Types
+    ghc-options: -W
     build-depends:
         base >=4.6.0.0 && <5,
         cmdargs >=0.10.5 && <0.11,
@@ -99,31 +112,20 @@ library
         lens-aeson >=1.0.2 && <1.1,
         bytestring >=0.10.8.2 && <1.0,
         text >=1.1.0.1 && <1.3
-    cpp-options: -DCABAL
-    hs-source-dirs: lib
-    other-modules:
-        Paths_cabal_bounds
-        CabalBounds.Bound
-        CabalBounds.Sections
-        CabalBounds.Dependencies
-        CabalBounds.Drop
-        CabalBounds.Update
-        CabalBounds.Dump
-        CabalBounds.HaskellPlatform
-        CabalBounds.Types
-    ghc-options: -W
 
-executable  cabal-bounds
+executable cabal-bounds
     main-is: Main.hs
+    hs-source-dirs: exe
+    ghc-options: -W
     build-depends:
         base >=3 && <5,
         cabal-bounds -any
-    hs-source-dirs: exe
-    ghc-options: -W
 
-test-suite  cabal-bounds-tests
+test-suite cabal-bounds-tests
     type: exitcode-stdio-1.0
     main-is: Main.hs
+    hs-source-dirs: tests
+    ghc-options: -W
     build-depends:
         base >=3 && <5,
         tasty >=0.9.0.1 && <1.2,
@@ -133,5 +135,3 @@ test-suite  cabal-bounds-tests
         directory >=1.2 && <1.4,
         Glob >=0.7 && <0.10,
         cabal-bounds -any
-    hs-source-dirs: tests
-    ghc-options: -W
