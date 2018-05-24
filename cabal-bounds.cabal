@@ -1,6 +1,6 @@
 cabal-version: >=1.9.2
 name: cabal-bounds
-version: 1.6.0
+version: 2.0.0
 license: BSD3
 license-file: LICENSE
 maintainer: daniel.trstenjak@gmail.com
