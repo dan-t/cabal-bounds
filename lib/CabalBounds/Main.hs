@@ -28,7 +28,7 @@ import qualified CabalLenses as CL
 import qualified System.IO.Strict as SIO
 import System.FilePath ((</>))
 import System.Directory (getCurrentDirectory)
-import Control.Monad.Trans.Either (EitherT, runEitherT, bimapEitherT, hoistEither, left, right)
+import Control.Monad.Trans.Except (ExceptT, throwE, runExceptT)
 import Control.Monad.IO.Class
 import Control.Lens
 import qualified Data.HashMap.Strict as HM
@@ -68,7 +68,7 @@ type CabalFile = FilePath
 
 cabalBounds :: A.Args -> IO (Maybe Error)
 cabalBounds args@A.Drop {} =
-   leftToJust <$> runEitherT (do
+   leftToJust <$> runExceptT (do
       cabalFile <- findCabalFile $ A.cabalFile args
       pkgDescrp <- packageDescription cabalFile
       let pkgDescrp' = DR.drop (B.boundOfDrop args) (S.sections args pkgDescrp) (DP.dependencies args) pkgDescrp
@@ -76,7 +76,7 @@ cabalBounds args@A.Drop {} =
       liftIO $ writeFile outputFile (showGenericPackageDescription pkgDescrp'))
 
 cabalBounds args@A.Update {} =
-   leftToJust <$> runEitherT (do
+   leftToJust <$> runExceptT (do
       cabalFile <- findCabalFile $ A.cabalFile args
       pkgDescrp <- packageDescription cabalFile
       let haskelPlatform = A.haskellPlatform args
@@ -89,10 +89,10 @@ cabalBounds args@A.Update {} =
       liftIO $ writeFile outputFile (showGenericPackageDescription pkgDescrp'))
 
 cabalBounds args@A.Dump {} =
-   leftToJust <$> runEitherT (do
+   leftToJust <$> runExceptT (do
       cabalFiles <- if null $ A.cabalFiles args
                        then (: []) <$> findCabalFile Nothing
-                       else right $ A.cabalFiles args
+                       else return $ A.cabalFiles args
 
       pkgDescrps <- packageDescriptions cabalFiles
       let libs = sortLibraries $ DU.dump (DP.dependencies args) pkgDescrps
@@ -101,7 +101,7 @@ cabalBounds args@A.Dump {} =
            Nothing   -> liftIO $ putStrLn (prettyPrint libs))
 
 cabalBounds args@A.Libs {} =
-   leftToJust <$> runEitherT (do
+   leftToJust <$> runExceptT (do
       cabalFile <- findCabalFile $ A.cabalFile args
       let haskelPlatform = A.haskellPlatform args
           libFile        = A.fromFile args
@@ -115,7 +115,7 @@ cabalBounds args@A.Libs {} =
 
 
 cabalBounds args@A.Format {} =
-   leftToJust <$> runEitherT (do
+   leftToJust <$> runExceptT (do
       cabalFile <- findCabalFile $ A.cabalFile args
       pkgDescrp <- packageDescription cabalFile
       let outputFile = fromMaybe cabalFile (A.output args)
@@ -132,22 +132,22 @@ prettyPrint (l:ls) =
    "[ " ++ show l ++ "\n" ++ foldl' (\str l -> str ++ ", " ++ show l ++ "\n") "" ls ++ "]\n";
 
 
-findCabalFile :: Maybe CabalFile -> EitherT Error IO CabalFile
+findCabalFile :: Maybe CabalFile -> ExceptT Error IO CabalFile
 findCabalFile Nothing = do
    curDir <- liftIO getCurrentDirectory
    CL.findCabalFile curDir
 
-findCabalFile (Just file) = right file
+findCabalFile (Just file) = return file
 
 
-packageDescription :: FilePath -> EitherT Error IO GenericPackageDescription
+packageDescription :: FilePath -> ExceptT Error IO GenericPackageDescription
 packageDescription file = do
    contents <- liftIO $ BS.readFile file
    let (warnings, result) = runParseResult $ parseGenericPackageDescription contents
    liftIO $ showWarnings warnings
    case result of
-        Left (_, errors) -> left $ show errors
-        Right pkgDescrp  -> right pkgDescrp
+        Left (_, errors) -> throwE $ show errors
+        Right pkgDescrp  -> return pkgDescrp
 
    where
       showWarnings :: [PWarning] -> IO ()
@@ -155,12 +155,12 @@ packageDescription file = do
       showWarnings ws = putStrLn $ "cabal-bounds: " ++ (L.intercalate ", " $ map show ws)
 
 
-packageDescriptions :: [FilePath] -> EitherT Error IO [GenericPackageDescription]
-packageDescriptions []    = left "Missing cabal file"
+packageDescriptions :: [FilePath] -> ExceptT Error IO [GenericPackageDescription]
+packageDescriptions []    = throwE "Missing cabal file"
 packageDescriptions files = mapM packageDescription files
 
 
-libraries :: HP.HPVersion -> LibraryFile -> Maybe SetupConfigFile -> Maybe PlanFile -> CabalFile -> EitherT Error IO LibraryMap
+libraries :: HP.HPVersion -> LibraryFile -> Maybe SetupConfigFile -> Maybe PlanFile -> CabalFile -> ExceptT Error IO LibraryMap
 libraries "" "" (Just confFile) _ _ = do
    librariesFromSetupConfig confFile
 
@@ -175,43 +175,45 @@ libraries "" "" Nothing Nothing cabalFile = do
            newDistDir <- liftIO $ CL.findNewDistDir cabalFile
            case newDistDir of
                 Just newDistDir -> librariesFromPlanFile $ newDistDir </> "cache" </> "plan.json"
-                Nothing         -> left "Couldn't find 'dist' nor 'dist-newstyle' directory! Have you already build the cabal project?"
+                Nothing         -> throwE "Couldn't find 'dist' nor 'dist-newstyle' directory! Have you already build the cabal project?"
 
 libraries hpVersion libFile _ _ _ = do
    hpLibs       <- haskellPlatformLibraries hpVersion
    libsFromFile <- librariesFromFile libFile
-   right $ HM.union hpLibs libsFromFile
+   return $ HM.union hpLibs libsFromFile
 
 
-librariesFromFile :: LibraryFile -> EitherT Error IO LibraryMap
-librariesFromFile ""      = right HM.empty
+librariesFromFile :: LibraryFile -> ExceptT Error IO LibraryMap
+librariesFromFile ""      = return HM.empty
 librariesFromFile libFile = do
    contents <- liftIO $ SIO.readFile libFile
    libsFrom contents
    where
       libsFrom contents
          | [(libs, _)] <- reads contents :: [([(String, [Int])], String)]
-         = right $ HM.fromList (map (\(pkgName, versBranch) -> (pkgName, V.mkVersion versBranch)) libs)
+         = return $ HM.fromList (map (\(pkgName, versBranch) -> (pkgName, V.mkVersion versBranch)) libs)
 
          | otherwise
-         = left "Invalid format of library file given to '--fromfile'. Expected file with content of type '[(String, [Int])]'."
+         = throwE "Invalid format of library file given to '--fromfile'. Expected file with content of type '[(String, [Int])]'."
 
 
-haskellPlatformLibraries :: HP.HPVersion -> EitherT Error IO LibraryMap
+haskellPlatformLibraries :: HP.HPVersion -> ExceptT Error IO LibraryMap
 haskellPlatformLibraries hpVersion =
    case hpVersion of
-        ""         -> right HM.empty
-        "current"  -> right . HM.fromList $ HP.currentLibraries
-        "previous" -> right . HM.fromList $ HP.previousLibraries
-        version | Just libs <- HP.librariesOf version -> right . HM.fromList $ libs
-                | otherwise                           -> left $ "Invalid haskell platform version '" ++ version ++ "'"
+        ""         -> return HM.empty
+        "current"  -> return . HM.fromList $ HP.currentLibraries
+        "previous" -> return . HM.fromList $ HP.previousLibraries
+        version | Just libs <- HP.librariesOf version -> return . HM.fromList $ libs
+                | otherwise                           -> throwE $ "Invalid haskell platform version '" ++ version ++ "'"
 
 
-librariesFromSetupConfig :: SetupConfigFile -> EitherT Error IO LibraryMap
-librariesFromSetupConfig ""       = right HM.empty
+librariesFromSetupConfig :: SetupConfigFile -> ExceptT Error IO LibraryMap
+librariesFromSetupConfig ""       = return HM.empty
 librariesFromSetupConfig confFile = do
    binfo <- liftIO $ tryGetConfigStateFile confFile
-   bimapEitherT show buildInfoLibs (hoistEither binfo)
+   case binfo of
+        Left e   -> throwE $ show e
+        Right bi -> return $ buildInfoLibs bi
    where
       buildInfoLibs :: LocalBuildInfo -> LibraryMap
       buildInfoLibs = HM.fromList
@@ -223,7 +225,7 @@ librariesFromSetupConfig confFile = do
       newestVersion = maximum . map (P.pkgVersion . PI.sourcePackageId)
 
 
-librariesFromPlanFile :: PlanFile -> EitherT Error IO LibraryMap
+librariesFromPlanFile :: PlanFile -> ExceptT Error IO LibraryMap
 librariesFromPlanFile planFile = do
    contents <- liftIO $ LBS.readFile planFile
    let json = Aeson.decode contents :: Maybe Aeson.Value
@@ -232,9 +234,9 @@ librariesFromPlanFile planFile = do
            -- get all ids: ["bytestring-0.10.6.0-2362d1f36f12553920ce3710ae4a4ecb432374f4e5feb33a61b7414b43605a0df", ...]
            let ids = json ^.. key "install-plan" . _Array . traversed . key "id" . _String
            let libs = catMaybes $ map parseLibrary ids
-           right . HM.fromList $ libs
+           return . HM.fromList $ libs
 
-        Nothing   -> left $ "Couldn't parse json file '" ++ planFile ++ "'"
+        Nothing   -> throwE $ "Couldn't parse json file '" ++ planFile ++ "'"
    where
       parseLibrary :: Text -> Maybe (LibName, V.Version)
       parseLibrary text =
