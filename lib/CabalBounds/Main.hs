@@ -114,6 +114,14 @@ cabalBounds args@A.Libs {} =
            Nothing   -> liftIO $ putStrLn (prettyPrint libs'))
 
 
+cabalBounds args@A.Format {} =
+   leftToJust <$> runEitherT (do
+      cabalFile <- findCabalFile $ A.cabalFile args
+      pkgDescrp <- packageDescription cabalFile
+      let outputFile = fromMaybe cabalFile (A.output args)
+      liftIO $ writeFile outputFile (showGenericPackageDescription pkgDescrp))
+
+
 sortLibraries :: Libraries -> Libraries
 sortLibraries = sortBy (compare `on` (map toLower . fst))
 

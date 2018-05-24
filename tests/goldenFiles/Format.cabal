@@ -1,0 +1,95 @@
+cabal-version: >=1.9.2
+name: setup-config
+version: 0.1
+license: UnspecifiedLicense
+maintainer: daniel.trstenjak@gmail.com
+author: Daniel Trstenjak
+build-type: Simple
+
+library
+    exposed-modules:
+        CabalBounds.Args
+        CabalBounds.Command
+        CabalBounds.Execute
+        CabalBounds.Lenses
+    hs-source-dirs: src
+    other-modules:
+        Paths_setup_config
+    build-depends:
+        base >=3,
+        A >=0.1 && <0.2,
+        B >=0.2 && <0.3,
+        C >=0.3 && <0.4,
+        D >=0.7
+
+executable cabal-bounds
+    main-is: ExeMain1.hs
+    cpp-options: -DCABAL
+    hs-source-dirs: src
+    other-modules:
+        Paths_setup_config
+        CabalBounds.Args
+        CabalBounds.Command
+        CabalBounds.Execute
+        CabalBounds.Lenses
+    ghc-options: -W
+    build-depends:
+        base >=3,
+        A >=0.1 && <0.2,
+        B >=0.2 && <0.3,
+        C >=0.3 && <0.4,
+        D <0.9
+
+executable other-exe
+    main-is: ExeMain2.hs
+    cpp-options: -DCABAL
+    hs-source-dirs: src
+    other-modules:
+        Paths_setup_config
+        CabalBounds.Args
+        CabalBounds.Command
+        CabalBounds.Execute
+        CabalBounds.Lenses
+    ghc-options: -W
+    build-depends:
+        base >=3,
+        A >=0.1 && <0.2,
+        B >=0.2 && <0.3,
+        C >=0.3 && <0.4,
+        D -any
+
+test-suite some-test
+    type: exitcode-stdio-1.0
+    main-is: TestMain1.hs
+    hs-source-dirs: src
+    other-modules:
+        Paths_setup_config
+        CabalBounds.Args
+        CabalBounds.Command
+        CabalBounds.Execute
+        CabalBounds.Lenses
+    ghc-options: -W
+    build-depends:
+        base >=3,
+        A >=0.1 && <0.2,
+        B >=0.2 && <0.3,
+        C >=0.3 && <0.4,
+        D -any
+
+test-suite other-test
+    type: exitcode-stdio-1.0
+    main-is: TestMain2.hs
+    hs-source-dirs: src
+    other-modules:
+        Paths_setup_config
+        CabalBounds.Args
+        CabalBounds.Command
+        CabalBounds.Execute
+        CabalBounds.Lenses
+    ghc-options: -W
+    build-depends:
+        base >=3,
+        A >=0.1 && <0.2,
+        B >=0.2 && <0.3,
+        C >=0.3 && <0.4,
+        D <1.0

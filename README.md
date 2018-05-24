@@ -180,7 +180,4 @@ Issues
 Perhaps the currently most annoying thing is, that you have to live with the reformating of your
 `cabal` file done by the pretty printer of the `Cabal` library.
 
-To reformat your `cabal` file without changing any bounds you can call `cabal-bounds` with the name of
-a section that isn't present in the `cabal` file:
-
-    $> cabal-bounds drop --executable=blub
+To only reformat your `cabal` file you can call `cabal-bounds format`.

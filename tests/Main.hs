@@ -61,7 +61,7 @@ buildSource source = do
 
 
 tests :: T.TestTree
-tests = T.testGroup "Tests" [ T.testGroup "Sourceless Tests" [dropTests, dumpTests]
+tests = T.testGroup "Tests" [ T.testGroup "Sourceless Tests" [dropTests, dumpTests, formatTests]
                             , T.testGroup "SetupConfig Tests" [updateTests SetupConfig, libsTests SetupConfig]
                             , T.testGroup "PlanFile Tests" [updateTests PlanFile, libsTests PlanFile]
                             ]
@@ -130,6 +130,12 @@ dumpTests = T.testGroup "Dump Tests"
    ]
 
 
+formatTests :: T.TestTree
+formatTests = T.testGroup "Format Tests"
+   [ test Nothing "Format" defaultFormat
+   ]
+
+
 libsTests :: LibsSource -> T.TestTree
 libsTests source = T.testGroup "Libs Tests"
    [ test (Just source) "Libs" defaultLibs
@@ -169,6 +175,10 @@ test source testName args =
                                 , setupConfigFile = setupConfigFile
                                 , planFile        = planFile
                                 , ignore          = ["base", "ghc-prim", "integer-gmp", "rts"] ++ ignore args
+                                }
+
+              Format {} -> args { cabalFile = Just inputFile
+                                , output    = Just outputFile
                                 }
 
       diff ref new    = ["diff", "-u", ref, new]

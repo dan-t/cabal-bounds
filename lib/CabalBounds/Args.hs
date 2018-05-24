@@ -8,6 +8,7 @@ module CabalBounds.Args
    , defaultUpdate
    , defaultDump
    , defaultLibs
+   , defaultFormat
    ) where
 
 import System.Console.CmdArgs hiding (ignore)
@@ -49,23 +50,26 @@ data Args = Drop { upper      :: Bool
                    }
           | Dump { only       :: [String]
                  , ignore     :: [String]
-                 , output     :: Maybe String
+                 , output     :: Maybe FilePath
                  , cabalFiles :: [FilePath]
                  }
           | Libs { only            :: [String]
                  , ignore          :: [String]
-                 , output          :: Maybe String
+                 , output          :: Maybe FilePath
                  , fromFile        :: FilePath
                  , haskellPlatform :: String
                  , cabalFile       :: Maybe FilePath
                  , setupConfigFile :: Maybe FilePath
                  , planFile        :: Maybe FilePath
                  }
+          | Format { output    :: Maybe FilePath
+                   , cabalFile :: Maybe FilePath
+                   }
           deriving (Data, Typeable, Show, Eq)
 
 
 get :: IO Args
-get = cmdArgsRun . cmdArgsMode $ modes [dropArgs, updateArgs, dumpArgs, libsArgs]
+get = cmdArgsRun . cmdArgsMode $ modes [dropArgs, updateArgs, dumpArgs, libsArgs, formatArgs]
    &= program "cabal-bounds"
    &= summary summaryInfo
    &= help "A command line program for managing the bounds/versions of the dependencies in a cabal file."
@@ -133,6 +137,13 @@ defaultLibs = Libs
    }
 
 
+defaultFormat :: Args
+defaultFormat = Format
+   { output    = def
+   , cabalFile = def
+   }
+
+
 dropArgs :: Args
 dropArgs = Drop
    { upper      = def &= explicit &= name "upper" &= name "U"
@@ -180,11 +191,19 @@ dumpArgs = Dump
 
 libsArgs :: Args
 libsArgs = Libs
-   { output     = def &= explicit &= typ "FILE" &= name "output" &= name "o"
-                      &= help "Save the libraries cabal-bounds would use for its update run to file, if empty, then they're written to stdout."
+   { output          = def &= explicit &= typ "FILE" &= name "output" &= name "o"
+                           &= help "Save the libraries cabal-bounds would use for its update run to file, if empty, then they're written to stdout."
    , fromFile        = def &= typ "FILE" &= help "Use the library versions specified in the given file."
    , haskellPlatform = def &= explicit &= typ "VERSION" &= name "haskell-platform"
                            &= help "Use the library versions of the specified haskell platform version"
+   }
+
+
+formatArgs :: Args
+formatArgs = Format
+   { output    = def &= explicit &= typ "FILE" &= name "output" &= name "o"
+                     &= help "Save the formated cabal file to file, if empty, the cabal file is modified inplace."
+   , cabalFile = def &= CmdArgs.ignore
    }
 
 
