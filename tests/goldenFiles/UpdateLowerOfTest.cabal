@@ -1,9 +1,9 @@
+cabal-version: >=1.9.2
 name: setup-config
 version: 0.1
 license: UnspecifiedLicense
 maintainer: daniel.trstenjak@gmail.com
 author: Daniel Trstenjak
-cabal-version: >=1.9.2
 build-type: Simple
 
 library
@@ -24,7 +24,6 @@ library
 
 executable cabal-bounds
     main-is: ExeMain1.hs
-    scope: unknown
     cpp-options: -DCABAL
     hs-source-dirs: src
     other-modules:
@@ -43,7 +42,6 @@ executable cabal-bounds
 
 executable other-exe
     main-is: ExeMain2.hs
-    scope: unknown
     cpp-options: -DCABAL
     hs-source-dirs: src
     other-modules:
