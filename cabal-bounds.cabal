@@ -1,12 +1,12 @@
 cabal-version: >=1.9.2
 name: cabal-bounds
-version: 2.0.0
+version: 2.1.0
 license: BSD3
 license-file: LICENSE
 maintainer: daniel.trstenjak@gmail.com
 author: Daniel Trstenjak
 tested-with: ghc ==7.6.2 ghc ==7.6.3 ghc ==7.8.3 ghc ==7.10.1
-             ghc ==8.0.1 ghc ==8.2.1 ghc ==8.4.2
+             ghc ==8.0.1 ghc ==8.2.1 ghc ==8.4.2 ghc ==8.6.3
 synopsis: A command line program for managing the bounds/versions of the dependencies in a cabal file.
 description:
     A command line program for managing the bounds/versions of the dependencies in a cabal file.
