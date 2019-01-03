@@ -1,6 +1,6 @@
-2.1.1
------
-* Fix cabal package description for Installation
+2.1.1, 2.1.2
+------------
+* Fix cabal package description
 
 2.1.0
 -----
