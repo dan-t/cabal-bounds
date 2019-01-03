@@ -21,7 +21,7 @@ data LibsSource = SetupConfig | PlanFile
 
 main :: IO ()
 main = do
-   buildSource SetupConfig
+--   buildSource SetupConfig
    T.defaultMain tests
 
 
@@ -62,7 +62,7 @@ buildSource source = do
 
 tests :: T.TestTree
 tests = T.testGroup "Tests" [ T.testGroup "Sourceless Tests" [dropTests, dumpTests, formatTests]
-                            , T.testGroup "SetupConfig Tests" [updateTests SetupConfig, libsTests SetupConfig]
+--                            , T.testGroup "SetupConfig Tests" [updateTests SetupConfig, libsTests SetupConfig]
                             , T.testGroup "PlanFile Tests" [updateTests PlanFile, libsTests PlanFile]
                             ]
 
