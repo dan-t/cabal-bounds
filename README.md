@@ -164,6 +164,8 @@ Please consult `cabal-bounds --help` for a complete list of options.
 Installation
 ============
 
+If you're using the cabal new style commands (e.g. cabal new-build), then you can skip the Installation section.
+
 You have to ensure, that the `Cabal` library of `cabal-bounds` matches the one used by the `cabal` binary:
 
     $> cabal --version
