@@ -168,14 +168,14 @@ libraries "" "" _ (Just planFile) _ = do
    librariesFromPlanFile planFile
 
 libraries "" "" Nothing Nothing cabalFile = do
-   distDir <- liftIO $ CL.findDistDir cabalFile
-   case distDir of
-        Just distDir -> librariesFromSetupConfig $ distDir </> "setup-config"
-        Nothing      -> do
-           newDistDir <- liftIO $ CL.findNewDistDir cabalFile
-           case newDistDir of
-                Just newDistDir -> librariesFromPlanFile $ newDistDir </> "cache" </> "plan.json"
-                Nothing         -> throwE "Couldn't find 'dist' nor 'dist-newstyle' directory! Have you already build the cabal project?"
+   newDistDir <- liftIO $ CL.findNewDistDir cabalFile
+   case newDistDir of
+        Just newDistDir -> librariesFromPlanFile $ newDistDir </> "cache" </> "plan.json"
+        Nothing         -> do
+           distDir <- liftIO $ CL.findDistDir cabalFile
+           case distDir of
+                Just distDir -> librariesFromSetupConfig $ distDir </> "setup-config"
+                Nothing      -> throwE "Couldn't find 'dist-newstyle' nor 'dist' directory! Have you already build the cabal project?"
 
 libraries hpVersion libFile _ _ _ = do
    hpLibs       <- haskellPlatformLibraries hpVersion

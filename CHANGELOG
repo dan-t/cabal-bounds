@@ -1,3 +1,7 @@
+2.2.1
+-----
+* First consider the cabal new style directory 'dist-newstyle' and then the old one 'dist'
+
 2.2.0
 ------------
 * Support Cabal 2.4 and ghc 8.6
