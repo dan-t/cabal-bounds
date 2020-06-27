@@ -161,21 +161,6 @@ e.g. `--executable=exe1 --executable=exe2` or `--ignore=base --ignore=whatever`
 
 Please consult `cabal-bounds --help` for a complete list of options.
 
-Installation
-============
-
-If you're using the cabal new style commands (e.g. cabal new-build), then you can skip the Installation section.
-
-You have to ensure, that the `Cabal` library of `cabal-bounds` matches the one used by the `cabal` binary:
-
-    $> cabal --version
-    cabal-install version 1.18.0.2
-    using version 1.18.1 of the Cabal library 
-
-    $> cabal install --constraint="Cabal == 1.18.1" cabal-bounds
-
-If you update the `cabal` binary and the used `Cabal` library changes, then you have to rebuild `cabal-bounds`.
-
 Issues
 ======
 
