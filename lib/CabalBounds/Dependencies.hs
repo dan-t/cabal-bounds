@@ -40,10 +40,10 @@ filterDependency AllDependencies =
    filtered (const True)
 
 filterDependency (OnlyDependencies deps) =
-   filtered (\(Dependency pkg _) -> (unPackageName pkg) `elem` deps)
+   filtered (\(Dependency pkg _ _) -> (unPackageName pkg) `elem` deps)
 
 filterDependency (IgnoreDependencies deps) =
-   filtered (\(Dependency pkg _) -> (unPackageName pkg) `notElem` deps)
+   filtered (\(Dependency pkg _ _) -> (unPackageName pkg) `notElem` deps)
 
 
 -- | A traversal for all 'Dependency' of all 'Section'.
