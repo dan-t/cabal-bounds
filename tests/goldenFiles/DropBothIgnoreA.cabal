@@ -1,4 +1,4 @@
-cabal-version: >=1.9.2
+cabal-version: >=1.10
 name:          setup-config
 version:       0.1
 license:       UnspecifiedLicense
@@ -18,9 +18,9 @@ library
     build-depends:
         base >=3,
         A >=0.1 && <0.2,
-        B -any,
-        C -any,
-        D -any
+        B,
+        C,
+        D
 
 executable cabal-bounds
     main-is:        ExeMain1.hs
@@ -37,9 +37,9 @@ executable cabal-bounds
     build-depends:
         base >=3,
         A >=0.1 && <0.2,
-        B -any,
-        C -any,
-        D -any
+        B,
+        C,
+        D
 
 executable other-exe
     main-is:        ExeMain2.hs
@@ -56,9 +56,9 @@ executable other-exe
     build-depends:
         base >=3,
         A >=0.1 && <0.2,
-        B -any,
-        C -any,
-        D -any
+        B,
+        C,
+        D
 
 test-suite some-test
     type:           exitcode-stdio-1.0
@@ -75,9 +75,9 @@ test-suite some-test
     build-depends:
         base >=3,
         A >=0.1 && <0.2,
-        B -any,
-        C -any,
-        D -any
+        B,
+        C,
+        D
 
 test-suite other-test
     type:           exitcode-stdio-1.0
@@ -94,6 +94,6 @@ test-suite other-test
     build-depends:
         base >=3,
         A >=0.1 && <0.2,
-        B -any,
-        C -any,
-        D -any
+        B,
+        C,
+        D

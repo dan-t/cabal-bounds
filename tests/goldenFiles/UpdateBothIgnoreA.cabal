@@ -1,4 +1,4 @@
-cabal-version: >=1.9.2
+cabal-version: >=1.10
 name:          setup-config
 version:       0.1
 license:       UnspecifiedLicense

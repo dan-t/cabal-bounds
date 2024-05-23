@@ -1,4 +1,4 @@
-cabal-version: >=1.9.2
+cabal-version: >=1.10
 name:          setup-config
 version:       0.1
 license:       UnspecifiedLicense
@@ -19,7 +19,7 @@ library
         base >=3,
         A >=0.1 && <0.4,
         B >=0.2 && <0.4,
-        C ==0.3.*,
+        C >=0.3 && <0.4,
         D >=0.7 && <0.9
 
 executable cabal-bounds
@@ -38,7 +38,7 @@ executable cabal-bounds
         base >=3,
         A >=0.1 && <0.4,
         B >=0.2 && <0.4,
-        C ==0.3.*,
+        C >=0.3 && <0.4,
         D <0.9
 
 executable other-exe
@@ -57,7 +57,7 @@ executable other-exe
         base >=3,
         A >=0.1 && <0.4,
         B >=0.2 && <0.4,
-        C ==0.3.*,
+        C >=0.3 && <0.4,
         D <0.9
 
 test-suite some-test
@@ -76,7 +76,7 @@ test-suite some-test
         base >=3,
         A >=0.1 && <0.4,
         B >=0.2 && <0.4,
-        C ==0.3.*,
+        C >=0.3 && <0.4,
         D <0.9
 
 test-suite other-test
@@ -95,5 +95,5 @@ test-suite other-test
         base >=3,
         A >=0.1 && <0.4,
         B >=0.2 && <0.4,
-        C ==0.3.*,
+        C >=0.3 && <0.4,
         D <1.0

@@ -1,4 +1,4 @@
-cabal-version: >=1.9.2
+cabal-version: >=1.10
 name:          setup-config
 version:       0.1
 license:       UnspecifiedLicense
@@ -17,8 +17,8 @@ library
     other-modules:   Paths_setup_config
     build-depends:
         base >=3,
-        A ==0.1.*,
-        B ==0.2.*,
+        A >=0.1 && <0.2,
+        B >=0.2 && <0.3,
         C >=0.2 && <0.4,
         D >=0.7
 
@@ -36,10 +36,10 @@ executable cabal-bounds
     ghc-options:    -W
     build-depends:
         base >=3,
-        A ==0.1.*,
-        B ==0.2.*,
+        A >=0.1 && <0.2,
+        B >=0.2 && <0.3,
         C >=0.2 && <0.4,
-        D ==0.8.*
+        D >=0.8 && <0.9
 
 executable other-exe
     main-is:        ExeMain2.hs
@@ -55,8 +55,8 @@ executable other-exe
     ghc-options:    -W
     build-depends:
         base >=3,
-        A ==0.1.*,
-        B ==0.2.*,
+        A >=0.1 && <0.2,
+        B >=0.2 && <0.3,
         C >=0.2 && <0.4,
         D >=0.8
 
@@ -74,8 +74,8 @@ test-suite some-test
     ghc-options:    -W
     build-depends:
         base >=3,
-        A ==0.1.*,
-        B ==0.2.*,
+        A >=0.1 && <0.2,
+        B >=0.2 && <0.3,
         C >=0.2 && <0.4,
         D >=0.8
 
@@ -93,7 +93,7 @@ test-suite other-test
     ghc-options:    -W
     build-depends:
         base >=3,
-        A ==0.1.*,
-        B ==0.2.*,
+        A >=0.1 && <0.2,
+        B >=0.2 && <0.3,
         C >=0.2 && <0.4,
         D >=0.8 && <1.0

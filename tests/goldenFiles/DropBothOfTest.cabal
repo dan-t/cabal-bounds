@@ -1,4 +1,4 @@
-cabal-version: >=1.9.2
+cabal-version: >=1.10
 name:          setup-config
 version:       0.1
 license:       UnspecifiedLicense
@@ -58,7 +58,7 @@ executable other-exe
         A >=0.1 && <0.2,
         B >=0.2 && <0.3,
         C >=0.3 && <0.4,
-        D -any
+        D
 
 test-suite some-test
     type:           exitcode-stdio-1.0
@@ -74,10 +74,10 @@ test-suite some-test
     ghc-options:    -W
     build-depends:
         base >=3,
-        A -any,
-        B -any,
-        C -any,
-        D -any
+        A,
+        B,
+        C,
+        D
 
 test-suite other-test
     type:           exitcode-stdio-1.0
