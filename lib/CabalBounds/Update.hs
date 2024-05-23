@@ -7,6 +7,7 @@ module CabalBounds.Update
 import qualified Distribution.PackageDescription as D
 import qualified Distribution.Package as P
 import qualified Distribution.Version as V
+import qualified Distribution.Types.VersionInterval as VI
 import Control.Lens
 import CabalBounds.Bound (UpdateBound(..))
 import CabalBounds.Dependencies (Dependencies(..), filterDependency, dependencyIf)
@@ -43,7 +44,7 @@ updateDependency (UpdateLower comp ifMissing) libs dep =
             lowerVersion <- HM.lookup pkgName_ libs
             let newLowerVersion = comp `compOf` lowerVersion
                 newLowerBound   = V.LowerBound newLowerVersion V.InclusiveBound
-                newIntervals    = (versionRange_ ^. CL.intervals) & _head . CL.lowerBound %~ updateIf (>) newLowerBound
+                newIntervals    = (versionRange_ ^. CL.intervals) & _head . CL.lowerBound %~ updateIfLower newLowerBound
                 vrange          = mkVersionRange newIntervals
             return $ dep & CL.versionRange .~ vrange
    where
@@ -51,14 +52,16 @@ updateDependency (UpdateLower comp ifMissing) libs dep =
       versionRange_ = dep ^. CL.versionRange
       lowerBound_   = fromMaybe CL.noLowerBound $ versionRange_ ^? CL.intervals . _head . CL.lowerBound
 
-      updateIf f newBound oldBound
+      updateIfLower newBound oldBound
          | oldBound /= CL.noLowerBound
-         = if f oldBound newBound
+         = if (version newBound) < (version oldBound)
               then newBound
               else oldBound
 
          | otherwise
          = newBound
+         where
+            version (V.LowerBound vers _) = vers
 
 
 updateDependency (UpdateUpper comp ifMissing) libs dep =
@@ -69,7 +72,7 @@ updateDependency (UpdateUpper comp ifMissing) libs dep =
             upperVersion <- HM.lookup pkgName_ libs
             let newUpperVersion = nextVersion comp upperVersion
                 newUpperBound   = V.UpperBound newUpperVersion V.ExclusiveBound
-                newIntervals    = (versionRange_ ^. CL.intervals) & _last . CL.upperBound %~ updateIf (<) newUpperBound
+                newIntervals    = (versionRange_ ^. CL.intervals) & _last . CL.upperBound %~ updateIfGreater newUpperBound
                 vrange          = mkVersionRange newIntervals
             return $ dep & CL.versionRange .~ vrange
    where
@@ -77,14 +80,16 @@ updateDependency (UpdateUpper comp ifMissing) libs dep =
       pkgName_      = dep ^. CL.packageName . _Wrapped
       upperBound_   = fromMaybe V.NoUpperBound $ versionRange_ ^? CL.intervals . _last . CL.upperBound
 
-      updateIf f newBound oldBound
+      updateIfGreater newBound oldBound
          | oldBound /= V.NoUpperBound
-         = if f oldBound newBound
+         = if (version newBound) > (version oldBound)
               then newBound
               else oldBound
 
          | otherwise
          = newBound
+         where
+            version (V.UpperBound vers _) = vers
 
 
 updateDependency (UpdateBoth lowerComp upperComp ifMissing) libs dep =
@@ -125,4 +130,4 @@ ensureMinimalVersionBranch comp branch =
 
 mkVersionRange :: [V.VersionInterval] -> V.VersionRange
 mkVersionRange []  = V.anyVersion
-mkVersionRange vis = V.fromVersionIntervals . V.mkVersionIntervals $ vis
+mkVersionRange vis = fromMaybe V.noVersion (V.fromVersionIntervals <$> VI.mkVersionIntervals vis)
