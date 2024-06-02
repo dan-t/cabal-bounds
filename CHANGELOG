@@ -1,3 +1,7 @@
+2.5.0
+-----
+* Support ghc 9.8.2
+
 2.4.0
 -----
 * Support Cabal 3.12

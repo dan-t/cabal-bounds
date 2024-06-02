@@ -31,19 +31,14 @@ versions of the dependencies.
 
 `cabal-bounds` tries to automate this update process to some degree. So a typical update process might look like:
 
-    # update the version infos of all libraries
+    # update the version infos of all packages
     $> cabal update
-
-    # create a cabal sandbox for building your project, this ensures that you're really using
-    # the newest available versions of the dependencies, otherwise you would be constraint
-    # to the already installed versions
-    $> cabal sandbox init
       
-    # build your project and allow newer library versions used as specified by the cabal file.
-    $> cabal install --allow-newer
+    # build the project and allow newer versions of the dependencies as specified in the cabal file
+    $> cabal build --allow-newer='THE_PROJECT_NAME:*'
 
-    # update the upper bound of all dependencies of the cabal file in the working directory
-    # if their upper bound is lower then the version used by the build
+    # update the upper bound of all dependencies in the cabal file, if their upper bound is lower
+    # than the version used by the build
     $> cabal-bounds update --upper
 
 If you're leaving out the `--upper` flag then `update` will widen the bounds on both directions.
