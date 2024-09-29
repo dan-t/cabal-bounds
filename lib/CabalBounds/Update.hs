@@ -81,15 +81,14 @@ updateDependency (UpdateUpper comp ifMissing) libs dep =
       upperBound_   = fromMaybe V.NoUpperBound $ versionRange_ ^? CL.intervals . _last . CL.upperBound
 
       updateIfGreater newBound oldBound
-         | oldBound /= V.NoUpperBound
-         = if (version newBound) > (version oldBound)
+         | V.UpperBound newVers _ <- newBound
+         , V.UpperBound oldVers _ <- oldBound
+         = if newVers > oldVers
               then newBound
               else oldBound
 
          | otherwise
          = newBound
-         where
-            version (V.UpperBound vers _) = vers
 
 
 updateDependency (UpdateBoth lowerComp upperComp ifMissing) libs dep =
