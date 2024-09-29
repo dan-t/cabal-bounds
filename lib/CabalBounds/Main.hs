@@ -10,6 +10,7 @@ import Distribution.Parsec.Warning (PWarning)
 import qualified Distribution.PackageDescription.PrettyPrint as PP
 import Distribution.Simple.Configure (tryGetConfigStateFile)
 import Distribution.Simple.LocalBuildInfo (LocalBuildInfo)
+import Distribution.Utils.Path (makeSymbolicPath)
 import qualified Distribution.Simple.LocalBuildInfo as BI
 import qualified Distribution.Package as P
 import qualified Distribution.Simple.PackageIndex as PX
@@ -210,7 +211,7 @@ haskellPlatformLibraries hpVersion =
 librariesFromSetupConfig :: SetupConfigFile -> ExceptT Error IO LibraryMap
 librariesFromSetupConfig ""       = return HM.empty
 librariesFromSetupConfig confFile = do
-   binfo <- liftIO $ tryGetConfigStateFile confFile
+   binfo <- liftIO $ tryGetConfigStateFile Nothing (makeSymbolicPath confFile)
    case binfo of
         Left e   -> throwE $ show e
         Right bi -> return $ buildInfoLibs bi
