@@ -14,7 +14,6 @@ import CabalBounds.Dependencies (Dependencies(..), filterDependency, dependencyI
 import CabalBounds.VersionComp (VersionComp(..))
 import CabalBounds.Types
 import qualified CabalLenses as CL
-import Data.List (foldl')
 import qualified Data.HashMap.Strict as HM
 import Data.Maybe (fromMaybe)
 

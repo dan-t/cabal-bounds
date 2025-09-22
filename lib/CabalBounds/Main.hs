@@ -33,7 +33,7 @@ import Control.Monad.Trans.Except (ExceptT, throwE, runExceptT)
 import Control.Monad.IO.Class
 import Control.Lens
 import qualified Data.HashMap.Strict as HM
-import Data.List (foldl', sortBy)
+import Data.List (sortBy)
 import Data.Function (on)
 import Data.Char (toLower)
 import Data.Maybe (fromMaybe, catMaybes)

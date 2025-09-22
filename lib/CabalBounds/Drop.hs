@@ -9,7 +9,6 @@ import Control.Lens
 import CabalBounds.Bound (DropBound(..))
 import CabalBounds.Dependencies (Dependencies, filterDependency, dependencyIf)
 import qualified CabalLenses as CL
-import Data.List (foldl')
 import Distribution.PackageDescription (GenericPackageDescription)
 import Distribution.Package (Dependency(..))
 import Distribution.Version (UpperBound(..), anyVersion)

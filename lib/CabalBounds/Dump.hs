@@ -5,7 +5,6 @@ module CabalBounds.Dump
 
 import Distribution.PackageDescription (GenericPackageDescription)
 import qualified Data.HashMap.Strict as HM
-import Data.List (foldl')
 import Data.Maybe (fromMaybe)
 import qualified CabalLenses as CL
 import CabalBounds.Dependencies (Dependencies(..), allDependency, filterDependency)
